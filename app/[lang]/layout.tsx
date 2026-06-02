@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "ClearCut Studio - Elimina Fondos de Imágenes con IA",
   description: "Elimina el fondo de tus imágenes automáticamente con inteligencia artificial y optimiza su tamaño. Totalmente local y privado.",
   keywords: "eliminar fondo, remover fondo, fondo transparente, background remover, background eraser, background editor, inteligencia artificial, IA, AI, edición de imágenes, image editing, optimizador, image optimizer",
-  metadataBase: new URL("https://clearcut.studio"),
+  metadataBase: new URL("https://studio.fabianh.me"),
   alternates: {
     canonical: "/",
     languages: {
@@ -44,14 +44,23 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "ClearCut Studio",
+    title: "ClearCut Studio - Elimina Fondos de Imágenes con IA",
     description: "Elimina el fondo de tus imágenes automáticamente con inteligencia artificial y optimiza su tamaño. Totalmente local y privado.",
-    url: "https://clearcut.studio",
+    url: "https://studio.fabianh.me",
+    images: [
+      {
+        url: "https://res.cloudinary.com/dvjzjasfg/image/upload/v1780438455/CleanCut-OpenGraph_oabyky.png",
+        width: 1280,
+        height: 720,
+        alt: "ClearCut Studio - Elimina Fondos de Imágenes con IA",
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClearCut Studio",
+    title: "ClearCut Studio - Elimina Fondos de Imágenes con IA",
     description: "Elimina el fondo de tus imágenes automáticamente con inteligencia artificial y optimiza su tamaño. Totalmente local y privado.",
+    images: ["https://res.cloudinary.com/dvjzjasfg/image/upload/v1780438455/CleanCut-OpenGraph_oabyky.png"],
   },
 };
 
