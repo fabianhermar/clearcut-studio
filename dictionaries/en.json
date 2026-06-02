@@ -1,0 +1,167 @@
+{
+  "common": {
+    "comingSoon": "Soon",
+    "poweredByAi": "Powered by AI"
+  },
+  "header": {
+    "features": "Features",
+    "howItWorks": "How it works",
+    "about": "About us",
+    "optimizerBtn": "Optimizer",
+    "startBtn": "Start for free"
+  },
+  "hero": {
+    "aiBadge": "Powered by Artificial Intelligence",
+    "title": "Edit images ",
+    "titleGradient": "with AI",
+    "description": "Remove backgrounds with AI and optimize your image file sizes. Edit, crop, and export in multiple formats — all for free in your browser.",
+    "bgRemoverBtn": "Remove background",
+    "optimizerBtn": "Optimize image",
+    "optimizerDesc": "WebP · AVIF · JPEG",
+    "demoBtn": "Demo",
+    "badges": {
+      "quality": "High quality",
+      "formats": "PNG, WebP, AVIF",
+      "editor": "Full editor",
+      "private": "100% private"
+    },
+    "comparison": {
+      "original": "Original",
+      "processed": "Background removed",
+      "badgeProcessed": "Background removed",
+      "badgeOriginal": "Original quality",
+      "disclaimer": "* ClearCut Studio uses AI to remove backgrounds and may make mistakes."
+    }
+  },
+  "features": {
+    "bgRemover": {
+      "title": "Magical background removal",
+      "desc": "Our AI analyzes your image and cuts out the main subject with pinpoint accuracy in seconds, without uploading anything to the cloud.",
+      "list": [
+        "100% local and private processing",
+        "Accurate results on complex hair and edges",
+        "Integrated editor to perfect the cutout"
+      ]
+    },
+    "optimizer": {
+      "title": "Expert-level compression",
+      "desc": "Reduce your image sizes by up to 90% without visible quality loss using native Squoosh encoders.",
+      "list": [
+        "Support for modern formats (AVIF, WebP)",
+        "Full control over quality and compression",
+        "Real-time before and after comparison"
+      ]
+    },
+    "editor": {
+      "title": "Flexible editing and export",
+      "desc": "Adjust, crop, and put the finishing touches on your images before exporting them in the exact format and quality you need.",
+      "list": [
+        "Brightness, contrast, saturation, and temp adjustments",
+        "Free or predefined aspect ratio cropping",
+        "Export directly to PNG, WebP, or AVIF"
+      ]
+    }
+  },
+  "howItWorks": {
+    "title": "How the system works",
+    "subtitle": "The magic happens on your device",
+    "desc": "ClearCut uses WebAssembly and browser-optimized AI models. This means all the heavy processing happens on your own computer, not on our servers.",
+    "steps": [
+      {
+        "title": "1. Select or drag",
+        "desc": "Upload your image. We support the most popular formats (JPG, PNG, WebP)."
+      },
+      {
+        "title": "2. Local processing",
+        "desc": "The AI and WASM engine analyze and edit your image directly in the browser."
+      },
+      {
+        "title": "3. Tweak and download",
+        "desc": "Adjust the final details in the editor and download your final result."
+      }
+    ]
+  },
+  "optimizerInfo": {
+    "title": "Advanced image",
+    "titleGradient": "optimization",
+    "subtitle": "ClearCut Optimizer",
+    "desc": "We use the same WebAssembly (WASM) technology that powers top professional tools to encode your images directly in the browser. Drastically reduce your file sizes to improve your website's performance without compromising visual quality.",
+    "badges": {
+      "avif": "AVIF Encoder (libavif)",
+      "webp": "WebP Encoder (libwebp)",
+      "jpeg": "MozJPEG (High quality)"
+    },
+    "features": [
+      {
+        "title": "Fully Local",
+        "desc": "Compression is performed on your own device using a dedicated Web Worker. Zero cloud uploads, total privacy, and instant results."
+      },
+      {
+        "title": "Visual Control",
+        "desc": "Compare the original result with the optimized one using our real-time slider. See exactly how compression affects the finest details."
+      },
+      {
+        "title": "Versatile Export",
+        "desc": "Convert heavy PNGs to next-generation modern formats like AVIF and WebP to achieve maximum bandwidth savings."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to enhance your images?",
+    "desc": "Join thousands of creators who are already saving time and improving their workflow with ClearCut Studio. Completely free, fast, and secure.",
+    "bgRemoverBtn": "Remove Background",
+    "optimizerBtn": "Optimize Image"
+  },
+  "footer": {
+    "desc": "ClearCut Studio is a free and private suite for image editing and optimization. All processing is done locally in your browser.",
+    "products": "Products",
+    "productsBg": "Background Remover",
+    "productsOpt": "Image Optimizer",
+    "productsCrop": "Crop & Upscale",
+    "company": "Company",
+    "companyAbout": "About us",
+    "companyBrand": "The Project & Brand",
+    "companySupport": "Support & Contact",
+    "legal": "Legal",
+    "legalPrivacy": "Privacy Policy",
+    "legalTerms": "Terms & Conditions",
+    "rights": "ClearCut Studio. All rights reserved.",
+    "madeBy": "Designed and developed with ♥ by",
+    "withHelp": ", with the help of"
+  },
+  "tools": {
+    "upload": {
+      "title": "Upload an image to start",
+      "subtitle": "Drag and drop your file here, or click to browse",
+      "desc": "Supported formats: JPG, PNG, WebP. 100% private processing in your browser.",
+      "processing": "Processing image...",
+      "processingDesc": "Running AI locally. This might take a few seconds the first time."
+    },
+    "optimizerWorkspace": {
+      "title": "Image Optimizer",
+      "anotherImage": "Another image",
+      "download": "Download",
+      "downloadMobile": "Download optimized image",
+      "format": "Format",
+      "quality": "Quality",
+      "qualityMaxComp": "Max compression",
+      "qualityMaxQual": "Max quality",
+      "presets": {
+        "low": "Low",
+        "med": "Medium",
+        "high": "High"
+      },
+      "stats": {
+        "original": "Original",
+        "optimized": "Optimized",
+        "saved": "Saved",
+        "dimensions": "Dimensions"
+      },
+      "wasmBadge": "WASM Encoder — just like Squoosh. 100% local, no servers.",
+      "pngNotice": "PNG is lossless. To reduce size, try WebP or AVIF.",
+      "largerNotice": "The result is larger than the original. Lower the quality for more compression.",
+      "loading": "Loading image...",
+      "disclaimer": "* ClearCut Studio uses AI to remove backgrounds and may make mistakes."
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "common": {
+    "comingSoon": "Pronto",
+    "poweredByAi": "Powered by IA"
+  },
+  "header": {
+    "features": "Características",
+    "howItWorks": "Cómo funciona",
+    "about": "Sobre nosotros",
+    "optimizerBtn": "Optimizador",
+    "startBtn": "Comenzar gratis"
+  },
+  "hero": {
+    "aiBadge": "Potenciado por Inteligencia Artificial",
+    "title": "Edita imágenes ",
+    "titleGradient": "con IA",
+    "description": "Elimina fondos con inteligencia artificial y optimiza el peso de tus imágenes. Edita, recorta y exporta en múltiples formatos — todo gratis y en tu navegador.",
+    "bgRemoverBtn": "Eliminar fondo",
+    "optimizerBtn": "Optimizar imagen",
+    "optimizerDesc": "WebP · AVIF · JPEG",
+    "demoBtn": "Demo",
+    "badges": {
+      "quality": "Alta calidad",
+      "formats": "PNG, WebP, AVIF",
+      "editor": "Editor completo",
+      "private": "100% privado"
+    },
+    "comparison": {
+      "original": "Original",
+      "processed": "Sin fondo",
+      "badgeProcessed": "Fondo eliminado",
+      "badgeOriginal": "Calidad original",
+      "disclaimer": "* ClearCut Studio utiliza IA para eliminar fondos y puede cometer errores."
+    }
+  },
+  "features": {
+    "bgRemover": {
+      "title": "Eliminación de fondos mágica",
+      "desc": "Nuestra IA analiza tu imagen y recorta el sujeto principal con precisión milimétrica en segundos, sin subir nada a la nube.",
+      "list": [
+        "Procesamiento 100% local y privado",
+        "Resultados precisos en cabellos y bordes complejos",
+        "Editor integrado para perfeccionar el recorte"
+      ]
+    },
+    "optimizer": {
+      "title": "Compresión nivel experto",
+      "desc": "Reduce el peso de tus imágenes hasta en un 90% sin perder calidad visible utilizando codificadores nativos de Squoosh.",
+      "list": [
+        "Soporte para formatos modernos (AVIF, WebP)",
+        "Control total sobre la calidad y compresión",
+        "Comparación en tiempo real del antes y después"
+      ]
+    },
+    "editor": {
+      "title": "Edición y exportación flexible",
+      "desc": "Ajusta, recorta y dale el toque final a tus imágenes antes de exportarlas en el formato y calidad exactos que necesitas.",
+      "list": [
+        "Ajustes de brillo, contraste, saturación y temperatura",
+        "Recorte de proporciones libres o predefinidas",
+        "Exporta directamente a PNG, WebP o AVIF"
+      ]
+    }
+  },
+  "howItWorks": {
+    "title": "Cómo funciona el sistema",
+    "subtitle": "La magia ocurre en tu dispositivo",
+    "desc": "ClearCut utiliza WebAssembly y modelos de IA optimizados para el navegador. Esto significa que todo el procesamiento pesado ocurre en tu propia computadora, no en nuestros servidores.",
+    "steps": [
+      {
+        "title": "1. Selecciona o arrastra",
+        "desc": "Carga tu imagen. Soporta los formatos más populares (JPG, PNG, WebP)."
+      },
+      {
+        "title": "2. Procesamiento local",
+        "desc": "La IA y el motor WASM analizan y editan tu imagen directamente en el navegador."
+      },
+      {
+        "title": "3. Afina y descarga",
+        "desc": "Ajusta los últimos detalles en el editor y descarga tu resultado final."
+      }
+    ]
+  },
+  "optimizerInfo": {
+    "title": "Optimización avanzada de",
+    "titleGradient": "imágenes",
+    "subtitle": "ClearCut Optimizer",
+    "desc": "Usamos la misma tecnología WebAssembly (WASM) que impulsa a las mejores herramientas profesionales para codificar tus imágenes directamente en el navegador. Reduce drásticamente el peso de tus archivos para mejorar el rendimiento de tu web sin comprometer la calidad visual.",
+    "badges": {
+      "avif": "Codificador AVIF (libavif)",
+      "webp": "Codificador WebP (libwebp)",
+      "jpeg": "MozJPEG (Alta calidad)"
+    },
+    "features": [
+      {
+        "title": "Totalmente Local",
+        "desc": "La compresión se realiza en tu propio dispositivo utilizando un Web Worker dedicado. Cero subidas a la nube, privacidad total y resultados instantáneos."
+      },
+      {
+        "title": "Control Visual",
+        "desc": "Compara el resultado original con el optimizado usando nuestro slider en tiempo real. Ve exactamente cómo afecta la compresión a los detalles más finos."
+      },
+      {
+        "title": "Exportación Versátil",
+        "desc": "Convierte PNGs pesados a formatos modernos de próxima generación como AVIF y WebP para lograr el máximo ahorro de ancho de banda."
+      }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para mejorar tus imágenes?",
+    "desc": "Únete a miles de creadores que ya están ahorrando tiempo y mejorando su flujo de trabajo con ClearCut Studio. Totalmente gratis, rápido y seguro.",
+    "bgRemoverBtn": "Eliminar Fondos",
+    "optimizerBtn": "Optimizar Imagen"
+  },
+  "footer": {
+    "desc": "ClearCut Studio es una suite gratuita y privada para edición y optimización de imágenes. Todo el procesamiento se realiza localmente en tu navegador.",
+    "products": "Productos",
+    "productsBg": "Eliminar Fondo",
+    "productsOpt": "Optimizar Imagen",
+    "productsCrop": "Recortar & Escalar",
+    "company": "Compañía",
+    "companyAbout": "Sobre nosotros",
+    "companyBrand": "El Proyecto & Marca",
+    "companySupport": "Soporte y Contacto",
+    "legal": "Legal",
+    "legalPrivacy": "Política de Privacidad",
+    "legalTerms": "Términos y Condiciones",
+    "rights": "ClearCut Studio. Todos los derechos reservados.",
+    "madeBy": "Diseñado y desarrollado con ♥ por",
+    "withHelp": ", junto a la ayuda de"
+  },
+  "tools": {
+    "upload": {
+      "title": "Sube una imagen para comenzar",
+      "subtitle": "Arrastra y suelta tu archivo aquí, o haz clic para explorar",
+      "desc": "Formatos soportados: JPG, PNG, WebP. Procesamiento 100% privado en tu navegador.",
+      "processing": "Procesando imagen...",
+      "processingDesc": "Ejecutando IA localmente. Esto puede tardar unos segundos la primera vez."
+    },
+    "optimizerWorkspace": {
+      "title": "Optimizador de Imágenes",
+      "anotherImage": "Otra imagen",
+      "download": "Descargar",
+      "downloadMobile": "Descargar imagen optimizada",
+      "format": "Formato",
+      "quality": "Calidad",
+      "qualityMaxComp": "Máx compresión",
+      "qualityMaxQual": "Máx calidad",
+      "presets": {
+        "low": "Baja",
+        "med": "Media",
+        "high": "Alta"
+      },
+      "stats": {
+        "original": "Original",
+        "optimized": "Optimizado",
+        "saved": "Ahorro",
+        "dimensions": "Dimensiones"
+      },
+      "wasmBadge": "Encoder WASM — igual que Squoosh. 100% local, sin servidores.",
+      "pngNotice": "PNG es sin pérdida. Para reducir tamaño, prueba WebP o AVIF.",
+      "largerNotice": "El resultado supera el original. Baja la calidad para comprimir más.",
+      "loading": "Cargando imagen...",
+      "disclaimer": "* ClearCut Studio utiliza IA para eliminar fondos y puede cometer errores."
+    }
+  }
+}
