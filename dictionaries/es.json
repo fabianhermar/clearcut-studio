@@ -45,7 +45,7 @@
     },
     "optimizer": {
       "title": "Compresión nivel experto",
-      "desc": "Reduce el peso de tus imágenes hasta en un 90% sin perder calidad visible utilizando codificadores nativos de Squoosh.",
+      "desc": "Reduce el peso de tus imágenes hasta en un 90% sin perder calidad visible utilizando codificadores WASM nativos.",
       "list": [
         "Soporte para formatos modernos (AVIF, WebP)",
         "Control total sobre la calidad y compresión",
@@ -157,7 +157,7 @@
         "saved": "Ahorro",
         "dimensions": "Dimensiones"
       },
-      "wasmBadge": "Encoder WASM — igual que Squoosh. 100% local, sin servidores.",
+      "wasmBadge": "Encoder WASM. 100% local, sin servidores.",
       "pngNotice": "PNG es sin pérdida. Para reducir tamaño, prueba WebP o AVIF.",
       "largerNotice": "El resultado supera el original. Baja la calidad para comprimir más.",
       "loading": "Cargando imagen...",

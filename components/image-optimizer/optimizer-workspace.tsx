@@ -265,7 +265,7 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
                 <strong>
                   {format === "avif" ? "libavif" : format === "webp" ? "libwebp" : "MozJPEG"}
                 </strong>
-                {" "}· Encoder WASM — igual que Squoosh. 100% local, sin servidores.
+                {" "}· Encoder WASM. 100% local, sin servidores.
               </span>
             </div>
           )}
