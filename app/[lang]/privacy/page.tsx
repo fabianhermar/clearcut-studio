@@ -28,7 +28,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
           {isEs ? "Última actualización: Junio de 2026" : "Last updated: June 2026"}
         </p>
         
-        <div className="prose prose-invert prose-lg font-accent text-muted-foreground">
+        <div className="prose dark:prose-invert prose-slate prose-lg max-w-none font-accent text-muted-foreground prose-headings:text-foreground prose-strong:text-foreground">
           {isEs ? (
             <>
               <p>
@@ -52,6 +52,18 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
               <p>
                 Actualmente, ClearCut Studio no almacena cuentas de usuario ni requiere registro. 
                 No recopilamos información personal identificable.
+              </p>
+              <p className="mt-4">
+                <strong>Fines Estrictamente Profesionales:</strong> Utilizamos servicios de análisis web (específicamente Microsoft Clarity) con el único propósito de entender de forma anónima cómo interactúan los usuarios con nuestra página. Esto nos permite descubrir qué herramientas son más útiles, dónde se dificulta la navegación y cómo podemos mejorar la interfaz general. Estos datos de interacción son para uso interno exclusivo y no se venden ni se comparten con terceros para fines publicitarios.
+              </p>
+              <p className="mt-4">
+                <strong>¿Cómo funciona esto y por qué tu privacidad está a salvo?</strong> Microsoft Clarity no graba tu pantalla 
+                como un video, sino que registra coordenadas matemáticas (dónde se mueve el ratón o se hace clic) y la estructura 
+                de la interfaz. Por defecto, esta herramienta enmascara datos sensibles. Toda la información se recopila de 
+                manera disociada, no está vinculada a tu identidad y, lo más importante, <strong>jamás incluye, rastrea ni sube 
+                las imágenes que procesas</strong>. El procesamiento de tus fotos ocurre en un entorno aislado dentro de tu 
+                navegador (WebAssembly), totalmente fuera del alcance de cualquier herramienta de análisis. Tu privacidad visual 
+                está garantizada en todo momento.
               </p>
 
               <h2 className="text-foreground font-heading mt-10 mb-4">3. Cookies</h2>
@@ -91,6 +103,17 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
               <p>
                 Currently, ClearCut Studio does not store user accounts or require registration. 
                 We do not collect personally identifiable information.
+              </p>
+              <p className="mt-4">
+                <strong>Strictly Professional Purposes:</strong> We use web analytics services (specifically Microsoft Clarity) with the sole purpose of anonymously understanding how users interact with our page. This allows us to discover which tools are most useful, where navigation becomes difficult, and how we can improve the overall interface. This interaction data is for exclusive internal use and is not sold or shared with third parties for advertising purposes.
+              </p>
+              <p className="mt-4">
+                <strong>How does this work and why is your privacy safe?</strong> Microsoft Clarity does not record your screen 
+                as a video. Instead, it logs mathematical coordinates (where the mouse moves or clicks) and interface structure. 
+                By default, this tool masks sensitive data. All information is collected in a dissociated manner, is not 
+                linked to your identity, and most importantly, <strong>never includes, tracks, or uploads the images you 
+                process</strong>. Your photo processing occurs in an isolated environment within your browser (WebAssembly), 
+                completely out of reach of any analytics tools. Your visual privacy is guaranteed at all times.
               </p>
 
               <h2 className="text-foreground font-heading mt-10 mb-4">3. Cookies</h2>
