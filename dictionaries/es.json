@@ -7,6 +7,7 @@
     "features": "Características",
     "howItWorks": "Cómo funciona",
     "about": "Sobre nosotros",
+    "pricing": "Precios",
     "optimizerBtn": "Optimizador",
     "startBtn": "Comenzar gratis"
   },
@@ -111,6 +112,38 @@
     "desc": "Únete a miles de creadores que ya están ahorrando tiempo y mejorando su flujo de trabajo con ClearCut Studio. Totalmente gratis, rápido y seguro.",
     "bgRemoverBtn": "Eliminar Fondos",
     "optimizerBtn": "Optimizar Imagen"
+  },
+  "pricing": {
+    "title": "Precios Simples y Transparentes",
+    "subtitle": "ClearCut es gratis, pero puedes apoyarnos.",
+    "free": {
+      "title": "Gratis",
+      "desc": "Perfecto para probar nuestra plataforma y procesar imágenes ilimitadas.",
+      "price": "$0",
+      "period": "/para siempre",
+      "whatsIncluded": "¿Qué incluye?",
+      "features": [
+        "Eliminación de fondos ilimitada",
+        "Optimización de imágenes ilimitada",
+        "Procesamiento local 100% privado",
+        "Sin marcas de agua",
+        "Resultados de alta calidad"
+      ],
+      "btn": "Comenzar gratis"
+    },
+    "sponsor": {
+      "title": "Apoyar el Proyecto",
+      "desc": "Ayúdanos a mantener ClearCut Studio gratis y desarrollar nuevas herramientas.",
+      "whatsIncluded": "¿Por qué apoyar?",
+      "features": [
+        "Cubrir costos de dominio y hosting",
+        "Financiar nuevas herramientas",
+        "Mantener la app 100% gratuita",
+        "Sin anuncios ni rastreo de datos",
+        "Nuestra eterna gratitud 💙"
+      ],
+      "btn": "Patrocinarnos"
+    }
   },
   "footer": {
     "desc": "ClearCut Studio es una suite gratuita y privada para edición y optimización de imágenes. Todo el procesamiento se realiza localmente en tu navegador.",

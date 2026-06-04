@@ -85,6 +85,7 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang 
     features: "Features",
     howItWorks: "How it works",
     about: "About us",
+    pricing: "Pricing",
     optimizerBtn: "Optimizer",
     startBtn: "Start for free"
   };
@@ -205,6 +206,13 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang 
                   <NavigationMenuLink asChild className={cn(navigationMenuTriggerStyle(), "font-accent")}>
                     <Link href={`/${lang}/#how-it-works`}>
                       {t.howItWorks}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild className={cn(navigationMenuTriggerStyle(), "font-accent")}>
+                    <Link href={`/${lang}/pricing`}>
+                      {t.pricing}
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>

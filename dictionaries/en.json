@@ -7,6 +7,7 @@
     "features": "Features",
     "howItWorks": "How it works",
     "about": "About us",
+    "pricing": "Pricing",
     "optimizerBtn": "Optimizer",
     "startBtn": "Start for free"
   },
@@ -111,6 +112,38 @@
     "desc": "Join thousands of creators who are already saving time and improving their workflow with ClearCut Studio. Completely free, fast, and secure.",
     "bgRemoverBtn": "Remove Background",
     "optimizerBtn": "Optimize Image"
+  },
+  "pricing": {
+    "title": "Simple & Transparent Pricing",
+    "subtitle": "Choose the perfect plan that fits your needs",
+    "free": {
+      "title": "Free",
+      "desc": "Perfect for testing out our platform and processing unlimited images locally.",
+      "price": "$0",
+      "period": "/forever",
+      "whatsIncluded": "What's Included?",
+      "features": [
+        "Unlimited background removals",
+        "Unlimited image optimizations",
+        "100% private local processing",
+        "No watermarks on exports",
+        "High quality results"
+      ],
+      "btn": "Start for free"
+    },
+    "sponsor": {
+      "title": "Support the Project",
+      "desc": "Help us keep ClearCut Studio free and fund new feature development.",
+      "whatsIncluded": "Why Support?",
+      "features": [
+        "Cover domain and hosting costs",
+        "Fund new feature development",
+        "Keep the tool 100% free",
+        "No ads or data tracking",
+        "Our eternal gratitude 💙"
+      ],
+      "btn": "Sponsor us"
+    }
   },
   "footer": {
     "desc": "ClearCut Studio is a free and private suite for image editing and optimization. All processing is done locally in your browser.",
