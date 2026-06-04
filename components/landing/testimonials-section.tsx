@@ -57,7 +57,7 @@ export function TestimonialsSection({ dict }: TestimonialsSectionProps) {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {currentTestimonials.map((testimonial, i) => (
-            <div key={i} className="p-6 bg-card border border-border rounded-2xl shadow-sm hover:shadow-medium transition-shadow">
+            <div key={i} className="p-6 bg-card border border-border rounded-2xl shadow-sm hover:shadow-medium transition-shadow flex flex-col h-full">
               <div className="flex gap-1 text-primary mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -65,10 +65,10 @@ export function TestimonialsSection({ dict }: TestimonialsSectionProps) {
                   </svg>
                 ))}
               </div>
-              <p className="text-muted-foreground font-accent mb-6 leading-relaxed">
+              <p className="text-muted-foreground font-accent mb-6 leading-relaxed flex-1">
                 "{testimonial.text}"
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mt-auto">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary font-heading">
                   {testimonial.avatar}
                 </div>
