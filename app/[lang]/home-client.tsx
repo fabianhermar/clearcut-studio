@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BackgroundRemoverApp from "@/components/background-remover/background-remover-app";
 import ImageOptimizerApp from "@/components/image-optimizer/image-optimizer-app";
+import MockupGeneratorApp from "@/components/mockup-generator/mockup-generator-app";
 
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -14,7 +15,7 @@ import { OptimizerInfoSection } from "@/components/landing/optimizer-info-sectio
 import { AboutSection, CtaSection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
 
-type ActiveApp = null | "background-remover" | "optimizer";
+type ActiveApp = null | "background-remover" | "optimizer" | "mockup-generator";
 
 export default function HomeClient({ dict, lang }: { dict: any; lang: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp>(null);
@@ -33,6 +34,10 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
 
   const handleStartOptimizer = () => {
     setActiveApp("optimizer");
+  };
+
+  const handleStartMockupGenerator = () => {
+    setActiveApp("mockup-generator");
   };
 
   const handleClose = () => {
@@ -54,17 +59,23 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
     return <ImageOptimizerApp onClose={handleClose} dict={dict} />;
   }
 
+  if (activeApp === "mockup-generator") {
+    return <MockupGeneratorApp onClose={handleClose} dict={dict} />;
+  }
+
   return (
     <main className="min-h-screen bg-background overflow-x-hidden">
       <Header
         onStartBackgroundRemover={handleStartBackgroundRemover}
         onStartOptimizer={handleStartOptimizer}
+        onStartMockupGenerator={handleStartMockupGenerator}
         dict={dict}
         lang={lang}
       />
       <HeroSection
         onStartApp={handleStartBackgroundRemover}
         onStartOptimizer={handleStartOptimizer}
+        onStartMockupGenerator={handleStartMockupGenerator}
         onSelectDemo={handleSelectDemo}
         comparisonPos={comparisonPos}
         setComparisonPos={setComparisonPos}

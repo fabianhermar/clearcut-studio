@@ -52,6 +52,11 @@ export function Footer({ dict, lang = "en" }: FooterProps) {
               </li>
               <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  Framed <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
                   {dict?.footer?.productsCrop || t.productsCrop} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
                 </span>
               </li>
@@ -70,14 +75,44 @@ export function Footer({ dict, lang = "en" }: FooterProps) {
                   {dict?.footer?.productsExif || (lang === 'es' ? 'Borrador de Metadatos' : 'EXIF Stripper')} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
                 </span>
               </li>
-              <li className="hidden">
+              <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
                   {dict?.footer?.productsConverter || (lang === 'es' ? 'Convertidor Masivo HEIC' : 'Bulk HEIC Converter')} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
                 </span>
               </li>
-              <li className="hidden">
+              <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
                   {dict?.footer?.productsColor || (lang === 'es' ? 'Generador de Paletas' : 'Color Palette Generator')} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Generador de Favicons' : 'Favicon Generator'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Imágenes Responsivas' : 'Responsive Images'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Extractor de Gradientes' : 'Gradient Extractor'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Adaptador para Redes' : 'Aspect Ratio Fitter'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Marca de Agua Masiva' : 'Batch Watermarker'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
+                </span>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
+                  {lang === 'es' ? 'Visor y Conversor RAW' : 'RAW Converter'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
                 </span>
               </li>
             </ul>

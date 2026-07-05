@@ -5,13 +5,14 @@ import { SAMPLE_IMAGES } from "@/lib/constants";
 interface HeroSectionProps {
   onStartApp: () => void;
   onStartOptimizer: () => void;
+  onStartMockupGenerator: () => void;
   onSelectDemo: (src: string) => void;
   comparisonPos: number;
   setComparisonPos: (pos: number) => void;
   dict?: any;
 }
 
-export function HeroSection({ onStartApp, onStartOptimizer, onSelectDemo, comparisonPos, setComparisonPos, dict }: HeroSectionProps) {
+export function HeroSection({ onStartApp, onStartOptimizer, onStartMockupGenerator, onSelectDemo, comparisonPos, setComparisonPos, dict }: HeroSectionProps) {
   const t = dict?.hero || {
     aiBadge: "Powered by Artificial Intelligence",
     title: "Edit images ",
@@ -97,6 +98,7 @@ export function HeroSection({ onStartApp, onStartOptimizer, onSelectDemo, compar
                   <div className="text-xs text-muted-foreground">{t.optimizerDesc}</div>
                 </div>
               </button>
+
 
               <button
                 onClick={() => onSelectDemo(SAMPLE_IMAGES[0].src)}

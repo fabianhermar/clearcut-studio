@@ -21,12 +21,24 @@ import {
   BookOpen,
   Info,
   Layers,
-  Menu
+  Menu,
+  Crop,
+  FileCode,
+  Files,
+  Palette,
+  Monitor,
+  AppWindow,
+  ImagePlus,
+  Paintbrush,
+  Maximize,
+  Stamp,
+  Aperture
 } from "lucide-react";
 
 interface HeaderProps {
   onStartBackgroundRemover?: () => void;
   onStartOptimizer?: () => void;
+  onStartMockupGenerator?: () => void;
   dict?: any;
   lang?: string;
 }
@@ -77,7 +89,7 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = "ListItem";
 
-export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang = "en" }: HeaderProps) {
+export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMockupGenerator, dict, lang = "en" }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -94,8 +106,12 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang 
     products: "Products",
     productsBg: "Background Remover",
     productsOpt: "Image Optimizer",
+    productsCrop: "Crop & Upscale",
+    productsSvg: "SVG Optimizer",
     productsMagicEraser: "Magic Eraser",
     productsExif: "EXIF Stripper",
+    productsConverter: "Bulk HEIC Converter",
+    productsColor: "Color Palette Generator",
     company: "Company",
     companyAbout: "About us",
     companyBrand: "The Project & Brand",
@@ -126,7 +142,7 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang 
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="font-accent">{dt.products}</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[650px] md:grid-cols-2 lg:w-[900px] lg:grid-cols-3">
                       <ListItem
                         href={`/${lang}/?tool=background-remover`}
                         title={dt.productsBg}
@@ -155,11 +171,99 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, dict, lang 
                       </ListItem>
                       <ListItem
                         href="#"
+                        title="Framed"
+                        icon={<Monitor className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Generador de mockups y marcos.' : 'Mockup and device framer.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
                         title={dt.productsMagicEraser}
                         icon={<Eraser className="h-5 w-5" />}
                         comingSoon
                       >
                         {lang === 'es' ? 'Borra objetos no deseados.' : 'Erase unwanted objects.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title={dt.productsCrop}
+                        icon={<Crop className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Recorta y mejora imágenes.' : 'Crop and upscale images.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="Favicon Generator"
+                        icon={<AppWindow className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Genera favicons y assets PWA.' : 'Generate favicons & PWA assets.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="Aspect Ratio Fitter"
+                        icon={<Maximize className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Adapta fotos para redes sociales.' : 'Fit photos for social media.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="RAW Converter"
+                        icon={<Aperture className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Visor y conversor de fotos RAW.' : 'RAW photo viewer & converter.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title={dt.productsConverter}
+                        icon={<Files className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Convierte HEIC por lotes.' : 'Batch convert HEIC.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="Responsive Images"
+                        icon={<ImagePlus className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Generador masivo de srcset.' : 'Batch srcset generator.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title={dt.productsSvg}
+                        icon={<FileCode className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Optimiza gráficos vectoriales.' : 'Optimize vector graphics.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="Gradient Extractor"
+                        icon={<Paintbrush className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Extrae gradientes CSS de fotos.' : 'Extract CSS gradients from photos.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title={dt.productsColor}
+                        icon={<Palette className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Extrae paletas de colores.' : 'Extract color palettes.'}
+                      </ListItem>
+                      <ListItem
+                        href="#"
+                        title="Batch Watermarker"
+                        icon={<Stamp className="h-5 w-5" />}
+                        comingSoon
+                      >
+                        {lang === 'es' ? 'Pon marcas de agua masivamente.' : 'Apply watermarks in bulk.'}
                       </ListItem>
                       <ListItem
                         href="#"
