@@ -54,6 +54,7 @@
 		"date-fns": "4.1.0",
 		"embla-carousel-react": "8.6.0",
 		"gray-matter": "^4.0.3",
+		"html-to-image": "^1.11.13",
 		"input-otp": "1.4.2",
 		"lucide-react": "^0.564.0",
 		"negotiator": "^1.0.0",
