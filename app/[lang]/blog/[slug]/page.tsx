@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CopyUrlButton } from "@/components/blog/copy-url-button";
 import { AccessibilityTools } from "@/components/blog/accessibility-tools";
 import { format } from "date-fns";
@@ -97,7 +98,7 @@ export default async function BlogPostPage({
       {/* Content */}
       <div className="container mx-auto px-4 max-w-3xl">
         <div id="article-content" className="prose prose-slate prose-lg max-w-none prose-headings:font-heading prose-a:text-primary hover:prose-a:text-primary-hover prose-img:rounded-xl transition-all duration-300">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>
       </div>
 
