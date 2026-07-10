@@ -38,7 +38,7 @@
         <g transform="matrix(1.48282,0,0,1.48282,-555.109,19.3852)">
             <g transform="matrix(144,0,0,144,1646.85,174.882)">
             </g>
-            <text x="652.387px" y="174.882px" style="font-family:'Gilroy-SemiBold', 'Gilroy';font-weight:600;font-size:144px;">Fabian Herr<tspan x="1426.39px 1510.19px 1556.13px " y="174.882px 174.882px 174.882px ">era</tspan></text>
+            <text x="652.387px" y="174.882px" style="font-family:'Gilroy-SemiBold', 'Gilroy', system-ui, -apple-system, sans-serif;font-weight:600;font-size:144px;fill:currentColor;">Fabian Herrera</text>
         </g>
     </g>
 </svg>
