@@ -71,9 +71,9 @@ export function Footer({ dict, lang = "en" }: FooterProps) {
                 </span>
               </li>
               <li>
-                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
-                  {dict?.footer?.productsExif || (lang === 'es' ? 'Borrador de Metadatos' : 'EXIF Stripper')} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
-                </span>
+                <Link href={`/${lang}/?tool=exif-stripper`} className="hover:text-primary transition-colors">
+                  {dict?.footer?.productsExif || (lang === 'es' ? 'Borrador de Metadatos' : 'EXIF Stripper')}
+                </Link>
               </li>
               <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
@@ -86,9 +86,9 @@ export function Footer({ dict, lang = "en" }: FooterProps) {
                 </span>
               </li>
               <li>
-                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
-                  {lang === 'es' ? 'Generador de Favicons' : 'Favicon Generator'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
-                </span>
+                <Link href={`/${lang}/?tool=favicon-generator`} className="hover:text-primary transition-colors">
+                  {lang === 'es' ? 'Generador de Favicons' : 'Favicon Generator'}
+                </Link>
               </li>
               <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
@@ -96,14 +96,14 @@ export function Footer({ dict, lang = "en" }: FooterProps) {
                 </span>
               </li>
               <li>
-                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
-                  {lang === 'es' ? 'Extractor de Gradientes' : 'Gradient Extractor'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
-                </span>
+                <Link href={`/${lang}/?tool=gradient-extractor`} className="hover:text-primary transition-colors">
+                  {lang === 'es' ? 'Extractor de Gradientes' : 'Gradient Extractor'}
+                </Link>
               </li>
               <li>
-                <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
-                  {lang === 'es' ? 'Adaptador para Redes' : 'Aspect Ratio Fitter'} <span className="text-[10px] uppercase bg-muted text-foreground px-1.5 py-0.5 rounded font-bold">{c.comingSoon}</span>
-                </span>
+                <Link href={`/${lang}/?tool=aspect-ratio-fitter`} className="hover:text-primary transition-colors">
+                  {lang === 'es' ? 'Adaptador para Redes' : 'Aspect Ratio Fitter'}
+                </Link>
               </li>
               <li>
                 <span className="inline-flex items-center gap-1.5 opacity-50 cursor-not-allowed">
