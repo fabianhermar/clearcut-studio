@@ -47,6 +47,7 @@
     "@radix-ui/react-tooltip": "1.2.12",
     "@tailwindcss/typography": "^0.5.20",
     "@types/colorthief": "^2.6.1",
+    "@types/jszip": "^3.4.1",
     "@vercel/analytics": "2.0.1",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",

@@ -12,7 +12,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useState } from "react";
 import { 
   Image as ImageIcon, 
   Zap, 
@@ -32,7 +32,10 @@ import {
   Paintbrush,
   Maximize,
   Stamp,
-  Aperture
+  Aperture,
+  X,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface HeaderProps {
@@ -43,6 +46,7 @@ interface HeaderProps {
   onStartAspectRatioFitter?: () => void;
   onStartGradientExtractor?: () => void;
   onStartExifStripper?: () => void;
+  onStartBatchWatermarker?: () => void;
   dict?: any;
   lang?: string;
 }
@@ -93,9 +97,11 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = "ListItem";
 
-export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMockupGenerator, onStartFaviconGenerator, onStartAspectRatioFitter, onStartGradientExtractor, onStartExifStripper, dict, lang = "en" }: HeaderProps) {
+export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMockupGenerator, onStartFaviconGenerator, onStartAspectRatioFitter, onStartGradientExtractor, onStartExifStripper, onStartBatchWatermarker, dict, lang = "en" }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
 
   const t = dict?.header || {
     features: "Features",
@@ -365,14 +371,17 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
 
             {/* Mobile Menu Toggle (Only visible on small screens) */}
             <div className="md:hidden flex items-center">
-               <button className="p-2 text-slate-600 hover:text-slate-900 transition-colors">
-                  <Menu className="w-6 h-6" />
+               <button>
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
+               >
+                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                </button>
             </div>
 
             {/* Main CTA button */}
             {onStartBackgroundRemover ? (
-              <button
+              <button>
                 onClick={onStartBackgroundRemover}
                 className="hidden sm:inline-flex px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-xl transition-colors shadow-sm font-accent"
               >
@@ -389,6 +398,195 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-card shadow-lg max-h-[calc(100vh-64px)] overflow-y-auto">
+          <div className="px-4 py-6 flex flex-col gap-6">
+
+            {/* Products (Mobile) */}
+            <div className="space-y-3">
+              <button
+                onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
+                className="w-full flex items-center justify-between font-heading font-semibold text-foreground px-2 py-1"
+              >
+                {dt.products}
+                {isMobileProductsOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              </button>
+
+              {isMobileProductsOpen && (
+                <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-slate-100 ml-2">
+                  <Link
+                    href={`/${lang}/?tool=background-remover`}
+                    onClick={(e) => {
+                      if (onStartBackgroundRemover) {
+                        e.preventDefault();
+                        onStartBackgroundRemover();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <ImageIcon className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">{dt.productsBg}</span>
+                  </Link>
+                  <Link
+                    href={`/${lang}/?tool=optimizer`}
+                    onClick={(e) => {
+                      if (onStartOptimizer) {
+                        e.preventDefault();
+                        onStartOptimizer();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <Zap className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">{dt.productsOpt}</span>
+                  </Link>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Monitor className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">Framed</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Eraser className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">{dt.productsMagicEraser}</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Crop className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">{dt.productsCrop}</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <Link
+                    href={`/${lang}/?tool=favicon-generator`}
+                    onClick={(e) => {
+                      if (onStartFaviconGenerator) {
+                        e.preventDefault();
+                        onStartFaviconGenerator();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <AppWindow className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">Favicon Generator</span>
+                  </Link>
+                  <Link
+                    href={`/${lang}/?tool=aspect-ratio`}
+                    onClick={(e) => {
+                      if (onStartAspectRatioFitter) {
+                        e.preventDefault();
+                        onStartAspectRatioFitter();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <Maximize className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">Aspect Ratio Fitter</span>
+                  </Link>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Aperture className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">RAW Converter</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Files className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">{dt.productsConverter}</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <ImagePlus className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">Responsive Images</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <FileCode className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">{dt.productsSvg}</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <Link
+                    href={`/${lang}/?tool=gradient-extractor`}
+                    onClick={(e) => {
+                      if (onStartGradientExtractor) {
+                        e.preventDefault();
+                        onStartGradientExtractor();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <Paintbrush className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">Gradient Extractor</span>
+                  </Link>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Palette className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">{dt.productsColor}</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed">
+                    <Stamp className="h-5 w-5 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500 flex-1">Batch Watermarker</span>
+                    <span className="text-[9px] uppercase bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-sm font-bold">Soon</span>
+                  </div>
+                  <Link
+                    href={`/${lang}/?tool=exif-stripper`}
+                    onClick={(e) => {
+                      if (onStartExifStripper) {
+                        e.preventDefault();
+                        onStartExifStripper();
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <ShieldAlert className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-slate-900">{dt.productsExif}</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Resources & Links (Mobile) */}
+            <div className="space-y-3">
+              <h4 className="font-heading font-semibold text-foreground px-2">{lang === 'es' ? 'Recursos' : 'Resources'}</h4>
+              <div className="flex flex-col gap-1">
+                <Link href={`/${lang}/blog`} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">Blog</Link>
+                <Link href={`/${lang}/about`} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">{dt.companyAbout}</Link>
+                <Link href={`/${lang}/brand`} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">{dt.companyBrand}</Link>
+                <Link href={`/${lang}/#how-it-works`} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">{t.howItWorks}</Link>
+                <Link href={`/${lang}/pricing`} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">{t.pricing}</Link>
+              </div>
+            </div>
+
+            {/* CTA Mobile */}
+            <div className="pt-4 border-t border-border">
+              {onStartBackgroundRemover ? (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onStartBackgroundRemover();
+                  }}
+                  className="w-full px-5 py-3 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-xl transition-colors shadow-sm font-accent flex justify-center"
+                >
+                  {t.startBtn}
+                </button>
+              ) : (
+                <Link
+                  href={`/${lang}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full px-5 py-3 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-xl transition-colors shadow-sm font-accent flex justify-center"
+                >
+                  {t.startBtn}
+                </Link>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

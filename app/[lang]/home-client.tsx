@@ -8,6 +8,7 @@ import FaviconGeneratorApp from "@/components/favicon-generator/favicon-generato
 import AspectRatioFitterApp from "@/components/aspect-ratio-fitter/aspect-ratio-fitter-app";
 import GradientExtractorApp from "@/components/gradient-extractor/gradient-extractor-app";
 import ExifStripperApp from "@/components/exif-stripper/exif-stripper-app";
+import BatchWatermarkerApp from "@/components/batch-watermarker/batch-watermarker-app";
 
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -19,7 +20,7 @@ import { OptimizerInfoSection } from "@/components/landing/optimizer-info-sectio
 import { AboutSection, CtaSection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
 
-export type ActiveApp = "landing" | "remover" | "optimizer" | "mockup" | "favicon" | "aspect-ratio" | "gradient" | "exif";
+export type ActiveApp = "landing" | "remover" | "optimizer" | "mockup" | "favicon" | "aspect-ratio" | "gradient" | "exif" | "watermark";
 
 export default function HomeClient({ dict, lang }: { dict: any; lang: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp | null>(null);
@@ -48,6 +49,9 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
     }
     if (searchParams.get("tool") === "exif-stripper") {
       setActiveApp("exif");
+    }
+    if (searchParams.get("tool") === "batch-watermarker") {
+      setActiveApp("watermark");
     }
   }, []);
 
@@ -83,6 +87,10 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
 
   const handleStartExifStripper = () => {
     setActiveApp("exif");
+  };
+
+  const handleStartBatchWatermarker = () => {
+    setActiveApp("watermark");
   };
 
   const handleClose = () => {
@@ -125,6 +133,10 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
     return <ExifStripperApp onClose={handleClose} dict={dict} />;
   }
 
+  if (activeApp === "watermark") {
+    return <BatchWatermarkerApp onClose={handleClose} dict={dict} />;
+  }
+
   return (
     <main className="min-h-screen bg-background overflow-x-hidden">
       <Header
@@ -135,6 +147,7 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
         onStartAspectRatioFitter={handleStartAspectRatioFitter}
         onStartGradientExtractor={handleStartGradientExtractor}
         onStartExifStripper={handleStartExifStripper}
+        onStartBatchWatermarker={handleStartBatchWatermarker}
         dict={dict}
         lang={lang}
       />
