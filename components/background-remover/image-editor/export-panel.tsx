@@ -18,7 +18,7 @@ export function ExportPanel({
   onUploadAnother,
 }: ExportPanelProps) {
   return (
-    <aside className="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0">
+    <aside className="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col shrink-0 order-3">
       <div className="p-4 border-b border-slate-200">
         <h3 className="font-semibold text-slate-800 font-heading">Exportar imagen</h3>
         <p className="text-sm text-slate-500 mt-0.5 font-accent">Elige el formato de descarga</p>

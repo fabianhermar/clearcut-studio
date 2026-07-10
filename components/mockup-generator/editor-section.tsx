@@ -216,15 +216,15 @@ export function EditorSection({ originalImage, onReset, onNewImage }: EditorSect
       </header>
 
       {/* ── Main Workspace ── */}
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
 
         {/* Left Sidebar */}
-        <div className="w-72 flex-shrink-0 h-full border-r border-border overflow-hidden">
+        <div className="w-full lg:w-72 flex-shrink-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border overflow-hidden order-2 lg:order-1">
           <LeftSidebar settings={settings} setSettings={setSettings} onNewImage={onNewImage} />
         </div>
 
         {/* Canvas Area — no scroll, clips overflow */}
-        <div className="flex-1 min-h-0 overflow-hidden relative flex items-center justify-center bg-[#f8fafc]">
+        <div className="w-full h-[50vh] lg:h-auto lg:flex-1 min-h-0 overflow-hidden relative flex items-center justify-center bg-[#f8fafc] shrink-0 order-1 lg:order-2">
           {/* Dot grid background */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -249,7 +249,7 @@ export function EditorSection({ originalImage, onReset, onNewImage }: EditorSect
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-64 flex-shrink-0 h-full border-l border-border overflow-hidden">
+        <div className="w-full lg:w-64 flex-shrink-0 lg:h-full border-t lg:border-t-0 lg:border-l border-border overflow-hidden order-3">
           <RightSidebar settings={settings} setSettings={setSettings} />
         </div>
       </main>

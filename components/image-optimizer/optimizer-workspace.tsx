@@ -249,9 +249,9 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-full lg:w-72 xl:w-80 border-b lg:border-b-0 lg:border-r border-border bg-card/50 p-5 overflow-y-auto space-y-6 shrink-0">
+        <aside className="w-full lg:w-72 xl:w-80 border-b lg:border-b-0 lg:border-r border-border bg-card/50 p-5 overflow-y-auto space-y-6 shrink-0 order-2 lg:order-1">
 
           <FormatSelector selected={format} onChange={handleFormatChange} />
 
@@ -351,7 +351,7 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
         </aside>
 
         {/* Preview */}
-        <main className="flex-1 flex items-center justify-center p-4 lg:p-6 bg-canvas min-h-[400px]">
+        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 flex items-center justify-center p-4 lg:p-6 bg-canvas shrink-0 order-1 lg:order-2">
           <div className="w-full h-full max-w-5xl max-h-[75vh] min-h-[340px]">
             {originalSrc ? (
               <ComparisonSlider originalSrc={originalSrc} optimizedSrc={optimizedSrc} isProcessing={isProcessing} />

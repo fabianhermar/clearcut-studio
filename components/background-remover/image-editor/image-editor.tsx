@@ -306,9 +306,9 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
       />
 
       {/* Main editor area */}
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden min-h-0">
         {/* Left panel */}
-        <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
+        <aside className="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col shrink-0 order-2 lg:order-1 h-[50vh] lg:h-auto">
           {/* Tabs */}
           <div className="flex border-b border-slate-200">
             <button
@@ -359,7 +359,7 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
         </aside>
 
         {/* Canvas area */}
-        <main className="flex-1 relative overflow-hidden" ref={containerRef}>
+        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 relative shrink-0 order-1 lg:order-2" ref={containerRef}>
           {/* Checkerboard background */}
           <div
             className="absolute inset-0"

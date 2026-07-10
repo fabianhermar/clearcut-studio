@@ -25,8 +25,8 @@ export function EditorToolbar({
         <div className="flex items-center gap-2">
           <img src="/logos/ClearCut-logo.avif" alt="ClearCut" className="h-24 w-auto" />
         </div>
-        <div className="h-6 w-px bg-slate-200" />
-        <span className="text-sm text-slate-500 font-accent">
+        <div className="hidden md:block h-6 w-px bg-slate-200" />
+        <span className="hidden md:block text-sm text-slate-500 font-accent">
           {canvasSize.width} x {canvasSize.height}px
         </span>
       </div>
