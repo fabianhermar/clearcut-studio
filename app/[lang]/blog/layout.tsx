@@ -7,7 +7,7 @@ export default async function BlogLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
+  params: Promise<any>;
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
