@@ -371,7 +371,7 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
 
             {/* Mobile Menu Toggle (Only visible on small screens) */}
             <div className="md:hidden flex items-center">
-               <button>
+              <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
                >
@@ -381,7 +381,7 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
 
             {/* Main CTA button */}
             {onStartBackgroundRemover ? (
-              <button>
+              <button
                 onClick={onStartBackgroundRemover}
                 className="hidden sm:inline-flex px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-xl transition-colors shadow-sm font-accent"
               >
