@@ -39,6 +39,10 @@ interface HeaderProps {
   onStartBackgroundRemover?: () => void;
   onStartOptimizer?: () => void;
   onStartMockupGenerator?: () => void;
+  onStartFaviconGenerator?: () => void;
+  onStartAspectRatioFitter?: () => void;
+  onStartGradientExtractor?: () => void;
+  onStartExifStripper?: () => void;
   dict?: any;
   lang?: string;
 }
@@ -89,7 +93,7 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = "ListItem";
 
-export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMockupGenerator, dict, lang = "en" }: HeaderProps) {
+export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMockupGenerator, onStartFaviconGenerator, onStartAspectRatioFitter, onStartGradientExtractor, onStartExifStripper, dict, lang = "en" }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -194,10 +198,15 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
                         {lang === 'es' ? 'Recorta y mejora imágenes.' : 'Crop and upscale images.'}
                       </ListItem>
                       <ListItem
-                        href="#"
+                        href={`/${lang}/?tool=favicon-generator`}
                         title="Favicon Generator"
                         icon={<AppWindow className="h-5 w-5" />}
-                        comingSoon
+                        onClick={(e) => {
+                          if (onStartFaviconGenerator) {
+                            e.preventDefault();
+                            onStartFaviconGenerator();
+                          }
+                        }}
                       >
                         {lang === 'es' ? 'Genera favicons y assets PWA.' : 'Generate favicons & PWA assets.'}
                       </ListItem>
@@ -205,9 +214,12 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
                         href="#"
                         title="Aspect Ratio Fitter"
                         icon={<Maximize className="h-5 w-5" />}
-                        comingSoon
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onStartAspectRatioFitter?.();
+                        }}
                       >
-                        {lang === 'es' ? 'Adapta fotos para redes sociales.' : 'Fit photos for social media.'}
+                        {lang === 'es' ? 'Adapta fotos para redes sociales.' : 'Adapt images for any social media platform instantly.'}
                       </ListItem>
                       <ListItem
                         href="#"
@@ -244,10 +256,13 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
                       <ListItem
                         href="#"
                         title="Gradient Extractor"
-                        icon={<Paintbrush className="h-5 w-5" />}
-                        comingSoon
+                        icon={<Palette className="h-5 w-5" />}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onStartGradientExtractor?.();
+                        }}
                       >
-                        {lang === 'es' ? 'Extrae gradientes CSS de fotos.' : 'Extract CSS gradients from photos.'}
+                        {lang === 'es' ? 'Extrae gradientes CSS de imágenes.' : 'Extract CSS gradients from images.'}
                       </ListItem>
                       <ListItem
                         href="#"
@@ -266,10 +281,15 @@ export function Header({ onStartBackgroundRemover, onStartOptimizer, onStartMock
                         {lang === 'es' ? 'Pon marcas de agua masivamente.' : 'Apply watermarks in bulk.'}
                       </ListItem>
                       <ListItem
-                        href="#"
+                        href={`/${lang}/?tool=exif-stripper`}
                         title={dt.productsExif}
                         icon={<ShieldAlert className="h-5 w-5" />}
-                        comingSoon
+                        onClick={(e) => {
+                          if (onStartExifStripper) {
+                            e.preventDefault();
+                            onStartExifStripper();
+                          }
+                        }}
                       >
                         {lang === 'es' ? 'Limpia metadatos ocultos.' : 'Clean hidden metadata.'}
                       </ListItem>

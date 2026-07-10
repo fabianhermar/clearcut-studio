@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BackgroundRemoverApp from "@/components/background-remover/background-remover-app";
 import ImageOptimizerApp from "@/components/image-optimizer/image-optimizer-app";
 import MockupGeneratorApp from "@/components/mockup-generator/mockup-generator-app";
+import FaviconGeneratorApp from "@/components/favicon-generator/favicon-generator-app";
+import AspectRatioFitterApp from "@/components/aspect-ratio-fitter/aspect-ratio-fitter-app";
+import GradientExtractorApp from "@/components/gradient-extractor/gradient-extractor-app";
+import ExifStripperApp from "@/components/exif-stripper/exif-stripper-app";
 
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -15,21 +19,46 @@ import { OptimizerInfoSection } from "@/components/landing/optimizer-info-sectio
 import { AboutSection, CtaSection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
 
-type ActiveApp = null | "background-remover" | "optimizer" | "mockup-generator";
+export type ActiveApp = "landing" | "remover" | "optimizer" | "mockup" | "favicon" | "aspect-ratio" | "gradient" | "exif";
 
 export default function HomeClient({ dict, lang }: { dict: any; lang: string }) {
-  const [activeApp, setActiveApp] = useState<ActiveApp>(null);
+  const [activeApp, setActiveApp] = useState<ActiveApp | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [comparisonPos, setComparisonPos] = useState(50);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("tool") === "background-remover") {
+      setActiveApp("remover");
+    }
+    if (searchParams.get("tool") === "image-optimizer") {
+      setActiveApp("optimizer");
+    }
+    if (searchParams.get("tool") === "mockup-generator") {
+      setActiveApp("mockup");
+    }
+    if (searchParams.get("tool") === "favicon-generator") {
+      setActiveApp("favicon");
+    }
+    if (searchParams.get("tool") === "aspect-ratio-fitter") {
+      setActiveApp("aspect-ratio");
+    }
+    if (searchParams.get("tool") === "gradient-extractor") {
+      setActiveApp("gradient");
+    }
+    if (searchParams.get("tool") === "exif-stripper") {
+      setActiveApp("exif");
+    }
+  }, []);
+
   const handleSelectDemo = (src: string) => {
     setSelectedImage(src);
-    setActiveApp("background-remover");
+    setActiveApp("remover");
   };
 
   const handleStartBackgroundRemover = () => {
     setSelectedImage(null);
-    setActiveApp("background-remover");
+    setActiveApp("remover");
   };
 
   const handleStartOptimizer = () => {
@@ -37,30 +66,63 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
   };
 
   const handleStartMockupGenerator = () => {
-    setActiveApp("mockup-generator");
+    setActiveApp("mockup");
+  };
+
+  const handleStartFaviconGenerator = () => {
+    setActiveApp("favicon");
+  };
+
+  const handleStartAspectRatioFitter = () => {
+    setActiveApp("aspect-ratio");
+  };
+
+  const handleStartGradientExtractor = () => {
+    setActiveApp("gradient");
+  };
+
+  const handleStartExifStripper = () => {
+    setActiveApp("exif");
   };
 
   const handleClose = () => {
     setActiveApp(null);
     setSelectedImage(null);
+    // Remove query params
+    window.history.replaceState({}, document.title, window.location.pathname);
   };
 
-  if (activeApp === "background-remover") {
+  if (activeApp === "remover") {
     return (
       <BackgroundRemoverApp
         initialImage={selectedImage || undefined}
         onClose={handleClose}
-        dict={dict}
       />
     );
   }
 
   if (activeApp === "optimizer") {
-    return <ImageOptimizerApp onClose={handleClose} dict={dict} />;
+    return <ImageOptimizerApp onClose={handleClose} />;
   }
 
-  if (activeApp === "mockup-generator") {
+  if (activeApp === "mockup") {
     return <MockupGeneratorApp onClose={handleClose} dict={dict} />;
+  }
+
+  if (activeApp === "favicon") {
+    return <FaviconGeneratorApp onClose={handleClose} dict={dict} />;
+  }
+
+  if (activeApp === "aspect-ratio") {
+    return <AspectRatioFitterApp onClose={handleClose} dict={dict} />;
+  }
+
+  if (activeApp === "gradient") {
+    return <GradientExtractorApp onClose={handleClose} dict={dict} />;
+  }
+
+  if (activeApp === "exif") {
+    return <ExifStripperApp onClose={handleClose} dict={dict} />;
   }
 
   return (
@@ -69,6 +131,10 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
         onStartBackgroundRemover={handleStartBackgroundRemover}
         onStartOptimizer={handleStartOptimizer}
         onStartMockupGenerator={handleStartMockupGenerator}
+        onStartFaviconGenerator={handleStartFaviconGenerator}
+        onStartAspectRatioFitter={handleStartAspectRatioFitter}
+        onStartGradientExtractor={handleStartGradientExtractor}
+        onStartExifStripper={handleStartExifStripper}
         dict={dict}
         lang={lang}
       />
