@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useFileDrop } from "@/hooks/use-file-drop";
+import { AppWindow } from "lucide-react";
 
 interface UploadSectionProps {
   onUpload: (src: string) => void;
@@ -47,11 +48,7 @@ export function UploadSection({ onUpload, onClose, dict }: UploadSectionProps) {
           )}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                 <path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12" />
-                 <path d="M4 22h16" />
-                 <path d="M12 8v4" />
-              </svg>
+              <AppWindow className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground font-heading">Favicon Generator</h1>
@@ -75,9 +72,7 @@ export function UploadSection({ onUpload, onClose, dict }: UploadSectionProps) {
           {/* Title */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-accent mb-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2.69l5.66 4.2c.2.15.34.37.34.61v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-8c0-.24.14-.46.34-.61L12 2.69zM12 1L4 7v9a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7l-8-6z" />
-              </svg>
+              <AppWindow className="w-4 h-4" />
               Creación automática
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">

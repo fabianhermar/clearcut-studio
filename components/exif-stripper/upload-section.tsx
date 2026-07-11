@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useFileDrop } from "@/hooks/use-file-drop";
+import { ShieldAlert } from "lucide-react";
 
 interface UploadSectionProps {
   onUpload: (file: File) => void;
@@ -42,10 +43,7 @@ export function UploadSection({ onUpload, onClose, dict }: UploadSectionProps) {
           )}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
+              <ShieldAlert className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground font-heading">EXIF Stripper</h1>

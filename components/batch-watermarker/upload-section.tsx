@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useFileDrop } from "@/hooks/use-file-drop";
+import { Stamp } from "lucide-react";
 
 interface UploadSectionProps {
   onUpload: (files: File[]) => void;
@@ -49,10 +50,7 @@ export function UploadSection({ onUpload, onClose }: UploadSectionProps) {
           )}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <path d="M3 21l4-4m0 0L18 6a2 2 0 0 0-3-3L4 17m3 0L3 21" />
-                <path d="M14 4l6 6" />
-              </svg>
+              <Stamp className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground font-heading">Batch Watermarker</h1>
@@ -76,10 +74,7 @@ export function UploadSection({ onUpload, onClose }: UploadSectionProps) {
           {/* Title */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-accent mb-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="2" width="20" height="20" rx="3" />
-                <path d="M7 12h10M12 7v10" />
-              </svg>
+              <Stamp className="w-4 h-4" />
               Procesamiento por lotes
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">

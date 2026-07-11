@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef } from "react";
+import { Zap } from "lucide-react";
 
 interface OptimizerUploadProps {
   onFileSelect: (file: File) => void;
@@ -61,11 +62,7 @@ export function OptimizerUpload({ onFileSelect, onClose }: OptimizerUploadProps)
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
+              <Zap className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground font-heading">Optimizador de Imágenes</h1>
@@ -95,9 +92,7 @@ export function OptimizerUpload({ onFileSelect, onClose }: OptimizerUploadProps)
           {/* Title */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-accent mb-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
+              <Zap className="w-4 h-4" />
               Optimización inteligente
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">

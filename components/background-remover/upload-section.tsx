@@ -1,15 +1,17 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef } from "react";
 import { useFileDrop } from "@/hooks/use-file-drop";
+import { ImageIcon } from "lucide-react";
 
 interface UploadSectionProps {
   onFileSelect: (file: File) => void;
   onSampleSelect: (src: string) => void;
   onClose?: () => void;
+  dict?: any;
 }
 
-export function UploadSection({ onFileSelect, onSampleSelect, onClose }: UploadSectionProps) {
+export function UploadSection({ onFileSelect, onSampleSelect, onClose, dict }: UploadSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const { isDragging, handleDrop, handleDragOver, handleDragLeave } = useFileDrop(onFileSelect);
@@ -32,10 +34,7 @@ export function UploadSection({ onFileSelect, onSampleSelect, onClose }: UploadS
           )}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
+              <ImageIcon className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground font-heading">Borrador de Fondos</h1>
@@ -67,11 +66,7 @@ export function UploadSection({ onFileSelect, onSampleSelect, onClose }: UploadS
           {/* Title */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-accent mb-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
+              <ImageIcon className="w-4 h-4" />
               Recorte perfecto
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
