@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import BackgroundRemoverApp from "@/components/background-remover/background-remover-app";
 import ImageOptimizerApp from "@/components/image-optimizer/image-optimizer-app";
 import MockupGeneratorApp from "@/components/mockup-generator/mockup-generator-app";
@@ -24,37 +25,26 @@ import { FaqSection } from "@/components/landing/faq-section";
 export type ActiveApp = "landing" | "remover" | "optimizer" | "mockup" | "favicon" | "aspect-ratio" | "gradient" | "exif" | "watermark";
 
 export default function HomeClient({ dict, lang }: { dict: any; lang: string }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [activeApp, setActiveApp] = useState<ActiveApp | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [comparisonPos, setComparisonPos] = useState(50);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get("tool") === "background-remover") {
-      setActiveApp("remover");
-    }
-    if (searchParams.get("tool") === "image-optimizer") {
-      setActiveApp("optimizer");
-    }
-    if (searchParams.get("tool") === "mockup-generator") {
-      setActiveApp("mockup");
-    }
-    if (searchParams.get("tool") === "favicon-generator") {
-      setActiveApp("favicon");
-    }
-    if (searchParams.get("tool") === "aspect-ratio-fitter") {
-      setActiveApp("aspect-ratio");
-    }
-    if (searchParams.get("tool") === "gradient-extractor") {
-      setActiveApp("gradient");
-    }
-    if (searchParams.get("tool") === "exif-stripper") {
-      setActiveApp("exif");
-    }
-    if (searchParams.get("tool") === "batch-watermarker") {
-      setActiveApp("watermark");
-    }
-  }, []);
+    const tool = searchParams.get("tool");
+    if (tool === "background-remover") setActiveApp("remover");
+    else if (tool === "image-optimizer") setActiveApp("optimizer");
+    else if (tool === "mockup-generator") setActiveApp("mockup");
+    else if (tool === "favicon-generator") setActiveApp("favicon");
+    else if (tool === "aspect-ratio-fitter") setActiveApp("aspect-ratio");
+    else if (tool === "gradient-extractor") setActiveApp("gradient");
+    else if (tool === "exif-stripper") setActiveApp("exif");
+    else if (tool === "batch-watermarker") setActiveApp("watermark");
+    else setActiveApp(null);
+  }, [searchParams]);
 
   const handleSelectDemo = (src: string) => {
     setSelectedImage(src);
@@ -97,8 +87,8 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
   const handleClose = () => {
     setActiveApp(null);
     setSelectedImage(null);
-    // Remove query params
-    window.history.replaceState({}, document.title, window.location.pathname);
+    // Remove query params properly using Next.js router
+    router.replace(pathname, { scroll: false });
   };
 
   if (activeApp === "remover") {
