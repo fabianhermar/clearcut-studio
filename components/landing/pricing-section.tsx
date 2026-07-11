@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import React from "react";
 import Link from "next/link";
+import { ApiDisclaimer } from "./api-disclaimer";
 
 interface PricingSectionProps {
   dict?: any;
@@ -142,6 +143,99 @@ export function PricingSection({ dict, lang = "en" }: PricingSectionProps) {
               {t.sponsor.btn}
             </a>
           </div>
+        </div>
+
+        {/* Why Free — Philosophy Section */}
+        <div className="max-w-4xl mx-auto mt-24 px-4">
+          {/* Divider with label */}
+          <div className="flex items-center gap-4 mb-16">
+            <hr className="flex-1 border-border" />
+            <span className="text-xs font-bold font-heading uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+              {lang === 'es' ? 'Por qué es gratis' : 'Why it\'s free'}
+            </span>
+            <hr className="flex-1 border-border" />
+          </div>
+
+          {/* Story */}
+          <div className="text-center mb-16">
+            <h3 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-6 text-balance">
+              {lang === 'es'
+                ? 'Una herramienta construida por frustración, para todos.'
+                : 'A tool built out of frustration, for everyone.'}
+            </h3>
+            <p className="text-lg text-muted-foreground font-accent leading-relaxed max-w-2xl mx-auto">
+              {lang === 'es'
+                ? 'ClearCut Studio nació porque las mejores herramientas de edición de imágenes terminan siempre detrás de un muro de pago. Cansados de eso, decidimos construir algo diferente: una suite que respeta tu privacidad, procesa todo en tu navegador y que no te pide ni un centavo para usarla.'
+                : 'ClearCut Studio was born out of frustration. The best image editing tools always end up behind a paywall. Tired of that, we decided to build something different — a suite that respects your privacy, processes everything in your browser, and never asks you for a single cent to use it.'}
+            </p>
+          </div>
+
+          {/* Three pillars */}
+          <div className="grid sm:grid-cols-3 gap-6 mb-16">
+            {[
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                ),
+                title: lang === 'es' ? 'Siempre será gratis' : 'Always free',
+                desc: lang === 'es'
+                  ? 'Nunca habrá un plan de pago obligatorio. Nuestro compromiso es claro: las herramientas principales de ClearCut Studio serán gratis para siempre.'
+                  : 'There will never be a mandatory paid plan. Our commitment is clear: ClearCut Studio\'s core tools will be free forever.'
+              },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                  </svg>
+                ),
+                title: lang === 'es' ? 'Tu privacidad primero' : 'Your privacy first',
+                desc: lang === 'es'
+                  ? 'Todo el procesamiento ocurre en tu navegador. Tus imágenes jamás llegan a nuestros servidores. Lo que es tuyo, es tuyo.'
+                  : 'All processing happens in your browser. Your images never reach our servers. What\'s yours stays yours.'
+              },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                ),
+                title: lang === 'es' ? 'Financiado por la comunidad' : 'Community-funded',
+                desc: lang === 'es'
+                  ? 'Los servidores, el dominio y el desarrollo continuo se sostienen gracias a las personas que eligen apoyar el proyecto voluntariamente. Sin presión.'
+                  : 'Servers, the domain, and ongoing development are sustained by people who choose to support the project voluntarily. No pressure.'
+              }
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4 hover:border-primary/30 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  {icon}
+                </div>
+                <div>
+                  <h4 className="font-heading font-bold text-foreground mb-2">{title}</h4>
+                  <p className="text-sm text-muted-foreground font-accent leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Commitment banner */}
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 text-center relative overflow-hidden mb-16">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)]" />
+            <p className="relative text-base md:text-lg font-accent text-foreground leading-relaxed max-w-2xl mx-auto">
+              {lang === 'es'
+                ? '💙 Si alguna vez ClearCut Studio te ahorró tiempo o dinero, considera invitarnos un café. No es obligatorio, pero nos ayuda a seguir construyendo para todos.'
+                : '💙 If ClearCut Studio ever saved you time or money, consider buying us a coffee. It\'s not required, but it helps us keep building for everyone.'}
+            </p>
+          </div>
+
+          {/* Third-party API Disclaimer */}
+          <ApiDisclaimer lang={lang} />
         </div>
       </div>
     </section>

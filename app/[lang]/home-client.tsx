@@ -19,6 +19,7 @@ import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { OptimizerInfoSection } from "@/components/landing/optimizer-info-section";
 import { AboutSection, CtaSection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
+import { FaqSection } from "@/components/landing/faq-section";
 
 export type ActiveApp = "landing" | "remover" | "optimizer" | "mockup" | "favicon" | "aspect-ratio" | "gradient" | "exif" | "watermark";
 
@@ -166,6 +167,7 @@ export default function HomeClient({ dict, lang }: { dict: any; lang: string }) 
       <HowItWorksSection dict={dict} />
       <TestimonialsSection dict={dict} />
       <AboutSection dict={dict} />
+      <FaqSection dict={dict} lang={lang} />
       <CtaSection 
         onStartApp={handleStartBackgroundRemover} 
         onStartOptimizer={handleStartOptimizer}
