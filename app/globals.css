@@ -232,7 +232,7 @@ input:focus-visible {
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  src: url(@fontsource-variable/albert-sans/files/albert-sans-latin-wght-normal.woff2) format('woff2-variations');
+  src: url(~@fontsource-variable/albert-sans/files/albert-sans-latin-wght-normal.woff2) format('woff2-variations');
 }
 
 @font-face {
@@ -240,7 +240,7 @@ input:focus-visible {
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  src: url(@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2) format('woff2-variations');
+  src: url(~@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2) format('woff2-variations');
 }
 
 /* caveat-latin-wght-normal */
@@ -249,5 +249,5 @@ input:focus-visible {
   font-style: normal;
   font-display: swap;
   font-weight: 400 700;
-  src: url(@fontsource-variable/caveat/files/caveat-latin-wght-normal.woff2) format('woff2-variations');
+  src: url(~@fontsource-variable/caveat/files/caveat-latin-wght-normal.woff2) format('woff2-variations');
 }
