@@ -48,7 +48,15 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                 para nosotros acceder, ver o almacenar las imágenes que editas con ClearCut Studio.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">2. Recopilación de Datos Analíticos</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">2. Integración de APIs de Terceros (Modelo Híbrido)</h2>
+              <p>
+                Aunque nuestra promesa principal es el procesamiento local, el desarrollo de herramientas de Inteligencia Artificial Generativa altamente complejas requerirá de un modelo de procesamiento híbrido. Para mantener la plataforma gratuita y evitar que tu dispositivo sufra problemas de rendimiento, implementaremos un modelo "BYOK" (Trae tu propia clave de API).
+              </p>
+              <p>
+                <strong>Privacidad de las APIs externas:</strong> El uso de estas APIs siempre será opcional y explícito. Te notificaremos claramente antes de que cualquier archivo o imagen deba abandonar tu dispositivo para ser procesado en la nube. Al utilizar tus propias credenciales (de plataformas como OpenAI o Google), el tratamiento de esos datos específicos estará sujeto exclusivamente a las políticas de privacidad del proveedor de la API que decidas conectar.
+              </p>
+
+              <h2 className="text-foreground font-heading mt-10 mb-4">3. Recopilación de Datos Analíticos</h2>
               <p>
                 Actualmente, ClearCut Studio no almacena cuentas de usuario ni requiere registro. 
                 No recopilamos información personal identificable.
@@ -66,14 +74,14 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                 está garantizada en todo momento.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">3. Cookies</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">4. Cookies</h2>
               <p>
                 Utilizamos tecnologías de almacenamiento local del navegador (como LocalStorage) 
                 exclusivamente para recordar tus preferencias dentro de la herramienta, como los 
                 parámetros de calidad o herramientas utilizadas recientemente.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">4. Cambios en esta política</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">5. Cambios en esta política</h2>
               <p>
                 ClearCut Studio se reserva el derecho de modificar esta política en el futuro 
                 a medida que agreguemos nuevas funcionalidades. Sin embargo, nuestro compromiso con el 
@@ -99,7 +107,15 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                 view, or store the images you edit with ClearCut Studio.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">2. Analytics Data Collection</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">2. Third-Party API Integration (Hybrid Model)</h2>
+              <p>
+                Although our core promise is local processing, the development of highly complex Generative AI tools will require a hybrid processing model. To keep the platform free and prevent your device from suffering performance issues, we will implement a "BYOK" (Bring Your Own Key) model.
+              </p>
+              <p>
+                <strong>External API Privacy:</strong> The use of these APIs will always be optional and explicit. We will clearly notify you before any file or image needs to leave your device to be processed in the cloud. By using your own credentials (from platforms like OpenAI or Google), the handling of that specific data will be strictly subject to the privacy policies of the API provider you choose to connect.
+              </p>
+
+              <h2 className="text-foreground font-heading mt-10 mb-4">3. Analytics Data Collection</h2>
               <p>
                 Currently, ClearCut Studio does not store user accounts or require registration. 
                 We do not collect personally identifiable information.
@@ -116,14 +132,14 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                 completely out of reach of any analytics tools. Your visual privacy is guaranteed at all times.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">3. Cookies</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">4. Cookies</h2>
               <p>
                 We use browser local storage technologies (such as LocalStorage) exclusively to 
                 remember your preferences within the tool, such as quality parameters or recently 
                 used tools.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">4. Changes to this policy</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">5. Changes to this policy</h2>
               <p>
                 ClearCut Studio reserves the right to modify this policy in the future as we add 
                 new features. However, our commitment to 100% local image processing will never change.

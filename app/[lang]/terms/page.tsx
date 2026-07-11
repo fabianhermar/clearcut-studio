@@ -63,7 +63,15 @@ export default async function TermsPage({ params }: { params: Promise<{ lang: st
                 utilizar cualquier imagen que cargues en la herramienta.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">4. Disponibilidad del Servicio</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">4. Uso de APIs de Terceros (Modelo Híbrido)</h2>
+              <p>
+                Ciertas funcionalidades avanzadas de la plataforma (actuales o futuras) pueden requerir el uso de servicios de Inteligencia Artificial en la nube. Para estas herramientas, proporcionaremos la opción de usar tus propias credenciales de API (modelo BYOK).
+              </p>
+              <p>
+                Al utilizar tus propias claves de API de terceros (como OpenAI, Google, etc.), aceptas que estás sujeto a los Términos de Servicio específicos de dichos proveedores. ClearCut Studio actúa únicamente como una interfaz y no se hace responsable por los cargos, facturación, bloqueos de cuenta o mal uso de dichas APIs externas.
+              </p>
+
+              <h2 className="text-foreground font-heading mt-10 mb-4">5. Disponibilidad del Servicio</h2>
               <p>
                 Nos reservamos el derecho de modificar, suspender o descontinuar temporal o permanentemente 
                 cualquier parte del servicio en cualquier momento, con o sin previo aviso.
@@ -101,7 +109,15 @@ export default async function TermsPage({ params }: { params: Promise<{ lang: st
                 use any image you upload to the tool.
               </p>
 
-              <h2 className="text-foreground font-heading mt-10 mb-4">4. Service Availability</h2>
+              <h2 className="text-foreground font-heading mt-10 mb-4">4. Use of Third-Party APIs (Hybrid Model)</h2>
+              <p>
+                Certain advanced features of the platform (current or future) may require the use of cloud-based Artificial Intelligence services. For these tools, we will provide the option to use your own API credentials (BYOK model).
+              </p>
+              <p>
+                By using your own third-party API keys (such as OpenAI, Google, etc.), you agree that you are subject to the specific Terms of Service of those providers. ClearCut Studio acts solely as an interface and is not responsible for charges, billing, account blocks, or misuse of such external APIs.
+              </p>
+
+              <h2 className="text-foreground font-heading mt-10 mb-4">5. Service Availability</h2>
               <p>
                 We reserve the right to modify, suspend, or discontinue temporarily or permanently 
                 any part of the service at any time, with or without prior notice.
