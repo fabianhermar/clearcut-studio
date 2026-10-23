@@ -34,6 +34,8 @@ export function SampleImagesSection({ onSelectDemo, dict }: SampleImagesSectionP
               onClick={() => onSelectDemo(img.src)}
             >
               <img
+                loading="lazy"
+                decoding="async"
                 src={img.src}
                 alt={img.name}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

@@ -135,10 +135,10 @@ export function HeroSection({ onStartApp, onStartOptimizer, onStartMockupGenerat
           <div className="relative">
             <div className="relative bg-card rounded-2xl border border-border overflow-hidden shadow-medium">
               <div className="absolute top-4 left-4 z-10">
-                <span className="px-3 py-1.5 bg-foreground/80 backdrop-blur text-card text-xs font-medium rounded-full font-accent">{t.comparison.original}</span>
+                <span className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full font-accent">{t.comparison.processed}</span>
               </div>
               <div className="absolute top-4 right-4 z-10">
-                <span className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full font-accent">{t.comparison.processed}</span>
+                <span className="px-3 py-1.5 bg-foreground/80 backdrop-blur text-card text-xs font-medium rounded-full font-accent">{t.comparison.original}</span>
               </div>
 
               <div
@@ -157,13 +157,13 @@ export function HeroSection({ onStartApp, onStartOptimizer, onStartMockupGenerat
               >
                 {/* Original */}
                 <div className="absolute inset-0">
-                  <img src="/demos/demo-original.png" alt="Original" className="w-full h-full object-cover" />
+                  <img src="/demos/demo-original.png" alt="Original" className="w-full h-full object-cover" fetchPriority="high" decoding="async" />
                 </div>
 
                 {/* Processed */}
                 <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - comparisonPos}% 0 0)` }}>
                   <div className="w-full h-full checkerboard">
-                    <img src="/demos/demo-processed.avif" alt="Sin fondo" className="w-full h-full object-cover" />
+                    <img src="/demos/demo-processed.avif" alt="Sin fondo" className="w-full h-full object-cover" decoding="async" />
                   </div>
                 </div>
 
@@ -201,7 +201,7 @@ export function HeroSection({ onStartApp, onStartOptimizer, onStartMockupGenerat
                   onClick={() => onSelectDemo(img.src)}
                   className="w-14 h-14 rounded-xl overflow-hidden border-2 border-card hover:border-primary transition-all hover:scale-105 shadow-medium bg-card"
                 >
-                  <img src={img.src} alt={img.name} className="w-full h-full object-cover" />
+                  <img src={img.src} alt={img.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>

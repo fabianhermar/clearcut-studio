@@ -2,14 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import BackgroundRemoverApp from "@/components/background-remover/background-remover-app";
-import ImageOptimizerApp from "@/components/image-optimizer/image-optimizer-app";
-import MockupGeneratorApp from "@/components/mockup-generator/mockup-generator-app";
-import FaviconGeneratorApp from "@/components/favicon-generator/favicon-generator-app";
-import AspectRatioFitterApp from "@/components/aspect-ratio-fitter/aspect-ratio-fitter-app";
-import GradientExtractorApp from "@/components/gradient-extractor/gradient-extractor-app";
-import ExifStripperApp from "@/components/exif-stripper/exif-stripper-app";
-import BatchWatermarkerApp from "@/components/batch-watermarker/batch-watermarker-app";
+import dynamic from "next/dynamic";
+
+const ToolLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-muted-foreground font-accent animate-pulse">Cargando herramienta...</p>
+    </div>
+  </div>
+);
+
+const BackgroundRemoverApp = dynamic(() => import("@/components/background-remover/background-remover-app"), { ssr: false, loading: ToolLoadingFallback });
+const ImageOptimizerApp = dynamic(() => import("@/components/image-optimizer/image-optimizer-app"), { ssr: false, loading: ToolLoadingFallback });
+const MockupGeneratorApp = dynamic(() => import("@/components/mockup-generator/mockup-generator-app"), { ssr: false, loading: ToolLoadingFallback });
+const FaviconGeneratorApp = dynamic(() => import("@/components/favicon-generator/favicon-generator-app"), { ssr: false, loading: ToolLoadingFallback });
+const AspectRatioFitterApp = dynamic(() => import("@/components/aspect-ratio-fitter/aspect-ratio-fitter-app"), { ssr: false, loading: ToolLoadingFallback });
+const GradientExtractorApp = dynamic(() => import("@/components/gradient-extractor/gradient-extractor-app"), { ssr: false, loading: ToolLoadingFallback });
+const ExifStripperApp = dynamic(() => import("@/components/exif-stripper/exif-stripper-app"), { ssr: false, loading: ToolLoadingFallback });
+const BatchWatermarkerApp = dynamic(() => import("@/components/batch-watermarker/batch-watermarker-app"), { ssr: false, loading: ToolLoadingFallback });
 
 import { Header } from "@/components/landing/header";
 import { HeroSection } from "@/components/landing/hero-section";

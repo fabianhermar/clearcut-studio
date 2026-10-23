@@ -1,19 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import "../globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
-});
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -81,7 +70,7 @@ interface RootLayoutProps {
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { lang } = await params;
   return (
-    <html lang={lang} className={`scroll-smooth ${inter.variable} ${outfit.variable}`}>
+    <html lang={lang} className="scroll-smooth">
       <body className="antialiased min-h-screen flex flex-col font-accent text-foreground selection:bg-primary/20 selection:text-primary">
         <main className="flex-1 flex flex-col">
           {children}

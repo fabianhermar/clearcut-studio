@@ -51,7 +51,7 @@ export function OptimizerInfoSection({ dict }: OptimizerInfoSectionProps) {
               <div className="p-6">
                 <div className="aspect-[4/3] relative rounded-xl overflow-hidden mb-6 border border-border">
                   <div className="absolute inset-0 checkerboard" />
-                  <img src="/demos/cat.png" alt="Optimization demo" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src="/demos/cat.jpg" alt="Optimization demo" className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
                   
                   {/* Overlay Stats */}
                   <div className="absolute bottom-4 left-4 right-4 flex justify-between gap-4 font-accent">

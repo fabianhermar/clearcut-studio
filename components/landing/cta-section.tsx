@@ -109,10 +109,10 @@ export function AboutSection({ dict }: { dict?: any }) {
           
           <div className="relative">
             <div className="aspect-square max-w-md mx-auto relative rounded-3xl overflow-hidden bg-[#0a0f1c] border border-border shadow-2xl group">
-              <img 
-                src="/img/secure-by-default.png" 
-                alt="ClearCut Privacy and Security" 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 opacity-90 group-hover:scale-105" 
+              <img
+                src="/img/secure-by-default.jpg" loading="lazy" decoding="async"
+                alt="ClearCut Privacy and Security"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 opacity-90 group-hover:scale-105"
               />
 
               <div className="absolute inset-0 bg-linear-to-t from-background/95 via-background/30 to-transparent pointer-events-none" />
