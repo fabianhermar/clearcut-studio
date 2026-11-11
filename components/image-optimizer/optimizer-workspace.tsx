@@ -4,27 +4,26 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { ComparisonSlider } from "./comparison-slider";
 import { FormatSelector, type ImageFormat, FORMATS } from "./format-selector";
 import { OptimizerStats } from "./optimizer-stats";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
+import { Download, ImagePlus, Cpu, AlertTriangle, Info } from "lucide-react";
 
 interface OptimizerWorkspaceProps {
   file: File;
   onReset: () => void;
+  onClose?: () => void;
   onNewFile: (file: File) => void;
+  lang?: string;
 }
 
-// Formats handled by WASM worker (Squoosh-style)
 const WASM_FORMATS: ImageFormat[] = ["avif", "webp", "jpeg"];
 
 const DEFAULT_QUALITY: Record<ImageFormat, number> = {
-  avif: 50,   // libavif: 50 is excellent quality with real compression
-  webp: 75,   // libwebp: matches Squoosh default
-  jpeg: 75,   // MozJPEG: matches Squoosh default
-  png: 100,   // Lossless — canvas.toBlob, no quality param
+  avif: 50,
+  webp: 75,
+  jpeg: 75,
+  png: 100,
 };
 
-// ─── Worker client singleton ──────────────────────────────────────────────────
-// The worker lives at /public/workers/encoder.js.
-// It is served as a static file → NOT bundled by Turbopack.
-// The browser runs it natively with full module support and WebAssembly access.
 let worker: Worker | null = null;
 let requestId = 0;
 const pending = new Map<number, { resolve: (v: Blob) => void; reject: (e: Error) => void }>();
@@ -63,7 +62,6 @@ function encodeViaWorker(
     const id = ++requestId;
     pending.set(id, { resolve, reject });
 
-    // Transfer the pixel buffer (zero-copy via Transferable)
     const pixelBuffer = imageData.data.buffer.slice(0);
     getWorker().postMessage(
       { id, format, pixelData: pixelBuffer, width: imageData.width, height: imageData.height, quality },
@@ -71,15 +69,21 @@ function encodeViaWorker(
     );
   });
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
-export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorkspaceProps) {
+export function OptimizerWorkspace({
+  file,
+  onReset,
+  onClose,
+  onNewFile,
+  lang = "es",
+}: OptimizerWorkspaceProps) {
+  const isEn = lang === "en";
   const [format, setFormat] = useState<ImageFormat>("webp");
   const [qualities, setQualities] = useState<Record<ImageFormat, number>>({ ...DEFAULT_QUALITY });
 
   const [originalSrc, setOriginalSrc] = useState<string>("");
   const [optimizedSrc, setOptimizedSrc] = useState<string | null>(null);
-  const [originalSize] = useState(file.size);
+  const [originalSize, setOriginalSize] = useState(file.size);
   const [optimizedSize, setOptimizedSize] = useState<number | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -92,8 +96,8 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
 
   const quality = qualities[format];
 
-  // Load image on mount
   useEffect(() => {
+    setOriginalSize(file.size);
     const url = URL.createObjectURL(file);
     setOriginalSrc(url);
     const img = new Image();
@@ -112,7 +116,7 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
       setEncodeError(null);
 
       try {
-        await new Promise((r) => setTimeout(r, 30)); // yield to UI
+        await new Promise((r) => setTimeout(r, 30));
 
         const img = imgRef.current;
         const canvas = canvasRef.current;
@@ -128,11 +132,9 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
         let blob: Blob;
 
         if (WASM_FORMATS.includes(targetFormat)) {
-          // ── WASM path: libavif / libwebp / MozJPEG (Squoosh-style) ──
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           blob = await encodeViaWorker(targetFormat, imageData, targetQuality);
         } else {
-          // ── PNG: lossless, canvas.toBlob is fine ──
           const native = await new Promise<Blob | null>((res) =>
             canvas.toBlob(res, "image/png")
           );
@@ -149,25 +151,25 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error("Compress error:", msg);
-        setEncodeError(`Error al codificar: ${msg}`);
+        setEncodeError(isEn ? `Encoding error: ${msg}` : `Error al codificar: ${msg}`);
         setOptimizedSrc(null);
         setOptimizedSize(null);
       } finally {
         setIsProcessing(false);
       }
     },
-    []
+    [isEn]
   );
 
-  // Debounced re-compress when format/quality changes
   useEffect(() => {
     if (!imgRef.current) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => compress(format, quality), 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    debounceRef.current = setTimeout(() => compress(format, quality), 250);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [format, quality, compress]);
 
-  // Initial compress after image loads
   useEffect(() => {
     if (dimensions.width > 0) compress(format, quality);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,10 +198,22 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
 
   const qualityPresets =
     format === "avif"
-      ? [{ label: "Baja", value: 25 }, { label: "Media", value: 50 }, { label: "Alta", value: 75 }]
+      ? [
+          { label: isEn ? "Low" : "Baja", value: 25 },
+          { label: isEn ? "Balanced" : "Media", value: 50 },
+          { label: isEn ? "High" : "Alta", value: 75 },
+        ]
       : format === "jpeg"
-      ? [{ label: "Baja", value: 50 }, { label: "Media", value: 75 }, { label: "Alta", value: 90 }]
-      : [{ label: "Baja", value: 40 }, { label: "Media", value: 75 }, { label: "Alta", value: 90 }];
+      ? [
+          { label: isEn ? "Low" : "Baja", value: 50 },
+          { label: isEn ? "Balanced" : "Media", value: 75 },
+          { label: isEn ? "High" : "Alta", value: 90 },
+        ]
+      : [
+          { label: isEn ? "Low" : "Baja", value: 40 },
+          { label: isEn ? "Balanced" : "Media", value: 75 },
+          { label: isEn ? "High" : "Alta", value: 90 },
+        ];
 
   const isLargerThanOriginal =
     optimizedSize !== null && optimizedSize > originalSize && format !== "png";
@@ -208,96 +222,94 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
     <div className="min-h-screen bg-background flex flex-col">
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-30">
-        <div className="flex items-center gap-3">
-          <button onClick={onReset} className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 5l-7 7 7 7" />
-            </svg>
-          </button>
+      <WorkspaceHeader
+        slug="image-optimizer"
+        lang={lang}
+        onClose={onClose || onReset}
+        subtitle={file.name}
+        rightSlot={
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground font-heading">Optimizador de Imágenes</h1>
-              <p className="text-xs text-muted-foreground font-accent truncate max-w-48">{file.name}</p>
-            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onNewFile(f);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-border/60 border border-border text-foreground text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            >
+              <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">{isEn ? "New image" : "Otra imagen"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={!optimizedSrc || isProcessing}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors shadow-xs cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{isEn ? "Download" : "Descargar"}</span>
+            </button>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onNewFile(f); }} />
-          <button onClick={() => fileInputRef.current?.click()}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border text-foreground text-sm font-medium rounded-xl transition-colors font-accent">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            Otra imagen
-          </button>
-          <button onClick={handleDownload} disabled={!optimizedSrc || isProcessing}
-            className="flex items-center gap-2 px-5 py-2 bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-primary/20 font-accent">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Descargar
-          </button>
-        </div>
-      </header>
+        }
+      />
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-full lg:w-72 xl:w-80 border-b lg:border-b-0 lg:border-r border-border bg-card/50 p-5 overflow-y-auto space-y-6 shrink-0 order-2 lg:order-1">
-
+        <aside className="w-full lg:w-80 border-t lg:border-t-0 lg:border-r border-border bg-card p-5 overflow-y-auto space-y-5 shrink-0 order-2 lg:order-1">
           <FormatSelector selected={format} onChange={handleFormatChange} />
 
           {/* WASM encoder badge */}
           {WASM_FORMATS.includes(format) && !encodeError && (
-            <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 text-xs font-accent flex items-start gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 shrink-0">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
+            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-foreground text-xs flex items-start gap-2.5">
+              <Cpu className="w-4 h-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
               <span>
-                <strong>
+                <strong className="font-mono font-semibold text-primary">
                   {format === "avif" ? "libavif" : format === "webp" ? "libwebp" : "MozJPEG"}
-                </strong>
-                {" "}· Encoder WASM. 100% local, sin servidores.
+                </strong>{" "}
+                · {isEn ? "WASM Worker encoder. 100% local." : "Codificador WASM en Worker. 100% local."}
               </span>
             </div>
           )}
 
           {/* Encode error */}
           {encodeError && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-accent flex items-start gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 shrink-0">
-                <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
-              </svg>
-              {encodeError}
+            <div
+              role="alert"
+              className="p-3 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive text-xs flex items-start gap-2"
+            >
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+              <span>{encodeError}</span>
             </div>
           )}
 
           {/* Larger than original */}
           {isLargerThanOriginal && (
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-xs font-accent flex items-start gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 shrink-0">
-                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-              El resultado supera el original. Baja la calidad para comprimir más.
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800 text-xs flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+              <span>
+                {isEn
+                  ? "Output exceeds original file size. Lower the quality slider to compress further."
+                  : "El resultado supera el peso original. Reduce la calidad para comprimir más."}
+              </span>
             </div>
           )}
 
           {/* PNG notice */}
           {format === "png" && (
-            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-primary text-xs font-accent flex items-start gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 shrink-0">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              PNG es sin pérdida. Para reducir tamaño, prueba WebP o AVIF.
+            <div className="p-3 rounded-xl bg-muted border border-border text-muted-foreground text-xs flex items-start gap-2">
+              <Info className="w-4 h-4 mt-0.5 shrink-0 text-primary" aria-hidden="true" />
+              <span>
+                {isEn
+                  ? "PNG is lossless. To reduce file weight significantly, select WebP or AVIF."
+                  : "PNG es un formato sin pérdida. Para reducir el peso drásticamente, elige WebP o AVIF."}
+              </span>
             </div>
           )}
 
@@ -305,23 +317,42 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
           {supportsQuality && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-accent">Calidad</label>
-                <span className="text-sm font-bold text-foreground font-heading tabular-nums">{quality}</span>
+                <label
+                  htmlFor="optimizer-quality-slider"
+                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                >
+                  {isEn ? "Quality" : "Calidad"}
+                </label>
+                <span className="text-sm font-bold text-foreground font-mono tabular-nums">
+                  {quality}%
+                </span>
               </div>
-              <input type="range" min={1} max={100} value={quality}
-                onChange={(e) => handleQualityChange(Number(e.target.value))} className="w-full" />
-              <div className="flex justify-between text-xs text-muted-foreground font-accent">
-                <span>Máx compresión</span><span>Máx calidad</span>
+              <input
+                id="optimizer-quality-slider"
+                type="range"
+                min={1}
+                max={100}
+                value={quality}
+                onChange={(e) => handleQualityChange(Number(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-[11px] text-muted-foreground">
+                <span>{isEn ? "Smallest file" : "Máx. compresión"}</span>
+                <span>{isEn ? "Highest fidelity" : "Máx. calidad"}</span>
               </div>
               <div className="flex gap-1.5">
                 {qualityPresets.map((preset) => (
-                  <button key={preset.label} onClick={() => handleQualityChange(preset.value)}
-                    className={`flex-1 py-1.5 text-xs rounded-lg border transition-all font-accent ${
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => handleQualityChange(preset.value)}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                       quality === preset.value
                         ? "bg-primary text-white border-primary"
-                        : "bg-card border-border text-muted-foreground hover:border-primary/40"
-                    }`}>
-                    {preset.label}
+                        : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    {preset.label} ({preset.value})
                   </button>
                 ))}
               </div>
@@ -337,27 +368,30 @@ export function OptimizerWorkspace({ file, onReset, onNewFile }: OptimizerWorksp
             isProcessing={isProcessing}
           />
 
-          <button onClick={handleDownload} disabled={!optimizedSrc || isProcessing}
-            className="lg:hidden w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-hover disabled:opacity-40 text-white font-semibold rounded-xl transition-colors font-accent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Descargar imagen optimizada
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={!optimizedSrc || isProcessing}
+            className="lg:hidden w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-hover disabled:opacity-40 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+          >
+            <Download className="w-4 h-4" aria-hidden="true" />
+            <span>{isEn ? "Download optimized image" : "Descargar imagen optimizada"}</span>
           </button>
-
-          <p className="text-[11px] text-muted-foreground/60 text-center font-accent mt-auto pt-4 border-t border-border/50">
-            * ClearCut Studio utiliza IA para eliminar fondos y puede cometer errores.
-          </p>
         </aside>
 
         {/* Preview */}
-        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 flex items-center justify-center p-4 lg:p-6 bg-canvas shrink-0 order-1 lg:order-2">
-          <div className="w-full h-full max-w-5xl max-h-[75vh] min-h-[340px]">
+        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 flex items-center justify-center p-4 lg:p-8 bg-canvas shrink-0 order-1 lg:order-2">
+          <div className="w-full h-full max-w-5xl max-h-[76vh] min-h-[320px]">
             {originalSrc ? (
-              <ComparisonSlider originalSrc={originalSrc} optimizedSrc={optimizedSrc} isProcessing={isProcessing} />
+              <ComparisonSlider
+                originalSrc={originalSrc}
+                optimizedSrc={optimizedSrc}
+                isProcessing={isProcessing}
+                lang={lang}
+              />
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground font-accent text-sm">
-                Cargando imagen...
+              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                {isEn ? "Loading image..." : "Cargando imagen..."}
               </div>
             )}
           </div>

@@ -6,10 +6,15 @@ import { EditorSection } from "./editor-section";
 
 interface FaviconGeneratorAppProps {
   onClose: () => void;
-  dict: any;
+  dict?: any;
+  lang?: string;
 }
 
-export default function FaviconGeneratorApp({ onClose, dict }: FaviconGeneratorAppProps) {
+export default function FaviconGeneratorApp({
+  onClose,
+  dict,
+  lang = "es",
+}: FaviconGeneratorAppProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleReset = () => {
@@ -19,9 +24,20 @@ export default function FaviconGeneratorApp({ onClose, dict }: FaviconGeneratorA
   return (
     <>
       {imageSrc ? (
-        <EditorSection imageSrc={imageSrc} onReset={handleReset} onClose={onClose} dict={dict} />
+        <EditorSection
+          imageSrc={imageSrc}
+          onReset={handleReset}
+          onClose={onClose}
+          dict={dict}
+          lang={lang}
+        />
       ) : (
-        <UploadSection onUpload={setImageSrc} onClose={onClose} dict={dict} />
+        <UploadSection
+          onUpload={setImageSrc}
+          onClose={onClose}
+          dict={dict}
+          lang={lang}
+        />
       )}
     </>
   );

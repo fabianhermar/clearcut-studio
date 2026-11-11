@@ -27,7 +27,7 @@ import { GradientBuilder, loadSavedGradients, deleteSavedGradient, SavedGradient
 
 interface LeftSidebarProps {
   settings: FramedSettings;
-  setSettings: (s: FramedSettings) => void;
+  setSettings: React.Dispatch<React.SetStateAction<FramedSettings>>;
   onNewImage: () => void;
 }
 

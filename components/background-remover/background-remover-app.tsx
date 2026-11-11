@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { removeBackground } from "@imgly/background-removal";
 
 import { UploadSection } from "./upload-section";
@@ -10,38 +10,63 @@ import { ImageEditor } from "./image-editor/image-editor";
 interface BackgroundRemoverAppProps {
   initialImage?: string;
   onClose?: () => void;
+  dict?: any;
+  lang?: string;
 }
 
-export default function BackgroundRemoverApp({ initialImage, onClose }: BackgroundRemoverAppProps) {
+export default function BackgroundRemoverApp({
+  initialImage,
+  onClose,
+  dict,
+  lang = "es",
+}: BackgroundRemoverAppProps) {
+  const isEn = lang === "en" || dict?.header?.features === "Features";
   const [originalImage, setOriginalImage] = useState<string | null>(initialImage || null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const cancelledRef = useRef(false);
 
-  const processImage = useCallback(async (imageSrc: string) => {
-    setIsProcessing(true);
-    setProgress(0);
+  const processImage = useCallback(
+    async (imageSrc: string) => {
+      cancelledRef.current = false;
+      setIsProcessing(true);
+      setProgress(0);
+      setErrorMessage(null);
 
-    try {
-      const response = await fetch(imageSrc);
-      const blob = await response.blob();
+      try {
+        const response = await fetch(imageSrc);
+        const blob = await response.blob();
 
-      const result = await removeBackground(blob, {
-        progress: (key, current, total) => {
-          const percentage = Math.round((current / total) * 100);
-          setProgress(percentage);
-        },
-      });
+        const result = await removeBackground(blob, {
+          progress: (_key, current, total) => {
+            if (cancelledRef.current || !total) return;
+            const percentage = Math.round((current / total) * 100);
+            setProgress(percentage);
+          },
+        });
 
-      const url = URL.createObjectURL(result);
-      setProcessedImage(url);
-    } catch (error) {
-      console.error("Error removing background:", error);
-      alert("Error al procesar la imagen. Por favor intenta de nuevo.");
-    } finally {
-      setIsProcessing(false);
-    }
-  }, []);
+        if (cancelledRef.current) return;
+        const url = URL.createObjectURL(result);
+        setProcessedImage(url);
+      } catch (error) {
+        if (cancelledRef.current) return;
+        console.error("Error removing background:", error);
+        setOriginalImage(null);
+        setErrorMessage(
+          isEn
+            ? "Could not process the image. Please verify the format and try another image."
+            : "No se pudo procesar la imagen. Verifica el formato e intenta nuevamente."
+        );
+      } finally {
+        if (!cancelledRef.current) {
+          setIsProcessing(false);
+        }
+      }
+    },
+    [isEn]
+  );
 
   useEffect(() => {
     if (initialImage && !processedImage) {
@@ -52,7 +77,11 @@ export default function BackgroundRemoverApp({ initialImage, onClose }: Backgrou
   const handleFileSelect = useCallback(
     (file: File) => {
       if (!file.type.startsWith("image/")) {
-        alert("Por favor selecciona un archivo de imagen valido.");
+        setErrorMessage(
+          isEn
+            ? "Please select a valid image file (JPG, PNG, WebP, AVIF)."
+            : "Por favor selecciona un archivo de imagen válido (JPG, PNG, WebP, AVIF)."
+        );
         return;
       }
 
@@ -61,7 +90,7 @@ export default function BackgroundRemoverApp({ initialImage, onClose }: Backgrou
       setProcessedImage(null);
       processImage(url);
     },
-    [processImage]
+    [processImage, isEn]
   );
 
   const handleSampleSelect = useCallback(
@@ -73,39 +102,59 @@ export default function BackgroundRemoverApp({ initialImage, onClose }: Backgrou
     [processImage]
   );
 
-  const handleReset = () => {
-    if (originalImage) URL.revokeObjectURL(originalImage);
-    if (processedImage) URL.revokeObjectURL(processedImage);
+  const handleCancelProcessing = () => {
+    cancelledRef.current = true;
+    setIsProcessing(false);
     setOriginalImage(null);
     setProcessedImage(null);
     setProgress(0);
-    if (onClose) onClose();
   };
 
-  // Upload phase
+  const handleNewImage = () => {
+    if (originalImage && originalImage.startsWith("blob:")) {
+      URL.revokeObjectURL(originalImage);
+    }
+    if (processedImage && processedImage.startsWith("blob:")) {
+      URL.revokeObjectURL(processedImage);
+    }
+    setOriginalImage(null);
+    setProcessedImage(null);
+    setProgress(0);
+  };
+
   if (!originalImage) {
     return (
       <UploadSection
         onFileSelect={handleFileSelect}
         onSampleSelect={handleSampleSelect}
         onClose={onClose}
+        dict={dict}
+        lang={lang}
+        errorMessage={errorMessage}
       />
     );
   }
 
-  // Processing phase
   if (isProcessing) {
-    return <ProcessingScreen progress={progress} originalImage={originalImage} />;
+    return (
+      <ProcessingScreen
+        progress={progress}
+        originalImage={originalImage}
+        onCancel={handleCancelProcessing}
+        lang={lang}
+      />
+    );
   }
 
-  // Editor phase
   if (processedImage) {
     return (
       <ImageEditor
         originalImage={originalImage}
         processedImage={processedImage}
-        onReset={handleReset}
+        onReset={handleNewImage}
+        onClose={onClose}
         onFileSelect={handleFileSelect}
+        lang={lang}
       />
     );
   }

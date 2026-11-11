@@ -1,23 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { UploadSection } from "./upload-section";
 import { EditorSection } from "./editor-section";
 
 interface ExifStripperAppProps {
   onClose: () => void;
   dict?: any;
+  lang?: string;
 }
 
-export default function ExifStripperApp({ onClose, dict }: ExifStripperAppProps) {
+export default function ExifStripperApp({
+  onClose,
+  dict,
+  lang = "es",
+}: ExifStripperAppProps) {
   const [file, setFile] = useState<File | null>(null);
+
+  const handleSampleSelect = useCallback(async (src: string) => {
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const name = src.split("/").pop() || "sample.jpg";
+      setFile(new File([blob], name, { type: blob.type || "image/jpeg" }));
+    } catch (e) {
+      console.error("Failed to load sample:", e);
+    }
+  }, []);
 
   return (
     <>
       {!file ? (
-        <UploadSection onUpload={setFile} onClose={onClose} dict={dict} />
+        <UploadSection
+          onUpload={setFile}
+          onSampleSelect={handleSampleSelect}
+          onClose={onClose}
+          dict={dict}
+          lang={lang}
+        />
       ) : (
-        <EditorSection file={file} onReset={() => setFile(null)} onClose={onClose} dict={dict} />
+        <EditorSection
+          file={file}
+          onReset={() => setFile(null)}
+          onClose={onClose}
+          dict={dict}
+          lang={lang}
+        />
       )}
     </>
   );

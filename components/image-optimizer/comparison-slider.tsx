@@ -1,14 +1,22 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
+import { MoveHorizontal } from "lucide-react";
 
 interface ComparisonSliderProps {
   originalSrc: string;
   optimizedSrc: string | null;
   isProcessing?: boolean;
+  lang?: string;
 }
 
-export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: ComparisonSliderProps) {
+export function ComparisonSlider({
+  originalSrc,
+  optimizedSrc,
+  isProcessing,
+  lang = "es",
+}: ComparisonSliderProps) {
+  const isEn = lang === "en";
   const [sliderPos, setSliderPos] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,18 +25,35 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width) * 100;
-    setSliderPos(Math.max(5, Math.min(95, x)));
+    setSliderPos(Math.max(4, Math.min(96, x)));
   }, []);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    setIsDragging(true);
-    updatePosition(e.clientX);
-  }, [updatePosition]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      updatePosition(e.clientX);
+    },
+    [updatePosition]
+  );
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setIsDragging(true);
-    updatePosition(e.touches[0].clientX);
-  }, [updatePosition]);
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      setIsDragging(true);
+      updatePosition(e.touches[0].clientX);
+    },
+    [updatePosition]
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 10 : 5;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setSliderPos((p) => Math.max(4, p - step));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setSliderPos((p) => Math.min(96, p + step));
+    }
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -55,7 +80,14 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full select-none overflow-hidden rounded-xl"
+      role="slider"
+      tabIndex={0}
+      aria-label={isEn ? "Compare optimized and original image" : "Comparar imagen optimizada y original"}
+      aria-valuemin={4}
+      aria-valuemax={96}
+      aria-valuenow={Math.round(sliderPos)}
+      onKeyDown={handleKeyDown}
+      className="relative w-full h-full select-none overflow-hidden rounded-2xl border border-border shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
       style={{ cursor: isDragging ? "grabbing" : "ew-resize" }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
@@ -67,7 +99,7 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
       <div className="absolute inset-0">
         <img
           src={originalSrc}
-          alt="Original"
+          alt={isEn ? "Original image" : "Imagen original"}
           className="w-full h-full object-contain"
           draggable={false}
         />
@@ -81,7 +113,7 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
         >
           <img
             src={optimizedSrc}
-            alt="Optimizada"
+            alt={isEn ? "Optimized image" : "Imagen optimizada"}
             className="w-full h-full object-contain"
             draggable={false}
           />
@@ -94,24 +126,26 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
           className="absolute inset-0 overflow-hidden"
           style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
         >
-          <div className="w-full h-full flex items-center justify-center bg-muted/80 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs text-muted-foreground font-accent">Optimizando...</span>
+          <div className="w-full h-full flex items-center justify-center bg-card/80 backdrop-blur-xs">
+            <div className="flex flex-col items-center gap-2.5 p-4 rounded-xl bg-card border border-border shadow-sm">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs text-foreground font-semibold">
+                {isEn ? "Encoding with WASM..." : "Codificando con WASM..."}
+              </span>
             </div>
           </div>
         </div>
       )}
 
       {/* Labels */}
-      <div className="absolute top-3 left-3 z-10">
-        <span className="px-2.5 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full font-accent">
-          Optimizada
+      <div className="absolute top-3 left-3 z-10 pointer-events-none">
+        <span className="px-2.5 py-1 bg-primary text-white text-xs font-semibold rounded-md shadow-xs">
+          {isEn ? "Optimized" : "Optimizada"}
         </span>
       </div>
-      <div className="absolute top-3 right-3 z-10">
-        <span className="px-2.5 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full font-accent">
-          Original
+      <div className="absolute top-3 right-3 z-10 pointer-events-none">
+        <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-semibold rounded-md">
+          {isEn ? "Original" : "Original"}
         </span>
       </div>
 
@@ -121,13 +155,9 @@ export function ComparisonSlider({ originalSrc, optimizedSrc, isProcessing }: Co
           className="absolute top-0 bottom-0 z-20 pointer-events-none"
           style={{ left: `${sliderPos}%` }}
         >
-          {/* Line */}
-          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 bg-white shadow-lg" />
-          {/* Handle */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border border-border/50 pointer-events-auto cursor-grab active:cursor-grabbing">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-              <path d="M8 3L4 7l4 4M16 3l4 4-4 4" />
-            </svg>
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 bg-white shadow-md" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-300 text-slate-800">
+            <MoveHorizontal className="w-4 h-4" aria-hidden="true" />
           </div>
         </div>
       )}

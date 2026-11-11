@@ -1,6 +1,7 @@
 "use client";
 
-import { UndoIcon, RedoIcon, RefreshIcon, LayersIcon } from "@/components/icons";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
+import { Undo2, Redo2, ImagePlus } from "lucide-react";
 
 interface EditorToolbarProps {
   canvasSize: { width: number; height: number };
@@ -9,6 +10,8 @@ interface EditorToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   onReset: () => void;
+  onClose?: () => void;
+  lang?: string;
 }
 
 export function EditorToolbar({
@@ -18,45 +21,56 @@ export function EditorToolbar({
   onUndo,
   onRedo,
   onReset,
+  onClose,
+  lang = "es",
 }: EditorToolbarProps) {
-  return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <img src="/logos/ClearCut-logo.avif" alt="ClearCut" className="h-24 w-auto" />
-        </div>
-        <div className="hidden md:block h-6 w-px bg-slate-200" />
-        <span className="hidden md:block text-sm text-slate-500 font-accent">
-          {canvasSize.width} x {canvasSize.height}px
-        </span>
-      </div>
+  const isEn = lang === "en";
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onUndo}
-          disabled={!canUndo}
-          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          title="Deshacer"
-        >
-          <UndoIcon size={18} />
-        </button>
-        <button
-          onClick={onRedo}
-          disabled={!canRedo}
-          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          title="Rehacer"
-        >
-          <RedoIcon size={18} />
-        </button>
-        <div className="h-6 w-px bg-slate-200 mx-2" />
-        <button
-          onClick={onReset}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
-        >
-          <RefreshIcon size={16} />
-          <span className="font-accent">Nueva imagen</span>
-        </button>
-      </div>
-    </header>
+  return (
+    <WorkspaceHeader
+      slug="background-remover"
+      lang={lang}
+      onClose={onClose || onReset}
+      centerSlot={
+        canvasSize.width > 0 ? (
+          <span className="font-mono text-xs font-medium text-muted-foreground px-2.5 py-1 rounded-md bg-muted border border-border">
+            {canvasSize.width} × {canvasSize.height} px
+          </span>
+        ) : null
+      }
+      rightSlot={
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={onUndo}
+            disabled={!canUndo}
+            aria-label={isEn ? "Undo" : "Deshacer"}
+            title={isEn ? "Undo" : "Deshacer"}
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Undo2 className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onRedo}
+            disabled={!canRedo}
+            aria-label={isEn ? "Redo" : "Rehacer"}
+            title={isEn ? "Redo" : "Rehacer"}
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Redo2 className="w-4 h-4" />
+          </button>
+          <div className="h-4 w-px bg-border mx-1" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+          >
+            <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{isEn ? "New image" : "Nueva imagen"}</span>
+          </button>
+        </div>
+      }
+    />
   );
 }

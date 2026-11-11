@@ -3,49 +3,78 @@
 import { useState, useEffect } from "react";
 import { StripResult, ExifData } from "./types";
 import { stripExif, formatBytes, getCleanFileName } from "./stripper";
-import { Download, RefreshCw, ShieldCheck, ShieldAlert } from "lucide-react";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
+import {
+  Download,
+  RefreshCw,
+  ShieldCheck,
+  ShieldAlert,
+  Camera,
+  Aperture,
+  MapPin,
+  Calendar,
+  Sliders,
+  Focus,
+  Cpu,
+  User,
+  Copyright,
+  CheckCircle2,
+  type LucideIcon,
+} from "lucide-react";
 
 interface EditorSectionProps {
   file: File;
   onReset: () => void;
   onClose?: () => void;
   dict?: any;
+  lang?: string;
 }
 
 interface MetaItem {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   value: string;
   highlight?: "red" | "blue";
 }
 
-function buildMetaItems(exif: ExifData): MetaItem[] {
+function buildMetaItems(exif: ExifData, isEn: boolean): MetaItem[] {
   const items: MetaItem[] = [];
 
   if (exif.Make || exif.Model) {
     items.push({
-      icon: "📷",
-      label: "Cámara",
+      icon: Camera,
+      label: isEn ? "Camera" : "Cámara",
       value: [exif.Make, exif.Model].filter(Boolean).join(" "),
     });
   }
   if (exif.LensModel) {
-    items.push({ icon: "🔭", label: "Lente", value: exif.LensModel });
+    items.push({
+      icon: Aperture,
+      label: isEn ? "Lens" : "Lente",
+      value: exif.LensModel,
+    });
   }
   if (exif.latitude != null && exif.longitude != null) {
     const lat = exif.latitude.toFixed(5);
     const lon = exif.longitude.toFixed(5);
     items.push({
-      icon: "📍",
-      label: "Ubicación GPS",
+      icon: MapPin,
+      label: isEn ? "GPS Location" : "Ubicación GPS",
       value: `${lat}°, ${lon}°`,
       highlight: "red",
     });
   }
   if (exif.DateTimeOriginal || exif.CreateDate) {
     const d = exif.DateTimeOriginal || exif.CreateDate;
-    const dateStr = d instanceof Date ? d.toLocaleString("es-MX") : String(d);
-    items.push({ icon: "📅", label: "Fecha de captura", value: dateStr });
+    const dateStr =
+      d instanceof Date
+        ? d.toLocaleString(isEn ? "en-US" : "es-MX")
+        : String(d);
+    items.push({
+      icon: Calendar,
+      label: isEn ? "Capture Date" : "Fecha de captura",
+      value: dateStr,
+    });
   }
   if (exif.FNumber && exif.ISO) {
     const f = `f/${exif.FNumber}`;
@@ -56,40 +85,58 @@ function buildMetaItems(exif: ExifData): MetaItem[] {
         : `${exif.ExposureTime}s`
       : null;
     items.push({
-      icon: "⚙️",
-      label: "Exposición",
+      icon: Sliders,
+      label: isEn ? "Exposure" : "Exposición",
       value: [f, ss, iso].filter(Boolean).join(" · "),
     });
   }
   if (exif.FocalLength) {
-    items.push({ icon: "🔍", label: "Focal", value: `${exif.FocalLength}mm` });
+    items.push({
+      icon: Focus,
+      label: isEn ? "Focal Length" : "Distancia focal",
+      value: `${exif.FocalLength} mm`,
+    });
   }
   if (exif.Software) {
-    items.push({ icon: "💾", label: "Software", value: exif.Software });
+    items.push({
+      icon: Cpu,
+      label: "Software",
+      value: exif.Software,
+    });
   }
   if (exif.Artist) {
-    items.push({ icon: "🎨", label: "Artista", value: exif.Artist });
+    items.push({
+      icon: User,
+      label: isEn ? "Author / Artist" : "Autor / Artista",
+      value: exif.Artist,
+    });
   }
   if (exif.Copyright) {
-    items.push({ icon: "©️", label: "Copyright", value: exif.Copyright });
+    items.push({
+      icon: Copyright,
+      label: "Copyright",
+      value: exif.Copyright,
+    });
   }
 
   return items;
 }
 
-export function EditorSection({ file, onReset, onClose, dict }: EditorSectionProps) {
+export function EditorSection({
+  file,
+  onReset,
+  onClose,
+  dict,
+  lang = "es",
+}: EditorSectionProps) {
+  const isEn = lang === "en" || dict?.header?.features === "Features";
   const [result, setResult] = useState<StripResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    // Show original image preview immediately
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewSrc(objectUrl);
-
-    // Process EXIF stripping
     setIsProcessing(true);
+    setError(null);
     stripExif(file)
       .then((res) => {
         setResult(res);
@@ -97,12 +144,14 @@ export function EditorSection({ file, onReset, onClose, dict }: EditorSectionPro
       })
       .catch((err) => {
         console.error(err);
-        setError("No se pudo procesar la imagen.");
+        setError(
+          isEn
+            ? "Could not process the image metadata."
+            : "No se pudo procesar los metadatos de la imagen."
+        );
         setIsProcessing(false);
       });
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [file]);
+  }, [file, isEn]);
 
   const handleDownload = () => {
     if (!result) return;
@@ -114,185 +163,198 @@ export function EditorSection({ file, onReset, onClose, dict }: EditorSectionPro
     document.body.removeChild(a);
   };
 
-  const metaItems = result?.exifData ? buildMetaItems(result.exifData) : [];
+  const metaItems = result?.exifData ? buildMetaItems(result.exifData, isEn) : [];
   const hasExif = metaItems.length > 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-3">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-              title="Volver al inicio"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 5l-7 7 7 7" />
-              </svg>
-            </button>
-          )}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground font-heading">EXIF Stripper</h1>
-              <p className="text-xs text-muted-foreground font-accent">Privacy Cleaner</p>
-            </div>
-          </div>
-        </div>
-        <button
-          onClick={onReset}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
-        >
-          <RefreshCw size={14} />
-          Limpiar otra imagen
-        </button>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <WorkspaceHeader
+        slug="exif-stripper"
+        lang={lang}
+        onClose={onClose || onReset}
+        subtitle={file.name}
+        rightSlot={
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{isEn ? "Clean another image" : "Limpiar otra imagen"}</span>
+          </button>
+        }
+      />
 
-      {/* Main content */}
-      <div className="flex-1 overflow-auto bg-[#f8fafc]">
+      <div className="flex-1 overflow-auto bg-background">
         {isProcessing ? (
-          /* Loading state */
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground">
-            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-            <p className="font-accent text-sm">Analizando y limpiando metadatos…</p>
+          <div className="flex flex-col items-center justify-center min-h-[65vh] gap-3 text-muted-foreground">
+            <div className="w-9 h-9 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-medium">
+              {isEn
+                ? "Inspecting and stripping EXIF metadata locally..."
+                : "Analizando y eliminando metadatos EXIF localmente..."}
+            </p>
           </div>
         ) : error ? (
-          /* Error state */
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-red-500">
-            <ShieldAlert size={48} />
-            <p className="font-heading font-bold">{error}</p>
+          <div className="flex flex-col items-center justify-center min-h-[65vh] gap-4 text-destructive px-4">
+            <ShieldAlert className="w-12 h-12" />
+            <p className="font-heading font-bold text-lg">{error}</p>
             <button
+              type="button"
               onClick={onReset}
-              className="px-4 py-2 bg-foreground text-background text-sm font-bold rounded-xl hover:bg-foreground/90 transition-colors"
+              className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary-hover transition-colors cursor-pointer"
             >
-              Intentar de nuevo
+              {isEn ? "Try again" : "Intentar de nuevo"}
             </button>
           </div>
         ) : result ? (
-          /* Results */
-          <div className="flex flex-col lg:flex-row gap-0 h-full">
+          <div className="flex flex-col lg:flex-row min-h-[calc(100vh-3.5rem)]">
             {/* Left: Image preview */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 gap-6 min-h-[300px]">
-              <div className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-xl ring-1 ring-border bg-card">
-                {/* Checkered background for transparency */}
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage:
-                      "repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%)",
-                    backgroundSize: "20px 20px",
-                  }}
-                />
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 gap-5 bg-canvas">
+              <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-md border border-border bg-card checkerboard">
                 <img
                   src={result.cleanDataUrl}
-                  alt="Imagen limpia"
-                  className="relative w-full h-auto object-contain max-h-[50vh]"
+                  alt={isEn ? "Sanitized image preview" : "Vista previa de imagen limpia"}
+                  className="relative w-full h-auto object-contain max-h-[54vh]"
                 />
               </div>
 
-              {/* File info */}
-              <div className="flex items-center gap-6 text-sm font-accent text-muted-foreground">
+              {/* File metrics */}
+              <div className="flex flex-wrap items-center justify-center gap-4 px-4 py-2.5 rounded-xl bg-card border border-border text-xs">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-muted-foreground">Original:</span>
-                  <span className="font-medium text-foreground">{formatBytes(result.originalSize)}</span>
-                </div>
-                <div className="w-px h-4 bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-muted-foreground">Limpia:</span>
-                  <span className="font-medium text-foreground">{formatBytes(result.cleanSize)}</span>
-                </div>
-                <div className="w-px h-4 bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs px-2 py-0.5 bg-muted rounded-full border border-border font-mono">
-                    {result.outputType.split("/")[1].toUpperCase()}
+                  <span className="text-muted-foreground">
+                    {isEn ? "Original:" : "Original:"}
+                  </span>
+                  <span className="font-mono font-semibold text-foreground">
+                    {formatBytes(result.originalSize)}
                   </span>
                 </div>
+                <div className="w-px h-3.5 bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-muted-foreground">
+                    {isEn ? "Clean output:" : "Salida limpia:"}
+                  </span>
+                  <span className="font-mono font-semibold text-emerald-700">
+                    {formatBytes(result.cleanSize)}
+                  </span>
+                </div>
+                <div className="w-px h-3.5 bg-border" />
+                <span className="font-mono font-semibold px-2 py-0.5 bg-muted rounded-md border border-border text-foreground">
+                  {result.outputType.split("/")[1].toUpperCase()}
+                </span>
               </div>
             </div>
 
-            {/* Right: Metadata panel */}
-            <div className="w-full lg:w-96 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col">
+            {/* Right: Metadata Report Panel */}
+            <aside className="w-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col justify-between">
               <div className="p-6 flex-1 overflow-auto">
+                <h2 className="text-base font-bold font-heading text-foreground mb-1">
+                  {isEn ? "Metadata Inspection Report" : "Informe de inspección de metadatos"}
+                </h2>
+                <p className="text-xs text-muted-foreground mb-5">
+                  {isEn
+                    ? "Tags read from the source file and removed from the clean copy."
+                    : "Etiquetas detectadas en el archivo original y eliminadas de la copia limpia."}
+                </p>
+
                 {hasExif ? (
                   <>
-                    {/* Danger badge */}
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium font-accent mb-5">
-                      <ShieldAlert size={16} className="shrink-0" />
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive text-xs font-medium mb-4">
+                      <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
                       <span>
-                        Se encontraron <strong>{metaItems.length}</strong> tipo{metaItems.length !== 1 ? "s" : ""} de datos privados — eliminados.
+                        {isEn ? (
+                          <>
+                            Found and stripped <strong>{metaItems.length}</strong> private metadata{" "}
+                            {metaItems.length === 1 ? "field" : "fields"}.
+                          </>
+                        ) : (
+                          <>
+                            Se detectaron y eliminaron <strong>{metaItems.length}</strong> campo
+                            {metaItems.length !== 1 ? "s" : ""} de metadatos privados.
+                          </>
+                        )}
                       </span>
                     </div>
 
-                    {/* Metadata list */}
-                    <ul className="space-y-2">
-                      {metaItems.map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-3 p-3 rounded-xl border border-border bg-background animate-slide-up"
-                          style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
-                        >
-                          <span className="text-lg leading-none mt-0.5 shrink-0">{item.icon}</span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-muted-foreground font-heading uppercase tracking-wide mb-0.5">
-                              {item.label}
-                            </p>
-                            <p
-                              className={`text-sm font-accent truncate ${
+                    <ul className="space-y-2.5">
+                      {metaItems.map((item, i) => {
+                        const Icon = item.icon;
+                        return (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 p-3 rounded-xl border border-border bg-background"
+                          >
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
                                 item.highlight === "red"
-                                  ? "text-red-500 font-medium"
-                                  : "text-foreground"
+                                  ? "bg-destructive/10 text-destructive border border-destructive/20"
+                                  : "bg-primary/10 text-primary border border-primary/20"
                               }`}
                             >
-                              {item.value}
-                            </p>
-                          </div>
-                          {/* Red dot for GPS */}
-                          {item.highlight === "red" && (
-                            <div className="w-2 h-2 rounded-full bg-red-500 mt-1 shrink-0 animate-pulse" />
-                          )}
-                        </li>
-                      ))}
+                              <Icon className="w-4 h-4" aria-hidden="true" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">
+                                {item.label}
+                              </p>
+                              <p
+                                className={`text-xs font-mono break-all ${
+                                  item.highlight === "red"
+                                    ? "text-destructive font-semibold"
+                                    : "text-foreground"
+                                }`}
+                              >
+                                {item.value}
+                              </p>
+                            </div>
+                            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+                              {isEn ? "STRIPPED" : "ELIMINADO"}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </>
                 ) : (
-                  /* No EXIF found */
-                  <div className="flex flex-col items-center justify-center h-full gap-4 py-12 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center">
-                      <ShieldCheck size={32} className="text-success" />
+                  <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-2xl bg-background border border-border">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
+                      <ShieldCheck className="w-6 h-6 text-emerald-700" aria-hidden="true" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-foreground font-heading mb-1">¡Ya estaba limpia!</h3>
-                      <p className="text-sm text-muted-foreground font-accent">
-                        No encontramos metadatos privados en esta imagen.
-                      </p>
-                    </div>
+                    <h3 className="font-bold text-foreground font-heading text-sm mb-1">
+                      {isEn ? "No embedded EXIF metadata found" : "Sin metadatos EXIF incrustados"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                      {isEn
+                        ? "This file did not contain readable GPS or camera EXIF tags. We still generated a freshly re-encoded clean copy for you."
+                        : "Este archivo no contenía etiquetas GPS o de cámara legibles. Aun así, generamos una copia re-codificada limpia lista para descargar."}
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                      <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+                      {isEn ? "Verified clean pixel buffer" : "Buffer de píxeles limpio verificado"}
+                    </span>
                   </div>
                 )}
               </div>
 
-              {/* Download button */}
-              <div className="p-5 border-t border-border bg-card/80 shrink-0">
+              {/* Download CTA */}
+              <div className="p-5 border-t border-border bg-card">
                 <button
+                  type="button"
                   onClick={handleDownload}
-                  className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 bg-foreground text-background font-bold text-sm rounded-2xl hover:bg-foreground/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg relative overflow-hidden group"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white font-semibold text-sm rounded-xl transition-all shadow-xs cursor-pointer"
                 >
-                  {/* Shimmer effect */}
-                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                  <Download size={18} />
-                  Descargar imagen limpia
+                  <Download className="w-4 h-4" aria-hidden="true" />
+                  <span>
+                    {isEn ? "Download sanitized image" : "Descargar imagen sin metadatos"}
+                  </span>
                 </button>
-                <p className="text-center text-xs text-muted-foreground font-accent mt-2.5">
-                  Sin marca de agua · Sin servidor · 100% privado
+                <p className="text-center text-[11px] text-muted-foreground mt-2">
+                  {isEn
+                    ? "Re-encoded locally via HTML5 Canvas · 0 bytes uploaded"
+                    : "Re-codificada localmente mediante HTML5 Canvas · 0 bytes subidos"}
                 </p>
               </div>
-            </div>
+            </aside>
           </div>
         ) : null}
       </div>

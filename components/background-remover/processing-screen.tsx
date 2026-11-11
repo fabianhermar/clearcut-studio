@@ -1,127 +1,152 @@
 "use client";
 
-import { CheckIcon, LayersIcon } from "@/components/icons";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
+import { Check, Cpu, X } from "lucide-react";
 
 interface ProcessingScreenProps {
   progress: number;
   originalImage: string | null;
+  onCancel?: () => void;
+  lang?: string;
 }
 
-export function ProcessingScreen({ progress, originalImage }: ProcessingScreenProps) {
+export function ProcessingScreen({
+  progress,
+  originalImage,
+  onCancel,
+  lang = "es",
+}: ProcessingScreenProps) {
+  const isEn = lang === "en";
+  const clamped = Math.max(0, Math.min(100, progress || 0));
+
+  const statusText = isEn
+    ? clamped < 30
+      ? "Initializing ONNX model in browser..."
+      : clamped < 65
+      ? "Analyzing subject edges and foreground..."
+      : clamped < 92
+      ? "Generating alpha mask..."
+      : "Preparing editor workspace..."
+    : clamped < 30
+    ? "Inicializando modelo ONNX en el navegador..."
+    : clamped < 65
+    ? "Analizando bordes del sujeto y primer plano..."
+    : clamped < 92
+    ? "Generando máscara de transparencia..."
+    : "Preparando el espacio de edición...";
+
+  const steps = isEn
+    ? ["Model", "Analysis", "Mask", "Ready"]
+    : ["Modelo", "Análisis", "Máscara", "Listo"];
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50/30 flex flex-col">
-      {/* Decorative elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/30 rounded-full blur-3xl animate-pulse" />
-      </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <WorkspaceHeader
+        slug="background-remover"
+        lang={lang}
+        onClose={onCancel}
+        subtitle={isEn ? "Processing locally..." : "Procesando localmente..."}
+      />
 
-      {/* Header */}
-      <header className="relative z-10 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="/logos/ClearCut-logo.avif" alt="ClearCut" className="h-24 w-auto" />
-          </div>
-        </div>
-      </header>
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-md p-6 sm:p-8">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
+              <Cpu className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
+              <span>{isEn ? "Local WebAssembly Execution" : "Ejecución local WebAssembly"}</span>
+            </div>
 
-      {/* Main content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-lg">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/50 p-10">
-            <div className="text-center">
-              {/* Animated progress ring */}
-              <div className="relative w-32 h-32 mx-auto mb-8">
-                {/* Background ring */}
-                <svg className="w-32 h-32 transform -rotate-90">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="#e2e8f0"
-                    strokeWidth="8"
-                    fill="none"
-                  />
-                  {/* Progress ring with gradient */}
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="url(#progressGradient)"
-                    strokeWidth="8"
-                    fill="none"
-                    strokeDasharray={351.86}
-                    strokeDashoffset={351.86 - (351.86 * progress) / 100}
-                    strokeLinecap="round"
-                    className="transition-all duration-300"
-                  />
-                  <defs>
-                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                {/* Center content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent font-accent">
-                    {progress}%
-                  </span>
-                </div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-slate-800 mb-2 font-heading">
-                Procesando imagen
-              </h3>
-              <p className="text-slate-500 mb-2 font-accent">
-                {progress < 30
-                  ? "Cargando modelos de IA..."
-                  : progress < 60
-                  ? "Analizando imagen..."
-                  : progress < 90
-                  ? "Eliminando fondo..."
-                  : "Finalizando..."}
-              </p>
-
-              {/* Progress steps */}
-              <div className="flex items-center justify-center gap-2 mt-6">
-                {["IA", "Analisis", "Fondo", "Listo"].map((step, i) => {
-                  const stepProgress = (i + 1) * 25;
-                  const isActive = progress >= stepProgress - 25;
-                  const isComplete = progress >= stepProgress;
-                  return (
-                    <div key={step} className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
-                        isComplete
-                          ? "bg-linear-to-r from-blue-500 to-cyan-500 text-white"
-                          : isActive
-                          ? "bg-blue-100 text-blue-600 animate-pulse"
-                          : "bg-slate-100 text-slate-400"
-                      }`}>
-                        {isComplete ? <CheckIcon size={14} /> : i + 1}
-                      </div>
-                      {i < 3 && (
-                        <div className={`w-8 h-0.5 rounded transition-colors ${
-                          isComplete ? "bg-linear-to-r from-blue-500 to-cyan-500" : "bg-slate-200"
-                        }`} />
-                      )}
-                    </div>
-                  );
-                })}
+            {/* Progress Ring */}
+            <div className="relative w-28 h-28 mx-auto mb-6">
+              <svg className="w-28 h-28 transform -rotate-90" aria-hidden="true">
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="48"
+                  stroke="#e2e8f0"
+                  strokeWidth="7"
+                  fill="none"
+                />
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="48"
+                  stroke="#2563eb"
+                  strokeWidth="7"
+                  fill="none"
+                  strokeDasharray={301.59}
+                  strokeDashoffset={301.59 - (301.59 * clamped) / 100}
+                  strokeLinecap="round"
+                  className="transition-all duration-200"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span
+                  aria-live="polite"
+                  className="text-2xl font-bold font-mono text-foreground"
+                >
+                  {clamped}%
+                </span>
               </div>
             </div>
 
-            {/* Preview */}
-            {originalImage && (
-              <div className="mt-8 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                <img
-                  src={originalImage}
-                  alt="Original"
-                  className="w-full h-48 object-contain bg-slate-50"
-                />
-              </div>
-            )}
+            <h2 className="text-xl font-bold text-foreground font-heading mb-1.5">
+              {isEn ? "Removing background" : "Eliminando el fondo"}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">{statusText}</p>
+
+            {/* Step indicators */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {steps.map((step, i) => {
+                const stepThreshold = (i + 1) * 25;
+                const isActive = clamped >= stepThreshold - 25;
+                const isComplete = clamped >= stepThreshold;
+                return (
+                  <div key={step} className="flex items-center gap-2">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
+                        isComplete
+                          ? "bg-primary text-white"
+                          : isActive
+                          ? "bg-primary/15 text-primary border border-primary/30"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {isComplete ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                    </div>
+                    {i < 3 && (
+                      <div
+                        className={`w-6 h-0.5 rounded ${
+                          isComplete ? "bg-primary" : "bg-border"
+                        }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
+          {originalImage && (
+            <div className="rounded-xl overflow-hidden border border-border bg-muted/40 mb-5">
+              <img
+                src={originalImage}
+                alt={isEn ? "Image being processed" : "Imagen en proceso"}
+                className="w-full h-40 object-contain"
+              />
+            </div>
+          )}
+
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+              {isEn ? "Cancel processing" : "Cancelar procesamiento"}
+            </button>
+          )}
         </div>
       </main>
     </div>

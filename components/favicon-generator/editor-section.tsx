@@ -1,25 +1,44 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Download, SlidersHorizontal, Eye, ImagePlus, X } from "lucide-react";
+import {
+  Download,
+  SlidersHorizontal,
+  Eye,
+  ImagePlus,
+  X,
+  Copy,
+  Check,
+  PackageCheck,
+} from "lucide-react";
 import { FaviconSettings, DEFAULT_FAVICON_SETTINGS } from "./types";
 import { generateFavicons } from "./generator";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
 
 interface EditorSectionProps {
   imageSrc: string;
   onReset: () => void;
   onClose?: () => void;
   dict?: any;
+  lang?: string;
 }
 
-export function EditorSection({ imageSrc, onReset, onClose, dict }: EditorSectionProps) {
+export function EditorSection({
+  imageSrc,
+  onReset,
+  onClose,
+  dict,
+  lang = "es",
+}: EditorSectionProps) {
+  const isEn = lang === "en" || dict?.header?.features === "Features";
   const [settings, setSettings] = useState<FaviconSettings>(DEFAULT_FAVICON_SETTINGS);
   const [darkImageSrc, setDarkImageSrc] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportData, setExportData] = useState<{ zipBlob: Blob; htmlCode: string } | null>(null);
+  const [copiedHtml, setCopiedHtml] = useState(false);
   const darkFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDarkFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +59,6 @@ export function EditorSection({ imageSrc, onReset, onClose, dict }: EditorSectio
       setShowExportModal(true);
     } catch (err) {
       console.error(err);
-      alert("Failed to generate favicons.");
     } finally {
       setIsGenerating(false);
     }
@@ -58,346 +76,507 @@ export function EditorSection({ imageSrc, onReset, onClose, dict }: EditorSectio
     URL.revokeObjectURL(url);
   };
 
+  const handleCopyHtml = async () => {
+    if (!exportData) return;
+    try {
+      await navigator.clipboard.writeText(exportData.htmlCode);
+      setCopiedHtml(true);
+      setTimeout(() => setCopiedHtml(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-3">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-              title="Volver al inicio"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 5l-7 7 7 7" />
-              </svg>
-            </button>
-          )}
+    <div className="min-h-screen bg-background flex flex-col">
+      <WorkspaceHeader
+        slug="favicon-generator"
+        lang={lang}
+        onClose={onClose || onReset}
+        rightSlot={
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                 <path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12" />
-                 <path d="M4 22h16" />
-                 <path d="M12 8v4" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground font-heading">Favicon Generator</h1>
-              <p className="text-xs text-muted-foreground font-accent">Icon Creator</p>
-            </div>
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+            >
+              <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">{isEn ? "New icon" : "Nuevo icono"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>
+                {isGenerating
+                  ? isEn
+                    ? "Packaging..."
+                    : "Empaquetando..."
+                  : isEn
+                  ? "Export Bundle"
+                  : "Exportar paquete"}
+              </span>
+            </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
-      {/* Main App */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f8fafc]">
-      {/* Left Sidebar (Settings) */}
-      <div className="w-full md:w-80 border-r border-border bg-card flex flex-col flex-shrink-0 h-[40vh] md:h-full overflow-y-auto">
-        <div className="p-4 border-b border-border flex items-center gap-2">
-          <SlidersHorizontal size={16} className="text-muted-foreground" />
-          <h2 className="text-sm font-bold">Settings</h2>
-        </div>
-        
-        <div className="p-5 space-y-8">
-          {/* Padding */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Image Margin</Label>
-              <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{settings.padding}%</span>
-            </div>
-            <Slider
-              min={0}
-              max={40}
-              step={1}
-              value={[settings.padding]}
-              onValueChange={([val]) => setSettings((s) => ({ ...s, padding: val }))}
-            />
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-background">
+        {/* Left Sidebar */}
+        <aside className="w-full lg:w-80 border-t lg:border-t-0 lg:border-r border-border bg-card flex flex-col shrink-0 order-2 lg:order-1 overflow-y-auto">
+          <div className="p-4 border-b border-border flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-primary" aria-hidden="true" />
+            <h2 className="text-sm font-bold font-heading text-foreground">
+              {isEn ? "Icon Configuration" : "Configuración de iconos"}
+            </h2>
           </div>
 
-          {/* Dark Mode Icon */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Dark Theme Icon</Label>
+          <div className="p-5 space-y-6">
+            {/* Padding */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  {isEn ? "Internal Margin" : "Margen interno"}
+                </Label>
+                <span className="text-xs font-mono font-semibold bg-muted px-2 py-0.5 rounded border border-border text-foreground">
+                  {settings.padding}%
+                </span>
+              </div>
+              <Slider
+                min={0}
+                max={40}
+                step={1}
+                value={[settings.padding]}
+                onValueChange={([val]) => setSettings((s) => ({ ...s, padding: val }))}
+              />
             </div>
-            {darkImageSrc ? (
-              <div className="flex items-center justify-between p-2 border border-border rounded-md bg-muted/50">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded bg-black/10 flex items-center justify-center overflow-hidden">
-                    <img src={darkImageSrc} alt="Dark Icon" className="w-full h-full object-contain" />
+
+            {/* Dark Mode Icon */}
+            <div className="space-y-2.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {isEn ? "Dark Mode Variant" : "Variante para modo oscuro"}
+              </Label>
+              {darkImageSrc ? (
+                <div className="flex items-center justify-between p-2.5 border border-border rounded-xl bg-muted/40">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center overflow-hidden p-1">
+                      <img src={darkImageSrc} alt="Dark Icon" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-xs font-semibold text-foreground">
+                      {isEn ? "Custom dark icon" : "Icono oscuro activo"}
+                    </span>
                   </div>
-                  <span className="text-xs font-medium text-foreground">Custom Dark Icon</span>
+                  <button
+                    type="button"
+                    onClick={() => setDarkImageSrc(null)}
+                    aria-label={isEn ? "Remove dark icon" : "Quitar icono oscuro"}
+                    className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
+              ) : (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => darkFileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-semibold border border-dashed border-border rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    <ImagePlus className="w-3.5 h-3.5" />
+                    <span>{isEn ? "Add dark theme icon" : "Añadir icono para tema oscuro"}</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={darkFileInputRef}
+                    onChange={handleDarkFile}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Background Color */}
+            <div className="space-y-2.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {isEn ? "Background Fill" : "Fondo del icono"}
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  aria-label={isEn ? "Select background color" : "Seleccionar color de fondo"}
+                  value={settings.backgroundColor === "transparent" ? "#ffffff" : settings.backgroundColor}
+                  onChange={(e) => setSettings((s) => ({ ...s, backgroundColor: e.target.value }))}
+                  className="w-9 h-9 rounded-lg border border-border cursor-pointer p-0.5 bg-card"
+                />
                 <button
-                  onClick={() => setDarkImageSrc(null)}
-                  className="p-1.5 hover:bg-black/5 rounded-full text-muted-foreground"
+                  type="button"
+                  onClick={() => setSettings((s) => ({ ...s, backgroundColor: "transparent" }))}
+                  className={`px-3 py-2 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                    settings.backgroundColor === "transparent"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-background text-foreground border-border hover:bg-muted"
+                  }`}
                 >
-                  <X size={14} />
+                  {isEn ? "Transparent" : "Transparente"}
                 </button>
               </div>
-            ) : (
-              <div>
-                <button
-                  onClick={() => darkFileInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium border border-dashed border-border rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
-                >
-                  <ImagePlus size={14} /> Add dark theme icon
-                </button>
+            </div>
+
+            {/* App Name */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="favicon-app-name"
+                className="text-xs font-bold text-muted-foreground uppercase tracking-wider"
+              >
+                {isEn ? "Application Name" : "Nombre de la aplicación"}
+              </Label>
+              <input
+                id="favicon-app-name"
+                type="text"
+                value={settings.appName}
+                onChange={(e) => setSettings((s) => ({ ...s, appName: e.target.value }))}
+                placeholder="My Web App"
+                className="w-full text-xs font-medium bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            {/* Theme Color */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {isEn ? "Manifest Theme Color" : "Color de tema (Manifest)"}
+              </Label>
+              <div className="flex items-center gap-2.5">
                 <input
-                  type="file"
-                  ref={darkFileInputRef}
-                  onChange={handleDarkFile}
-                  accept="image/*"
-                  className="hidden"
+                  type="color"
+                  aria-label={isEn ? "Select theme color" : "Seleccionar color de tema"}
+                  value={settings.themeColor}
+                  onChange={(e) => setSettings((s) => ({ ...s, themeColor: e.target.value }))}
+                  className="w-9 h-9 rounded-lg border border-border cursor-pointer p-0.5 bg-card"
                 />
-                <p className="text-[10px] text-muted-foreground mt-2 leading-tight">
-                  Optional: Upload a different icon for users in Dark Mode.
+                <span className="text-xs font-mono font-semibold text-foreground">
+                  {settings.themeColor}
+                </span>
+              </div>
+            </div>
+
+            {/* Favicon Path */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="favicon-path-input"
+                className="text-xs font-bold text-muted-foreground uppercase tracking-wider"
+              >
+                {isEn ? "Public Path Prefix" : "Ruta pública de archivos"}
+              </Label>
+              <input
+                id="favicon-path-input"
+                type="text"
+                value={settings.path}
+                onChange={(e) => setSettings((s) => ({ ...s, path: e.target.value }))}
+                placeholder="/"
+                className="w-full text-xs font-mono bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* Center Live Previews */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6 bg-canvas order-1 lg:order-2">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-card p-4 rounded-2xl border border-border shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                <Eye className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold font-heading text-foreground">
+                  {isEn ? "Real-Time Platform Previews" : "Previsualización multiplataforma en vivo"}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {isEn
+                    ? "Includes 16×16, 32×32, favicon.ico, Apple 180×180, Android 192/512 & site.webmanifest"
+                    : "Incluye 16×16, 32×32, favicon.ico, Apple 180×180, Android 192/512 y site.webmanifest"}
                 </p>
               </div>
-            )}
-          </div>
-
-          {/* Background Color */}
-          <div className="space-y-3">
-            <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Background Color</Label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={settings.backgroundColor === "transparent" ? "#ffffff" : settings.backgroundColor}
-                onChange={(e) => setSettings((s) => ({ ...s, backgroundColor: e.target.value }))}
-                className="w-8 h-8 rounded border-none cursor-pointer p-0"
-              />
-              <button
-                onClick={() => setSettings((s) => ({ ...s, backgroundColor: "transparent" }))}
-                className={`px-3 py-1.5 text-xs font-medium rounded border ${settings.backgroundColor === "transparent" ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:bg-muted"}`}
-              >
-                Transparent
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            >
+              <Download className="w-4 h-4" aria-hidden="true" />
+              <span>
+                {isGenerating
+                  ? isEn
+                    ? "Generating..."
+                    : "Generando..."
+                  : isEn
+                  ? "Generate Favicons (.ZIP)"
+                  : "Generar Favicons (.ZIP)"}
+              </span>
+            </button>
           </div>
 
-          {/* App Name */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">App Name</Label>
-            </div>
-            <input
-              type="text"
-              value={settings.appName}
-              onChange={(e) => setSettings((s) => ({ ...s, appName: e.target.value }))}
-              placeholder="My Awesome App"
-              className="w-full text-xs font-medium bg-background border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-
-          {/* Theme Color */}
-          <div className="space-y-3">
-            <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Theme Color (Android/Web)</Label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={settings.themeColor}
-                onChange={(e) => setSettings((s) => ({ ...s, themeColor: e.target.value }))}
-                className="w-8 h-8 rounded border-none cursor-pointer p-0"
-              />
-              <span className="text-xs font-mono">{settings.themeColor}</span>
-            </div>
-          </div>
-
-          {/* Favicon Path */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Favicon Path</Label>
-            </div>
-            <input
-              type="text"
-              value={settings.path}
-              onChange={(e) => setSettings((s) => ({ ...s, path: e.target.value }))}
-              placeholder="/assets/favicons/"
-              className="w-full text-xs font-mono bg-background border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              Path where files will be hosted (e.g. <code>/</code> or <code>/assets/</code>).
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Center Previews */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-8 relative">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Eye size={18} />
-            <h2 className="text-lg font-bold text-foreground">Previews</h2>
-          </div>
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-bold rounded-full transition-all hover:bg-foreground/90 active:scale-95 shadow-lg disabled:opacity-50"
-          >
-            {isGenerating ? "Generating..." : <><Download size={16} /> Generate Favicons</>}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* 1. Desktop Browser (Light & Dark) */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h3 className="text-sm font-bold text-foreground">Desktop Browser</h3>
-              <p className="text-xs text-muted-foreground mt-1">Standard 16x16 favicon in Chrome.</p>
-            </div>
-            <div className="p-4 flex flex-col gap-6 bg-white">
-              {/* Light Theme */}
-              <div className="w-full">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Light Theme</p>
-                <div className="bg-[#dee1e6] rounded-t-lg pt-2 px-2 flex items-end w-full overflow-hidden">
-                  <div className="bg-white rounded-t-lg min-w-[140px] max-w-[220px] w-full px-3 py-1.5 flex items-center gap-2 shrink-0">
-                    <PreviewIcon size={16} settings={settings} imageSrc={imageSrc} />
-                    <span className="text-xs text-[#3c4043] font-medium truncate">{settings.appName}</span>
-                    <div className="ml-auto shrink-0 w-4 h-4 rounded-full hover:bg-black/5 flex items-center justify-center text-black/50 text-[10px]">✕</div>
-                  </div>
-                  <div className="w-7 h-7 rounded-full ml-1.5 mb-[2px] flex items-center justify-center text-black/50 hover:bg-black/5 transition-colors shrink-0">
-                    <span className="text-lg leading-none mt-[-2px]">+</span>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* 1. Desktop Browser */}
+            <div className="bg-card border border-border rounded-2xl shadow-2xs flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold font-heading text-foreground">
+                    {isEn ? "Browser Tab (16×16 & 32×32)" : "Pestaña de navegador (16×16 y 32×32)"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "Light and dark browser chrome" : "Tema claro y oscuro en escritorio"}
+                  </p>
+                </div>
+                <span className="font-mono text-[11px] text-muted-foreground px-2 py-0.5 bg-background rounded border border-border">
+                  favicon.ico
+                </span>
+              </div>
+              <div className="p-5 flex flex-col gap-5 bg-white">
+                {/* Light Theme */}
+                <div className="w-full">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                    {isEn ? "Light Mode" : "Modo Claro"}
+                  </p>
+                  <div className="bg-[#dee1e6] rounded-t-lg pt-2 px-2 flex items-end w-full overflow-hidden">
+                    <div className="bg-white rounded-t-lg min-w-[140px] max-w-[220px] w-full px-3 py-1.5 flex items-center gap-2 shrink-0">
+                      <PreviewIcon size={16} settings={settings} imageSrc={imageSrc} />
+                      <span className="text-xs text-[#3c4043] font-medium truncate">
+                        {settings.appName}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Dark Theme */}
-              <div className="w-full">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Dark Theme</p>
-                <div className="bg-[#202124] rounded-t-lg pt-2 px-2 flex items-end w-full overflow-hidden">
-                  <div className="bg-[#323639] rounded-t-lg min-w-[140px] max-w-[220px] w-full px-3 py-1.5 flex items-center gap-2 shrink-0">
-                    <PreviewIcon size={16} settings={settings} imageSrc={darkImageSrc || imageSrc} />
-                    <span className="text-xs text-[#e8eaed] font-medium truncate">{settings.appName}</span>
-                    <div className="ml-auto shrink-0 w-4 h-4 rounded-full hover:bg-white/10 flex items-center justify-center text-white/50 text-[10px]">✕</div>
-                  </div>
-                  <div className="w-7 h-7 rounded-full ml-1.5 mb-[2px] flex items-center justify-center text-white/50 hover:bg-white/10 transition-colors shrink-0">
-                    <span className="text-lg leading-none mt-[-2px]">+</span>
+
+                {/* Dark Theme */}
+                <div className="w-full">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                    {isEn ? "Dark Mode" : "Modo Oscuro"}
+                  </p>
+                  <div className="bg-[#202124] rounded-t-lg pt-2 px-2 flex items-end w-full overflow-hidden">
+                    <div className="bg-[#323639] rounded-t-lg min-w-[140px] max-w-[220px] w-full px-3 py-1.5 flex items-center gap-2 shrink-0">
+                      <PreviewIcon
+                        size={16}
+                        settings={settings}
+                        imageSrc={darkImageSrc || imageSrc}
+                      />
+                      <span className="text-xs text-[#e8eaed] font-medium truncate">
+                        {settings.appName}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* 2. Google Search Result (Light & Dark) */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h3 className="text-sm font-bold text-foreground">Google Result</h3>
-              <p className="text-xs text-muted-foreground mt-1">How it looks on search engines.</p>
-            </div>
-            <div className="flex flex-col h-full">
-              {/* Light Theme */}
-              <div className="w-full p-5 border-b border-border/50 bg-white">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Light Theme</p>
-                <div className="flex flex-col gap-1 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-[#f1f3f4] flex items-center justify-center p-1 border border-black/5 shrink-0">
-                       <PreviewIcon size={18} settings={settings} imageSrc={imageSrc} />
-                    </div>
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="text-[13px] text-[#202124] truncate">{settings.appName}</span>
-                      <span className="text-[11px] text-[#4d5156] truncate">https://{settings.appName.toLowerCase().replace(/\s+/g, '')}.com</span>
-                    </div>
-                  </div>
-                  <h4 className="text-[16px] md:text-[18px] text-[#1a0dab] font-normal mt-1 hover:underline cursor-pointer truncate">Welcome to {settings.appName}</h4>
-                  <p className="text-[13px] text-[#4d5156] leading-tight mt-1 line-clamp-2">This is a preview of how your website will appear in Google search results. The icon is prominently displayed next to the URL.</p>
+            {/* 2. Google Search Result */}
+            <div className="bg-card border border-border rounded-2xl shadow-2xs flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold font-heading text-foreground">
+                    {isEn ? "Search Engine Result (SERP)" : "Resultado de búsqueda web (SERP)"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "Site identity icon next to URL" : "Icono de identidad junto al dominio"}
+                  </p>
                 </div>
+                <span className="font-mono text-[11px] text-muted-foreground px-2 py-0.5 bg-background rounded border border-border">
+                  32×32 PNG
+                </span>
               </div>
-
-              {/* Dark Theme */}
-              <div className="w-full bg-[#202124] p-5 h-full">
-                <p className="text-[10px] font-bold text-[#9aa0a6] uppercase tracking-widest mb-4">Dark Theme</p>
-                <div className="flex flex-col gap-1 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-[#303134] flex items-center justify-center p-1 border border-white/5 shrink-0">
-                       <PreviewIcon size={18} settings={settings} imageSrc={darkImageSrc || imageSrc} />
-                    </div>
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="text-[13px] text-[#e8eaed] truncate">{settings.appName}</span>
-                      <span className="text-[11px] text-[#bdc1c6] truncate">https://{settings.appName.toLowerCase().replace(/\s+/g, '')}.com</span>
-                    </div>
+              <div className="p-5 bg-white flex-1 flex flex-col justify-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#f1f3f4] flex items-center justify-center p-1 border border-black/5 shrink-0">
+                    <PreviewIcon size={18} settings={settings} imageSrc={imageSrc} />
                   </div>
-                  <h4 className="text-[16px] md:text-[18px] text-[#8ab4f8] font-normal mt-1 hover:underline cursor-pointer truncate">Welcome to {settings.appName}</h4>
-                  <p className="text-[13px] text-[#bdc1c6] leading-tight mt-1 line-clamp-2">This is a preview of how your website will appear in Google search results. The icon is prominently displayed next to the URL.</p>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-[13px] text-[#202124] font-medium truncate">
+                      {settings.appName}
+                    </span>
+                    <span className="text-[11px] text-[#4d5156] truncate">
+                      https://{settings.appName.toLowerCase().replace(/\s+/g, "") || "example"}.com
+                    </span>
+                  </div>
                 </div>
+                <p className="text-[16px] text-[#1a0dab] font-medium mt-1.5 truncate">
+                  {settings.appName} — Official Website
+                </p>
+                <p className="text-xs text-[#4d5156] leading-relaxed mt-1 line-clamp-2">
+                  {isEn
+                    ? "Preview how your website icon appears in search engine listings across desktop and mobile devices."
+                    : "Previsualización de cómo se muestra el icono de tu sitio web en los motores de búsqueda en escritorio y móvil."}
+                </p>
+              </div>
+            </div>
+
+            {/* 3. iOS Home Screen */}
+            <div className="bg-card border border-border rounded-2xl shadow-2xs flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold font-heading text-foreground">
+                    iOS Apple Touch Icon
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "iPhone & iPad home screen" : "Pantalla de inicio en iPhone y iPad"}
+                  </p>
+                </div>
+                <span className="font-mono text-[11px] text-muted-foreground px-2 py-0.5 bg-background rounded border border-border">
+                  180×180 PNG
+                </span>
+              </div>
+              <div className="p-6 bg-gradient-to-b from-slate-800 to-slate-900 flex flex-col items-center justify-center min-h-[180px]">
+                <PreviewIcon
+                  size={64}
+                  settings={{
+                    ...settings,
+                    backgroundColor:
+                      settings.backgroundColor === "transparent"
+                        ? "#ffffff"
+                        : settings.backgroundColor,
+                    backgroundRadius: 22.5,
+                  }}
+                  imageSrc={imageSrc}
+                  forceSolidBg
+                />
+                <span className="text-xs text-white mt-2.5 font-medium tracking-wide">
+                  {settings.appName}
+                </span>
+              </div>
+            </div>
+
+            {/* 4. Android Home Screen */}
+            <div className="bg-card border border-border rounded-2xl shadow-2xs flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold font-heading text-foreground">
+                    Android PWA & Chrome
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "Web manifest & adaptive launcher" : "Web manifest e icono de lanzador"}
+                  </p>
+                </div>
+                <span className="font-mono text-[11px] text-muted-foreground px-2 py-0.5 bg-background rounded border border-border">
+                  192 / 512 PNG
+                </span>
+              </div>
+              <div className="p-6 bg-slate-950 flex flex-col items-center justify-center relative min-h-[180px] overflow-hidden">
+                <div
+                  className="absolute inset-x-0 top-0 h-1/2"
+                  style={{ backgroundColor: settings.themeColor, opacity: 0.18 }}
+                />
+                <div className="w-[70px] h-[70px] rounded-full bg-white flex items-center justify-center relative z-10 p-1 shadow-lg border border-white/10">
+                  <PreviewIcon
+                    size={62}
+                    settings={{ ...settings, backgroundRadius: 50 }}
+                    imageSrc={imageSrc}
+                  />
+                </div>
+                <span className="text-xs text-white mt-2.5 font-medium z-10 tracking-wide">
+                  {settings.appName}
+                </span>
               </div>
             </div>
           </div>
-
-          {/* 3. iOS Home Screen */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h3 className="text-sm font-bold text-foreground">iOS Home Screen</h3>
-              <p className="text-xs text-muted-foreground mt-1">Added to home screen on iPhone/iPad.</p>
-            </div>
-            <div className="p-6 bg-gradient-to-b from-[#74b9ff] to-[#0984e3] flex flex-col items-center justify-center min-h-[200px]">
-              <PreviewIcon size={64} settings={{ ...settings, backgroundColor: settings.backgroundColor === "transparent" ? "#ffffff" : settings.backgroundColor, backgroundRadius: 22.5 }} imageSrc={imageSrc} forceSolidBg />
-              <span className="text-[11px] text-white mt-2 font-medium tracking-wide shadow-black/20 drop-shadow-md">{settings.appName}</span>
-            </div>
-          </div>
-
-          {/* 4. Android Home Screen */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h3 className="text-sm font-bold text-foreground">Android Home Screen</h3>
-              <p className="text-xs text-muted-foreground mt-1">App drawer or home screen icon.</p>
-            </div>
-            <div className="p-6 bg-[#202124] flex flex-col items-center justify-center relative min-h-[200px] overflow-hidden">
-              <div className="absolute inset-x-0 top-0 h-1/2 transition-colors duration-500" style={{ backgroundColor: settings.themeColor, opacity: 0.15 }} />
-              <div className="w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center relative z-10 p-1 shadow-xl shadow-black/40 border border-white/10">
-                <PreviewIcon size={64} settings={{ ...settings, backgroundRadius: 50 }} imageSrc={imageSrc} />
-              </div>
-              <span className="text-[11px] text-white mt-3 font-medium z-10 tracking-wide">{settings.appName}</span>
-            </div>
-          </div>
-
-        </div>
+        </main>
       </div>
 
       {/* Export Modal */}
       {showExportModal && exportData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-2xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95">
-            <h2 className="text-xl font-bold mb-2">Favicons Generated!</h2>
-            <p className="text-sm text-muted-foreground mb-6">Extract the ZIP file in your website's root directory, then copy this HTML code into the <code>&lt;head&gt;</code> section of your HTML document.</p>
-            
-            <div className="bg-muted p-4 rounded-lg relative group mb-6">
-              <pre className="text-[11px] md:text-xs overflow-x-auto text-foreground font-mono">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="favicon-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+        >
+          <div className="bg-card border border-border rounded-2xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0">
+                  <PackageCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 id="favicon-modal-title" className="text-lg font-bold font-heading text-foreground">
+                    {isEn ? "Favicon Package Ready" : "Paquete de Favicons generado"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn
+                      ? "Extract favicons.zip into your public directory and paste these tags inside <head>."
+                      : "Extrae favicons.zip en tu carpeta pública y pega estas etiquetas dentro de <head>."}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                aria-label={isEn ? "Close dialog" : "Cerrar ventana"}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="bg-muted p-4 rounded-xl border border-border relative mb-6">
+              <pre className="text-xs overflow-x-auto text-foreground font-mono leading-relaxed pr-20">
                 {exportData.htmlCode}
               </pre>
               <button
-                onClick={() => navigator.clipboard.writeText(exportData.htmlCode)}
-                className="absolute top-2 right-2 p-1.5 bg-card border border-border rounded text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                type="button"
+                onClick={handleCopyHtml}
+                className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-card border border-border rounded-lg text-xs font-semibold text-foreground hover:bg-background shadow-2xs cursor-pointer"
               >
-                Copy
+                {copiedHtml ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>{isEn ? "Copied" : "Copiado"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{isEn ? "Copy HTML" : "Copiar HTML"}</span>
+                  </>
+                )}
               </button>
             </div>
 
             <div className="flex items-center justify-end gap-3">
               <button
+                type="button"
                 onClick={() => setShowExportModal(false)}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors cursor-pointer"
               >
-                Close
+                {isEn ? "Close" : "Cerrar"}
               </button>
               <button
+                type="button"
                 onClick={downloadZip}
-                className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+                className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
               >
-                <Download size={16} /> Download favicons.zip
+                <Download className="w-4 h-4" />
+                <span>{isEn ? "Download favicons.zip" : "Descargar favicons.zip"}</span>
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
-    </div>
   );
 }
 
-// ─── Inline SVG/Canvas Preview Component ─────────────────────────────
-function PreviewIcon({ size, settings, imageSrc, forceSolidBg }: { size: number; settings: FaviconSettings; imageSrc: string; forceSolidBg?: boolean }) {
+function PreviewIcon({
+  size,
+  settings,
+  imageSrc,
+  forceSolidBg,
+}: {
+  size: number;
+  settings: FaviconSettings;
+  imageSrc: string;
+  forceSolidBg?: boolean;
+}) {
   const paddingPx = (size * settings.padding) / 100;
   const drawAreaSize = size - paddingPx * 2;
   const radiusPx = (size * settings.backgroundRadius) / 100;

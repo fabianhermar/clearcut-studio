@@ -1,30 +1,37 @@
 "use client";
 
-import { ZoomInIcon, ZoomOutIcon } from "@/components/icons";
+import { ZoomIn, ZoomOut } from "lucide-react";
 
 interface ZoomControlsProps {
   zoom: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
+  lang?: string;
 }
 
-export function ZoomControls({ zoom, onZoomIn, onZoomOut }: ZoomControlsProps) {
+export function ZoomControls({ zoom, onZoomIn, onZoomOut, lang = "es" }: ZoomControlsProps) {
+  const isEn = lang === "en";
+
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-1.5 border border-slate-200">
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-card/95 backdrop-blur-xs rounded-xl shadow-md px-2 py-1.5 border border-border z-10">
       <button
+        type="button"
         onClick={onZoomOut}
-        className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+        aria-label={isEn ? "Zoom out" : "Alejar"}
+        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
       >
-        <ZoomOutIcon size={18} />
+        <ZoomOut className="w-4 h-4" />
       </button>
-      <span className="text-sm font-medium text-slate-700 min-w-16 text-center">
+      <span className="text-xs font-mono font-semibold text-foreground min-w-14 text-center">
         {Math.round(zoom * 100)}%
       </span>
       <button
+        type="button"
         onClick={onZoomIn}
-        className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+        aria-label={isEn ? "Zoom in" : "Acercar"}
+        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
       >
-        <ZoomInIcon size={18} />
+        <ZoomIn className="w-4 h-4" />
       </button>
     </div>
   );

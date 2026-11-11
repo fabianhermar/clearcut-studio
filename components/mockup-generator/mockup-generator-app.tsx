@@ -8,14 +8,19 @@ interface MockupGeneratorAppProps {
   initialImage?: string;
   onClose?: () => void;
   dict?: any;
+  lang?: string;
 }
 
-export default function MockupGeneratorApp({ initialImage, onClose, dict }: MockupGeneratorAppProps) {
+export default function MockupGeneratorApp({
+  initialImage,
+  onClose,
+  dict,
+  lang = "es",
+}: MockupGeneratorAppProps) {
   const [originalImage, setOriginalImage] = useState<string | null>(initialImage || null);
 
   const handleFileSelect = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
-      alert("Por favor selecciona un archivo de imagen valido.");
       return;
     }
     const url = URL.createObjectURL(file);
@@ -35,7 +40,6 @@ export default function MockupGeneratorApp({ initialImage, onClose, dict }: Mock
   };
 
   const handleNewImage = () => {
-    // Only revoke if it's a blob to avoid memory leaks
     if (originalImage && originalImage.startsWith("blob:")) {
       URL.revokeObjectURL(originalImage);
     }
@@ -48,6 +52,8 @@ export default function MockupGeneratorApp({ initialImage, onClose, dict }: Mock
         onFileSelect={handleFileSelect}
         onSampleSelect={handleSampleSelect}
         onClose={onClose}
+        dict={dict}
+        lang={lang}
       />
     );
   }
@@ -57,6 +63,7 @@ export default function MockupGeneratorApp({ initialImage, onClose, dict }: Mock
       originalImage={originalImage}
       onReset={handleReset}
       onNewImage={handleNewImage}
+      lang={lang}
     />
   );
 }

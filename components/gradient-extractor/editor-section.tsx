@@ -1,33 +1,46 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { SlidersHorizontal, Copy, Check, Palette } from "lucide-react";
-import { GradientSettings, DEFAULT_GRADIENT_SETTINGS, GradientType } from "./types";
-import { extractColors, generateGradientCSS } from "./extractor";
+import { SlidersHorizontal, Copy, Check, ImagePlus } from "lucide-react";
+import { GradientSettings, DEFAULT_GRADIENT_SETTINGS } from "./types";
+import {
+  extractDetailedColors,
+  generateGradientCSS,
+  type ExtractedColor,
+} from "./extractor";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
 
 interface EditorSectionProps {
   imageSrc: string;
   onReset: () => void;
   onClose?: () => void;
   dict?: any;
+  lang?: string;
 }
 
-export function EditorSection({ imageSrc, onReset, onClose, dict }: EditorSectionProps) {
+export function EditorSection({
+  imageSrc,
+  onReset,
+  onClose,
+  dict,
+  lang = "es",
+}: EditorSectionProps) {
+  const isEn = lang === "en" || dict?.header?.features === "Features";
   const [settings, setSettings] = useState<GradientSettings>(DEFAULT_GRADIENT_SETTINGS);
-  const [colors, setColors] = useState<string[]>([]);
+  const [palette, setPalette] = useState<ExtractedColor[]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
-  const [copied, setCopied] = useState(false);
-  
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
+
   useEffect(() => {
     let active = true;
     const processImage = async () => {
       setIsProcessing(true);
       try {
-        const extractedColors = await extractColors(imageSrc, settings.colorCount);
+        const extracted = await extractDetailedColors(imageSrc, settings.colorCount);
         if (active) {
-          setColors(extractedColors);
+          setPalette(extracted);
         }
       } catch (err) {
         console.error("Failed to extract colors:", err);
@@ -35,193 +48,244 @@ export function EditorSection({ imageSrc, onReset, onClose, dict }: EditorSectio
         if (active) setIsProcessing(false);
       }
     };
-    
-    // Add small delay to prevent rapid processing when sliding color count
-    const timeout = setTimeout(processImage, 150);
+
+    const timeout = setTimeout(processImage, 120);
     return () => {
       active = false;
       clearTimeout(timeout);
     };
   }, [imageSrc, settings.colorCount]);
 
-  const cssString = generateGradientCSS(colors, settings.type, settings.angle);
+  const hexColors = palette.map((c) => c.hex);
+  const cssString = generateGradientCSS(hexColors, settings.type, settings.angle);
 
-  const handleCopy = useCallback(async () => {
-    if (!cssString || cssString === "none") return;
+  const copyText = useCallback(async (text: string, tokenKey: string) => {
     try {
-      await navigator.clipboard.writeText(`background: ${cssString};`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(text);
+      setCopiedToken(tokenKey);
+      setTimeout(() => setCopiedToken(null), 1800);
     } catch (err) {
       console.error("Failed to copy", err);
     }
-  }, [cssString]);
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-3">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-              title="Volver al inicio"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 5l-7 7 7 7" />
-              </svg>
-            </button>
-          )}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                 <path d="M12 2L2 22h20L12 2z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground font-heading">Gradient Extractor</h1>
-              <p className="text-xs text-muted-foreground font-accent">CSS Generator</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main App */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f8fafc]">
-      {/* Left Sidebar */}
-      <div className="w-full md:w-80 border-r border-border bg-card flex flex-col flex-shrink-0 h-[40vh] md:h-full overflow-y-auto">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal size={16} className="text-muted-foreground" />
-            <h2 className="text-sm font-bold">Settings</h2>
-          </div>
-          <button onClick={onReset} className="text-xs font-medium text-muted-foreground hover:text-foreground">
-            New Image
+    <div className="min-h-screen bg-background flex flex-col">
+      <WorkspaceHeader
+        slug="gradient-extractor"
+        lang={lang}
+        onClose={onClose || onReset}
+        rightSlot={
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+          >
+            <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{isEn ? "New image" : "Nueva imagen"}</span>
           </button>
-        </div>
-        
-        <div className="p-5 space-y-8">
-          {/* Gradient Type */}
-          <div className="space-y-3">
-            <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Gradient Type</Label>
-            <div className="flex gap-2">
-              {(["linear", "radial"] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSettings(s => ({ ...s, type }))}
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md capitalize transition-colors border ${
-                    settings.type === type
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-foreground border-border hover:border-foreground/30"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
+        }
+      />
+
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-background">
+        {/* Left Sidebar */}
+        <aside className="w-full lg:w-80 border-t lg:border-t-0 lg:border-r border-border bg-card flex flex-col shrink-0 order-2 lg:order-1 overflow-y-auto">
+          <div className="p-4 border-b border-border flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-primary" aria-hidden="true" />
+            <h2 className="text-sm font-bold font-heading text-foreground">
+              {isEn ? "Gradient Parameters" : "Parámetros del degradado"}
+            </h2>
           </div>
 
-          {/* Angle (only for linear) */}
-          {settings.type === "linear" && (
+          <div className="p-5 space-y-6">
+            {/* Gradient Type */}
+            <div className="space-y-2.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {isEn ? "Gradient Type" : "Tipo de degradado"}
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                {(["linear", "radial"] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setSettings((s) => ({ ...s, type }))}
+                    className={`px-3 py-2 text-xs font-semibold rounded-lg capitalize transition-colors border cursor-pointer ${
+                      settings.type === type
+                        ? "bg-primary text-white border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/40"
+                    }`}
+                  >
+                    {type === "linear"
+                      ? isEn
+                        ? "Linear"
+                        : "Lineal"
+                      : isEn
+                      ? "Radial"
+                      : "Radial"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Angle */}
+            {settings.type === "linear" && (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    {isEn ? "Angle" : "Ángulo"}
+                  </Label>
+                  <span className="text-xs font-mono font-semibold bg-muted px-2 py-0.5 rounded border border-border text-foreground">
+                    {settings.angle}°
+                  </span>
+                </div>
+                <Slider
+                  min={0}
+                  max={360}
+                  step={1}
+                  value={[settings.angle]}
+                  onValueChange={([val]) => setSettings((s) => ({ ...s, angle: val }))}
+                />
+              </div>
+            )}
+
+            {/* Color Count */}
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Angle</Label>
-                <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{settings.angle}°</span>
+                <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  {isEn ? "Extracted Stops" : "Número de colores"}
+                </Label>
+                <span className="text-xs font-mono font-semibold bg-muted px-2 py-0.5 rounded border border-border text-foreground">
+                  {settings.colorCount}
+                </span>
               </div>
               <Slider
-                min={0}
-                max={360}
+                min={2}
+                max={5}
                 step={1}
-                value={[settings.angle]}
-                onValueChange={([val]) => setSettings(s => ({ ...s, angle: val }))}
+                value={[settings.colorCount]}
+                onValueChange={([val]) => setSettings((s) => ({ ...s, colorCount: val }))}
               />
             </div>
-          )}
 
-          {/* Color Count */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Colors</Label>
-              <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{settings.colorCount}</span>
+            {/* Source Image Preview */}
+            <div className="space-y-2.5 pt-4 border-t border-border">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {isEn ? "Source Image" : "Imagen de origen"}
+              </Label>
+              <div className="rounded-xl overflow-hidden border border-border bg-muted/40 p-2 flex items-center justify-center">
+                <img
+                  src={imageSrc}
+                  alt={isEn ? "Source" : "Origen"}
+                  className="max-w-full max-h-[140px] object-contain rounded-lg"
+                />
+              </div>
             </div>
-            <Slider
-              min={2}
-              max={5}
-              step={1}
-              value={[settings.colorCount]}
-              onValueChange={([val]) => setSettings(s => ({ ...s, colorCount: val }))}
-            />
           </div>
-          
-          <div className="space-y-3 pt-4 border-t border-border/50">
-             <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Original Image</Label>
-             <div className="rounded-lg overflow-hidden border border-border shadow-sm max-h-[120px] flex items-center justify-center bg-black/5">
-                <img src={imageSrc} alt="Original" className="max-w-full max-h-[120px] object-contain" />
-             </div>
-          </div>
-        </div>
-      </div>
+        </aside>
 
-      {/* Main Preview Area */}
-      <div className="flex-1 bg-[#e2e8f0] flex flex-col p-6 overflow-hidden">
-        
-        {/* CSS Code Snippet */}
-        <div className="bg-card border border-border rounded-xl shadow-sm mb-6 flex-shrink-0 flex items-center overflow-hidden">
-           <div className="flex-1 p-4 font-mono text-sm text-foreground overflow-x-auto whitespace-nowrap hide-scrollbar">
-              <span className="text-blue-500">background</span>: {cssString};
-           </div>
-           <button 
-             onClick={handleCopy}
-             className="px-6 py-4 bg-foreground text-background font-bold text-sm h-full flex items-center gap-2 transition-colors hover:bg-foreground/90 shrink-0"
-           >
-             {copied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Copy CSS</>}
-           </button>
-        </div>
-        
-        {/* Extracted Colors Palette */}
-        <div className="flex items-center gap-4 mb-6 shrink-0 justify-center">
-           {isProcessing ? (
-             <div className="flex gap-2 animate-pulse">
-                {[...Array(settings.colorCount)].map((_, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-black/10" />
-                ))}
-             </div>
-           ) : (
-             <div className="flex gap-3 bg-white p-2.5 rounded-full shadow-sm border border-border/50">
-               <Palette className="w-5 h-5 text-muted-foreground ml-1 self-center" />
-               <div className="w-px h-6 bg-border mx-1 self-center" />
-               {colors.map((c, i) => (
-                 <div 
-                   key={i} 
-                   className="w-10 h-10 rounded-full border border-black/10 shadow-sm transition-transform hover:scale-110 relative group"
-                   style={{ backgroundColor: c }}
-                   title={c}
-                 >
-                   <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black text-white text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none z-20">
-                     {c}
-                   </div>
-                 </div>
-               ))}
-             </div>
-           )}
-        </div>
+        {/* Main Workspace Area */}
+        <main className="flex-1 bg-canvas flex flex-col p-4 sm:p-6 lg:p-8 gap-6 overflow-y-auto order-1 lg:order-2">
+          {/* Gradient Preview Canvas */}
+          <div
+            className="w-full min-h-[240px] sm:min-h-[300px] flex-1 rounded-2xl shadow-md transition-all duration-200 relative border border-border overflow-hidden flex items-end p-5"
+            style={{
+              background: cssString !== "none" ? cssString : "#e2e8f0",
+            }}
+          >
+            {isProcessing && (
+              <div className="absolute inset-0 bg-card/60 backdrop-blur-xs flex items-center justify-center">
+                <span className="text-foreground text-xs font-semibold bg-card px-4 py-2 rounded-full border border-border shadow-xs">
+                  {isEn ? "Sampling dominant colors..." : "Extrayendo colores dominantes..."}
+                </span>
+              </div>
+            )}
 
-        {/* Big Preview */}
-        <div 
-          className="flex-1 rounded-3xl shadow-xl transition-all duration-300 relative border-4 border-white overflow-hidden"
-          style={{
-             background: cssString !== "none" ? cssString : "transparent"
-          }}
-        >
-          {isProcessing && (
-            <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
-               <span className="text-foreground font-medium bg-background/80 px-4 py-2 rounded-full shadow-sm">Extracting Colors...</span>
+            <div className="bg-slate-900/80 backdrop-blur-md text-white px-3.5 py-2 rounded-xl border border-white/15 text-xs font-mono">
+              {settings.type === "linear" ? `linear-gradient(${settings.angle}deg)` : "radial-gradient(circle)"} · {palette.length}{" "}
+              {isEn ? "stops" : "colores"}
             </div>
-          )}
-        </div>
+          </div>
+
+          {/* Dominant Colors Grid with HEX & RGB Copy */}
+          <section aria-label={isEn ? "Extracted Color Swatches" : "Muestras de color extraídas"}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                {isEn
+                  ? "Dominant Palette (Click HEX or RGB to copy)"
+                  : "Paleta dominante (Haz clic en HEX o RGB para copiar)"}
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+              {palette.map((color, i) => {
+                const hexKey = `hex-${i}`;
+                const rgbKey = `rgb-${i}`;
+                return (
+                  <div
+                    key={i}
+                    className="p-3 rounded-xl bg-card border border-border shadow-2xs flex items-center sm:flex-col sm:items-stretch gap-3"
+                  >
+                    <div
+                      className="w-12 h-12 sm:w-full sm:h-16 rounded-lg border border-black/10 shrink-0"
+                      style={{ backgroundColor: color.hex }}
+                      aria-label={`Color ${i + 1}: ${color.hex}`}
+                    />
+                    <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                      <button
+                        type="button"
+                        onClick={() => copyText(color.hex, hexKey)}
+                        className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-md bg-muted/60 hover:bg-muted border border-border text-xs font-mono font-bold text-foreground transition-colors cursor-pointer"
+                      >
+                        <span>{color.hex}</span>
+                        {copiedToken === hexKey ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-muted-foreground shrink-0" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => copyText(color.rgb, rgbKey)}
+                        className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-md hover:bg-muted text-[11px] font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      >
+                        <span className="truncate">{color.rgb}</span>
+                        {copiedToken === rgbKey ? (
+                          <Check className="w-3 h-3 text-emerald-700 shrink-0" />
+                        ) : (
+                          <Copy className="w-2.5 h-2.5 opacity-60 shrink-0" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* CSS Code Output */}
+          <div className="bg-card border border-border rounded-xl shadow-2xs flex flex-col sm:flex-row sm:items-center overflow-hidden">
+            <div className="flex-1 p-4 font-mono text-xs sm:text-sm text-foreground overflow-x-auto whitespace-nowrap">
+              <span className="text-primary font-semibold">background</span>: {cssString};
+            </div>
+            <button
+              type="button"
+              onClick={() => copyText(`background: ${cssString};`, "css")}
+              className="px-5 py-3.5 bg-primary hover:bg-primary-hover text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shrink-0 cursor-pointer"
+            >
+              {copiedToken === "css" ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>{isEn ? "Copied CSS!" : "¡CSS copiado!"}</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span>{isEn ? "Copy CSS" : "Copiar CSS"}</span>
+                </>
+              )}
+            </button>
+          </div>
+        </main>
       </div>
-    </div>
     </div>
   );
 }

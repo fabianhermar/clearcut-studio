@@ -20,10 +20,20 @@ interface ImageEditorProps {
   originalImage: string;
   processedImage: string;
   onReset: () => void;
+  onClose?: () => void;
   onFileSelect: (file: File) => void;
+  lang?: string;
 }
 
-export function ImageEditor({ originalImage, processedImage, onReset, onFileSelect }: ImageEditorProps) {
+export function ImageEditor({
+  originalImage,
+  processedImage,
+  onReset,
+  onClose,
+  onFileSelect,
+  lang = "es",
+}: ImageEditorProps) {
+  const isEn = lang === "en";
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +43,7 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
   const [tool, setTool] = useState<ToolId>("move");
   const [brushSize, setBrushSize] = useState(30);
   const [adjustments, setAdjustments] = useState<Adjustments>({ ...DEFAULT_ADJUSTMENTS });
-  const [activeTab, setActiveTab] = useState<"tools" | "adjust">("tools");
+  const [activeTab, setActiveTab] = useState<"tools" | "adjust" | "export">("tools");
 
   // Image data state
   const [originalImageData, setOriginalImageData] = useState<ImageData | null>(null);
@@ -295,7 +305,7 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
   };
 
   return (
-    <div className="h-screen bg-slate-100 flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <EditorToolbar
         canvasSize={canvasSize}
         canUndo={canUndo}
@@ -303,38 +313,70 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
         onUndo={handleUndo}
         onRedo={handleRedo}
         onReset={onReset}
+        onClose={onClose}
+        lang={lang}
       />
 
       {/* Main editor area */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden min-h-0">
-        {/* Left panel */}
-        <aside className="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col shrink-0 order-2 lg:order-1 h-[50vh] lg:h-auto">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
+        {/* Left panel (Tools / Adjustments, plus Export tab on mobile) */}
+        <aside className="w-full lg:w-72 bg-card border-t lg:border-t-0 lg:border-r border-border flex flex-col shrink-0 order-2 lg:order-1 h-[46vh] lg:h-auto">
           {/* Tabs */}
-          <div className="flex border-b border-slate-200">
+          <div className="flex border-b border-border bg-muted/40">
             <button
+              type="button"
               onClick={() => setActiveTab("tools")}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === "tools"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "text-primary border-b-2 border-primary bg-card"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Herramientas
+              {isEn ? "Tools" : "Herramientas"}
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("adjust")}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === "adjust"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "text-primary border-b-2 border-primary bg-card"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Ajustes
+              {isEn ? "Adjust" : "Ajustes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("export")}
+              className={`flex-1 lg:hidden px-3 py-2.5 text-xs font-semibold transition-colors cursor-pointer ${
+                activeTab === "export"
+                  ? "text-primary border-b-2 border-primary bg-card"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {isEn ? "Export" : "Exportar"}
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === "tools" ? (
+            {activeTab === "adjust" ? (
+              <AdjustmentsPanel
+                adjustments={adjustments}
+                setAdjustments={setAdjustments}
+                onReset={resetAdjustments}
+              />
+            ) : activeTab === "export" ? (
+              <div className="lg:hidden">
+                <ExportPanel
+                  processedImage={processedImage}
+                  canvasSize={canvasSize}
+                  onDownload={handleDownload}
+                  onUploadAnother={() => fileInputRef.current?.click()}
+                  lang={lang}
+                  className="border-none"
+                />
+              </div>
+            ) : (
               <ToolsPanel
                 tool={tool}
                 setTool={setTool}
@@ -348,31 +390,22 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
                 showOriginal={showOriginal}
                 setShowOriginal={setShowOriginal}
               />
-            ) : (
-              <AdjustmentsPanel
-                adjustments={adjustments}
-                setAdjustments={setAdjustments}
-                onReset={resetAdjustments}
-              />
             )}
           </div>
         </aside>
 
         {/* Canvas area */}
-        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 relative shrink-0 order-1 lg:order-2" ref={containerRef}>
+        <main
+          className="w-full flex-1 relative shrink-0 order-1 lg:order-2 min-h-[45vh]"
+          ref={containerRef}
+        >
           {/* Checkerboard background */}
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='10' height='10' fill='%23f1f5f9'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23f1f5f9'/%3E%3Crect x='10' width='10' height='10' fill='%23e2e8f0'/%3E%3Crect y='10' width='10' height='10' fill='%23e2e8f0'/%3E%3C/svg%3E")`,
-              backgroundSize: "20px 20px",
-            }}
-          />
+          <div className="absolute inset-0 checkerboard" />
 
           {/* Canvas container */}
-          <div className="absolute inset-0 flex items-center justify-center p-8">
+          <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8">
             <div
-              className="relative shadow-2xl rounded-lg overflow-hidden"
+              className="relative shadow-lg rounded-lg overflow-hidden border border-border/60"
               style={{
                 width: `${canvasSize.width * fitScale}px`,
                 height: `${canvasSize.height * fitScale}px`,
@@ -408,15 +441,17 @@ export function ImageEditor({ originalImage, processedImage, onReset, onFileSele
             </div>
           </div>
 
-          <ZoomControls zoom={zoom} onZoomIn={zoomIn} onZoomOut={zoomOut} />
+          <ZoomControls zoom={zoom} onZoomIn={zoomIn} onZoomOut={zoomOut} lang={lang} />
         </main>
 
-        {/* Right panel */}
+        {/* Right panel (Desktop) */}
         <ExportPanel
           processedImage={processedImage}
           canvasSize={canvasSize}
           onDownload={handleDownload}
           onUploadAnother={() => fileInputRef.current?.click()}
+          lang={lang}
+          className="hidden lg:flex order-3"
         />
         <input
           ref={fileInputRef}

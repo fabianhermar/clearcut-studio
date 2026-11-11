@@ -5,21 +5,22 @@ import { toPng, toJpeg, toBlob } from "html-to-image";
 import {
   Download,
   RotateCcw,
-  Copy,
   ChevronDown,
-  Monitor,
   Clipboard,
   Check,
+  ImagePlus,
 } from "lucide-react";
 import { LeftSidebar } from "./left-sidebar";
 import { RightSidebar } from "./right-sidebar";
 import { FrameCanvas } from "./frame-canvas";
 import { FramedSettings, BACKGROUNDS } from "./types";
+import { WorkspaceHeader } from "@/components/studio/workspace-header";
 
 interface EditorSectionProps {
   originalImage: string;
   onReset: () => void;
   onNewImage: () => void;
+  lang?: string;
 }
 
 type ExportFormat = "png" | "jpg" | "webp";
@@ -41,10 +42,16 @@ const DEFAULT_SETTINGS: FramedSettings = {
   offsetY: 0,
   filterEffect: "none",
   deviceColor: "black",
-  browserUrl: "https://yourapp.com",
+  browserUrl: "https://studio.fabianh.me",
 };
 
-export function EditorSection({ originalImage, onReset, onNewImage }: EditorSectionProps) {
+export function EditorSection({
+  originalImage,
+  onReset,
+  onNewImage,
+  lang = "es",
+}: EditorSectionProps) {
+  const isEn = lang === "en";
   const [settings, setSettings] = useState<FramedSettings>(DEFAULT_SETTINGS);
   const [isExporting, setIsExporting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -72,7 +79,6 @@ export function EditorSection({ originalImage, onReset, onNewImage }: EditorSect
         link.click();
       } catch (err) {
         console.error("Export error", err);
-        alert("Export failed. Make sure the image doesn't have CORS issues.");
       } finally {
         setIsExporting(false);
       }
@@ -94,162 +100,164 @@ export function EditorSection({ originalImage, onReset, onNewImage }: EditorSect
   }, []);
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-background flex flex-col font-accent text-foreground">
-
-      {/* ── Top Bar ── */}
-      <header className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0 h-14">
-        {/* Left: Logo + Start Over */}
-        <div className="flex items-center gap-3 min-w-[200px]">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-              <Monitor size={14} />
-            </div>
-            <span className="text-sm font-bold text-foreground font-heading">Framed</span>
+    <div className="h-screen max-h-screen overflow-hidden bg-background flex flex-col text-foreground">
+      <WorkspaceHeader
+        slug="mockup-generator"
+        lang={lang}
+        onClose={onReset}
+        centerSlot={
+          <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-md border border-border text-xs font-mono text-muted-foreground">
+            <span className="capitalize">{settings.frameStyle}</span>
+            <span>·</span>
+            <span>{settings.aspectRatio}</span>
+            <span>·</span>
+            <span>{settings.padding}px</span>
           </div>
-          <div className="w-px h-4 bg-border" />
-          <button
-            onClick={onReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all"
-          >
-            <RotateCcw size={12} />
-            Start Over
-          </button>
-        </div>
+        }
+        rightSlot={
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onNewImage}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+            >
+              <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{isEn ? "New image" : "Nueva imagen"}</span>
+            </button>
 
-        {/* Center: Frame info pill */}
-        <div className="hidden lg:flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-[10px] font-semibold text-muted-foreground">
-          <span className="capitalize">{settings.frameStyle}</span>
-          <span className="text-border">·</span>
-          <span>{settings.aspectRatio}</span>
-          <span className="text-border">·</span>
-          <span>{settings.padding}px padding</span>
-        </div>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-card hover:bg-muted rounded-lg border border-border transition-colors cursor-pointer"
+              title={isEn ? "Copy to clipboard" : "Copiar al portapapeles"}
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-emerald-700" />
+              ) : (
+                <Clipboard className="w-3.5 h-3.5" />
+              )}
+              <span className="hidden sm:inline">
+                {copied ? (isEn ? "Copied!" : "¡Copiado!") : isEn ? "Copy" : "Copiar"}
+              </span>
+            </button>
 
-        {/* Right: Copy + Export */}
-        <div className="flex items-center gap-2 min-w-[200px] justify-end">
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg border border-border transition-all"
-            title="Copy to clipboard"
-          >
-            {copied ? <Check size={12} className="text-green-500" /> : <Clipboard size={12} />}
-            {copied ? "Copied!" : "Copy"}
-          </button>
+            {/* Export button + dropdown */}
+            <div className="relative">
+              <div className="flex">
+                <button
+                  type="button"
+                  onClick={() => handleExport()}
+                  disabled={isExporting}
+                  className="inline-flex items-center gap-1.5 pl-3.5 pr-2.5 py-1.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-white text-xs font-semibold rounded-l-lg transition-colors cursor-pointer"
+                >
+                  {isExporting ? (
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5" />
+                  )}
+                  <span>
+                    {isEn ? "Export" : "Exportar"} {exportScale}x {exportFormat.toUpperCase()}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  aria-label={isEn ? "Export options" : "Opciones de exportación"}
+                  onClick={() => setShowExportMenu((v) => !v)}
+                  className="flex items-center justify-center w-7 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-r-lg border-l border-white/20 transition-colors cursor-pointer"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-          {/* Export button + dropdown */}
-          <div className="relative">
-            <div className="flex">
-              <button
-                onClick={() => handleExport()}
-                disabled={isExporting}
-                className="flex items-center gap-1.5 pl-4 pr-2 py-2 bg-foreground hover:bg-foreground/90 disabled:opacity-50 text-background text-xs font-bold rounded-l-full transition-colors"
-              >
-                {isExporting ? (
-                  <RotateCcw size={12} className="animate-spin" />
-                ) : (
-                  <Download size={12} />
-                )}
-                Export {exportScale}x {exportFormat.toUpperCase()}
-              </button>
-              <button
-                onClick={() => setShowExportMenu((v) => !v)}
-                className="flex items-center justify-center w-8 py-2 bg-foreground hover:bg-foreground/90 text-background rounded-r-full border-l border-background/20 transition-colors"
-              >
-                <ChevronDown size={12} />
-              </button>
+              {showExportMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowExportMenu(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 z-20 bg-card border border-border rounded-xl shadow-lg p-3 w-52 space-y-3">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                        {isEn ? "Format" : "Formato"}
+                      </p>
+                      <div className="grid grid-cols-3 gap-1">
+                        {(["png", "jpg", "webp"] as ExportFormat[]).map((f) => (
+                          <button
+                            key={f}
+                            type="button"
+                            onClick={() => setExportFormat(f)}
+                            className={`py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                              exportFormat === f
+                                ? "bg-primary text-white"
+                                : "bg-muted text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {f}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                        {isEn ? "Resolution Scale" : "Escala de resolución"}
+                      </p>
+                      <div className="grid grid-cols-3 gap-1">
+                        {([1, 2, 3] as ExportScale[]).map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setExportScale(s)}
+                            className={`py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                              exportScale === s
+                                ? "bg-primary text-white"
+                                : "bg-muted text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {s}x
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleExport()}
+                      className="w-full py-2 bg-primary hover:bg-primary-hover text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                    >
+                      {isEn ? "Download Now" : "Descargar ahora"}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-
-            {showExportMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowExportMenu(false)}
-                />
-                <div className="absolute right-0 top-full mt-2 z-20 bg-card border border-border rounded-2xl shadow-xl p-3 w-52 space-y-3">
-                  <div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Format</p>
-                    <div className="grid grid-cols-3 gap-1">
-                      {(["png", "jpg", "webp"] as ExportFormat[]).map((f) => (
-                        <button
-                          key={f}
-                          onClick={() => setExportFormat(f)}
-                          className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
-                            exportFormat === f
-                              ? "bg-foreground text-background"
-                              : "bg-muted text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {f}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Scale</p>
-                    <div className="grid grid-cols-3 gap-1">
-                      {([1, 2, 3] as ExportScale[]).map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => setExportScale(s)}
-                          className={`py-1.5 rounded-lg text-[10px] font-bold transition-all ${
-                            exportScale === s
-                              ? "bg-foreground text-background"
-                              : "bg-muted text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {s}x
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleExport()}
-                    className="w-full py-2 bg-foreground text-background text-xs font-bold rounded-xl transition-colors hover:bg-foreground/90"
-                  >
-                    Export Now
-                  </button>
-                </div>
-              </>
-            )}
           </div>
-        </div>
-      </header>
+        }
+      />
 
-      {/* ── Main Workspace ── */}
+      {/* Main Workspace */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
-
         {/* Left Sidebar */}
-        <div className="w-full lg:w-72 flex-shrink-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border overflow-hidden order-2 lg:order-1">
-          <LeftSidebar settings={settings} setSettings={setSettings} onNewImage={onNewImage} />
+        <div className="w-full lg:w-72 shrink-0 lg:h-full border-t lg:border-t-0 lg:border-r border-border overflow-hidden order-2 lg:order-1">
+          <LeftSidebar
+            settings={settings}
+            setSettings={setSettings}
+            onNewImage={onNewImage}
+          />
         </div>
 
-        {/* Canvas Area — no scroll, clips overflow */}
-        <div className="w-full h-[50vh] lg:h-auto lg:flex-1 min-h-0 overflow-hidden relative flex items-center justify-center bg-[#f8fafc] shrink-0 order-1 lg:order-2">
-          {/* Dot grid background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-              opacity: 0.6,
-            }}
-          />
-          {/* Gradient vignette over the grid */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at center, transparent 50%, #f8fafc 100%)",
-            }}
-          />
-
-          {/* Canvas — fixed size, no min-h-full so it doesn't force scroll */}
-          <div className="relative z-10 w-full h-full flex items-center justify-center p-6">
-            <FrameCanvas ref={canvasRef} imageSrc={originalImage} settings={settings} />
+        {/* Canvas Area */}
+        <div className="w-full h-[50vh] lg:h-auto lg:flex-1 min-h-0 overflow-hidden relative flex items-center justify-center bg-canvas shrink-0 order-1 lg:order-2">
+          <div className="absolute inset-0 pointer-events-none studio-grid opacity-70" />
+          <div className="relative z-10 w-full h-full flex items-center justify-center p-4 sm:p-6">
+            <FrameCanvas
+              ref={canvasRef}
+              imageSrc={originalImage}
+              settings={settings}
+            />
           </div>
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-full lg:w-64 flex-shrink-0 lg:h-full border-t lg:border-t-0 lg:border-l border-border overflow-hidden order-3">
+        <div className="w-full lg:w-64 shrink-0 lg:h-full border-t lg:border-t-0 lg:border-l border-border overflow-hidden order-3">
           <RightSidebar settings={settings} setSettings={setSettings} />
         </div>
       </main>
