@@ -16,29 +16,30 @@ export function CopyUrlButton({ title }: CopyUrlButtonProps) {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       toast.success(
-        title === "Copiar Enlace" || window.location.pathname.startsWith('/es/') 
-          ? "Enlace copiado al portapapeles" 
+        title === "Copiar enlace" || window.location.pathname.startsWith("/es/")
+          ? "Enlace copiado al portapapeles"
           : "Link copied to clipboard"
       );
-      
+
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast.error("Error al copiar / Failed to copy");
     }
   };
 
   return (
     <button
+      type="button"
       onClick={handleCopy}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-      aria-label="Copy article URL"
+      className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-foreground bg-card border border-border rounded-xl hover:bg-muted hover:border-slate-300 transition-colors focus-visible:outline-2 focus-visible:outline-primary cursor-pointer font-accent shadow-2xs"
+      aria-label={title || "Copy article URL"}
     >
       {copied ? (
-        <Check className="w-4 h-4 text-emerald-500" />
+        <Check className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
       ) : (
-        <Link2 className="w-4 h-4" />
+        <Link2 className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
       )}
-      <span>{title || "Copy URL"}</span>
+      <span>{copied ? (window.location.pathname.startsWith("/es/") ? "¡Copiado!" : "Copied!") : title || "Copy URL"}</span>
     </button>
   );
 }

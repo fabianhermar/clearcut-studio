@@ -1,65 +1,68 @@
 import { SAMPLE_IMAGES } from "@/lib/constants";
+import { Eraser, ArrowUpRight } from "lucide-react";
 
 interface SampleImagesSectionProps {
   onSelectDemo: (src: string) => void;
   dict?: any;
+  lang?: string;
 }
 
-export function SampleImagesSection({ onSelectDemo, dict }: SampleImagesSectionProps) {
-  const isEn = dict?.header?.features === "Features";
+export function SampleImagesSection({ onSelectDemo, dict, lang }: SampleImagesSectionProps) {
+  const isEn = lang === "en" || dict?.header?.features === "Features";
 
   return (
-    <section className="py-24 px-4 bg-muted/30">
+    <section className="py-20 sm:py-24 px-4 sm:px-6 lg:px-8 bg-background border-b border-border">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-primary text-sm font-semibold uppercase tracking-wider font-accent">
-            {isEn ? "Gallery" : "Galería"}
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-3 mb-4 font-heading">
-            {isEn ? "Try it with these examples" : "Pruébalo con estos ejemplos"}
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-accent">
-            {isEn 
-              ? "Select any image to see the background removal in action."
-              : "Selecciona cualquier imagen para ver la eliminación de fondo en acción."
-            }
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
+              {isEn ? "Interactive Test Gallery" : "Galería de prueba inmediata"}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-3 font-heading tracking-tight">
+              {isEn ? "No image on hand? Test with a sample" : "¿Sin imagen a mano? Prueba con un ejemplo real"}
+            </h2>
+          </div>
+          <p className="text-muted-foreground max-w-md text-sm sm:text-base leading-relaxed">
+            {isEn
+              ? "Click any photograph below to load it directly into the AI Background Remover workspace."
+              : "Selecciona cualquiera de estas fotografías de muestra para cargarla directamente en el editor de recorte con IA."}
           </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {SAMPLE_IMAGES.map((img) => (
-            <div
+            <button
               key={img.id}
-              className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-medium transition-all cursor-pointer"
+              type="button"
               onClick={() => onSelectDemo(img.src)}
+              className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-card shadow-2xs hover:shadow-md hover:border-primary/40 transition-all text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-primary"
             >
               <img
                 loading="lazy"
                 decoding="async"
                 src={img.src}
-                alt={img.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                alt={`${img.name} - ${img.category}`}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition-transform">
-                <p className="text-white/80 text-xs font-semibold uppercase tracking-wider mb-1 font-accent">
-                  {img.category}
-                </p>
-                <p className="text-white font-bold font-heading">{img.name}</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/75 text-white backdrop-blur-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </div>
 
-              {/* Hover action overlay */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-primary/90 text-white px-4 py-2 rounded-full font-medium font-accent text-sm shadow-lg backdrop-blur flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    <path d="M4.93 4.93l14.14 14.14"/>
-                  </svg>
-                  {isEn ? "Remove background" : "Eliminar fondo"}
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-white/75 text-[11px] font-mono uppercase tracking-wider mb-0.5">
+                  {img.category}
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-white font-bold font-heading text-base">{img.name}</p>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-white bg-primary/90 px-2.5 py-1 rounded-md">
+                    <Eraser className="w-3 h-3" aria-hidden="true" />
+                    {isEn ? "Test" : "Probar"}
+                  </span>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

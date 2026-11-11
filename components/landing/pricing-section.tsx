@@ -1,4 +1,4 @@
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Info } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import { ApiDisclaimer } from "./api-disclaimer";

@@ -1,214 +1,318 @@
 "use client";
 
+import React, { useRef, useCallback } from "react";
 import { SAMPLE_IMAGES } from "@/lib/constants";
+import { ToolSlug } from "@/lib/tools-catalog";
+import {
+  Scissors,
+  Zap,
+  ShieldCheck,
+  Cpu,
+  SlidersHorizontal,
+  ArrowRight,
+  MoveHorizontal,
+} from "lucide-react";
 
 interface HeroSectionProps {
   onStartApp: () => void;
   onStartOptimizer: () => void;
-  onStartMockupGenerator: () => void;
+  onStartMockupGenerator?: () => void;
+  onSelectTool?: (slug: ToolSlug) => void;
   onSelectDemo: (src: string) => void;
   comparisonPos: number;
   setComparisonPos: (pos: number) => void;
   dict?: any;
+  lang?: string;
 }
 
-export function HeroSection({ onStartApp, onStartOptimizer, onStartMockupGenerator, onSelectDemo, comparisonPos, setComparisonPos, dict }: HeroSectionProps) {
-  const t = dict?.hero || {
-    aiBadge: "Powered by Artificial Intelligence",
-    title: "Edit images ",
-    titleGradient: "with AI",
-    description: "Remove backgrounds with AI and optimize your image file sizes. Edit, crop, and export in multiple formats — all for free in your browser.",
-    bgRemoverBtn: "Remove background",
-    optimizerBtn: "Optimize image",
-    optimizerDesc: "WebP · AVIF · JPEG",
-    demoBtn: "Demo",
-    badges: {
-      quality: "High quality",
-      formats: "PNG, WebP, AVIF",
-      editor: "Full editor",
-      private: "100% private"
+export function HeroSection({
+  onStartApp,
+  onStartOptimizer,
+  onSelectDemo,
+  comparisonPos,
+  setComparisonPos,
+  lang = "es",
+}: HeroSectionProps) {
+  const isEs = lang === "es";
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
+
+  const updateSliderFromClientX = useCallback(
+    (clientX: number) => {
+      if (!sliderContainerRef.current) return;
+      const rect = sliderContainerRef.current.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      setComparisonPos(Math.max(5, Math.min(95, Math.round(x))));
     },
-    comparison: {
-      original: "Original",
-      processed: "Background removed",
-      badgeProcessed: "Background removed",
-      badgeOriginal: "Original quality",
-      disclaimer: "* ClearCut Studio uses AI to remove backgrounds and may make mistakes."
+    [setComparisonPos]
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setComparisonPos(Math.max(5, comparisonPos - 5));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setComparisonPos(Math.min(95, comparisonPos + 5));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setComparisonPos(5);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setComparisonPos(95);
     }
   };
 
-  const c = dict?.common || { poweredByAi: "Powered by AI" };
+  const pillars = isEs
+    ? [
+        { label: "Procesamiento en navegador", icon: ShieldCheck },
+        { label: "Codificadores WASM nativos", icon: Cpu },
+        { label: "PNG · WebP · AVIF · JPG", icon: SlidersHorizontal },
+      ]
+    : [
+        { label: "In-browser processing", icon: ShieldCheck },
+        { label: "Native WASM encoders", icon: Cpu },
+        { label: "PNG · WebP · AVIF · JPG", icon: SlidersHorizontal },
+      ];
 
   return (
-    <section className="relative pt-32 pb-24 px-4 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-150 bg-linear-to-b from-primary/5 via-accent/5 to-transparent rounded-full blur-3xl" />
-      </div>
+    <section className="relative pt-10 pb-20 sm:pt-16 sm:pb-24 px-4 sm:px-6 lg:px-8 border-b border-border bg-background overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          {/* Left Column: Value Proposition & Actions */}
+          <div className="lg:col-span-6 space-y-6 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border shadow-soft text-xs font-semibold text-foreground font-accent">
+              <span className="w-2 h-2 rounded-full bg-emerald-600" />
+              <span>
+                {isEs
+                  ? "Estudio de edición local · WebAssembly y Canvas API"
+                  : "Local editing studio · WebAssembly & Canvas API"}
+              </span>
+            </div>
 
-      <div className="relative max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left - Content */}
-          <div className="text-center lg:text-left">
-            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-accent mb-6">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-              </svg>
-              {t.aiBadge}
-            </p>
-
-            <h1 className="text-5xl md:text-7xl tracking-tighter font-heading text-balance font-bold mb-6">
-              {t.title}
-              <span className="gradient-text">{t.titleGradient}</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.08] tracking-tight font-heading font-bold text-foreground">
+              {isEs ? (
+                <>
+                  Herramientas de imagen precisas,{" "}
+                  <span className="text-primary">ejecutadas en tu navegador.</span>
+                </>
+              ) : (
+                <>
+                  Precision image tools,{" "}
+                  <span className="text-primary">running in your browser.</span>
+                </>
+              )}
             </h1>
 
-            <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-accent">
-              {t.description}
+            <p className="text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed font-accent">
+              {isEs
+                ? "Elimina fondos con inteligencia artificial, comprime archivos en formatos WebP y AVIF, limpia metadatos EXIF y prepara recursos gráficos sin subir tus imágenes a servidores externos."
+                : "Remove backgrounds with AI, compress files into WebP and AVIF, strip EXIF metadata, and prepare graphic assets without uploading your images to external servers."}
             </p>
 
-            {/* Tool cards */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10">
+            {/* Primary & Secondary Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
+                type="button"
                 onClick={onStartApp}
-                className="group font-accent flex items-center gap-3 px-6 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary/20 text-left"
+                className="group inline-flex items-center justify-between sm:justify-start gap-3.5 px-5 py-3.5 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl transition-all shadow-soft font-accent text-left"
               >
-                <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    <path d="M4.93 4.93l14.14 14.14"/>
-                  </svg>
+                <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                  <Scissors className="w-4 h-4" />
                 </div>
-                <div>
-                  <div className="text-sm font-bold">{t.bgRemoverBtn}</div>
-                  <div className="text-xs text-white/70">{c.poweredByAi}</div>
+                <div className="pr-1">
+                  <div className="text-sm font-bold leading-tight">
+                    {isEs ? "Eliminar fondo con IA" : "AI Background Remover"}
+                  </div>
+                  <div className="text-[11px] text-white/80 font-mono mt-0.5">
+                    PNG · WebP · AVIF · Editor
+                  </div>
                 </div>
+                <ArrowRight className="w-4 h-4 ml-auto sm:ml-1 opacity-80 group-hover:translate-x-0.5 transition-transform" />
               </button>
 
               <button
+                type="button"
                 onClick={onStartOptimizer}
-                className="group font-accent flex items-center gap-3 px-6 py-4 bg-card hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all text-left"
+                className="group inline-flex items-center justify-between sm:justify-start gap-3.5 px-5 py-3.5 bg-card hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all shadow-soft font-accent text-left"
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                  </svg>
+                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Zap className="w-4 h-4" />
                 </div>
-                <div>
-                  <div className="text-sm font-bold">{t.optimizerBtn}</div>
-                  <div className="text-xs text-muted-foreground">{t.optimizerDesc}</div>
+                <div className="pr-1">
+                  <div className="text-sm font-bold leading-tight">
+                    {isEs ? "Optimizar y convertir" : "Optimize & Convert"}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                    libavif · libwebp · MozJPEG
+                  </div>
                 </div>
-              </button>
-
-
-              <button
-                onClick={() => onSelectDemo(SAMPLE_IMAGES[0].src)}
-                className="flex font-accent items-center justify-center gap-2 px-6 py-4 bg-card hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="5 3 19 12 5 21 5 3"/>
-                </svg>
-                {t.demoBtn}
               </button>
             </div>
 
-            {/* Trust badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 sm:gap-y-2">
-              {[
-                { label: t.badges.quality, icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-                { label: t.badges.formats, icon: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" },
-                { label: t.badges.editor, icon: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" },
-                { label: t.badges.private, icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" },
-              ].map(({ label, icon }) => (
-                <div key={label} className="inline-flex items-center gap-2.5 text-sm text-muted-foreground font-accent leading-none justify-self-center lg:justify-self-start">
-                  <span className="flex h-5 w-5 items-center justify-center shrink-0 text-success">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
-                      <path d={icon} />
-                    </svg>
-                  </span>
-                  <span className="whitespace-nowrap leading-none">{label}</span>
+            {/* Technical Specs / Format Requirements Notice */}
+            <div className="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground font-accent">
+              {pillars.map(({ label, icon: Icon }) => (
+                <div key={label} className="inline-flex items-center gap-1.5">
+                  <Icon className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span>{label}</span>
                 </div>
               ))}
             </div>
+
+            {/* Quick Sample Try Bar */}
+            <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="text-xs text-muted-foreground font-accent">
+                <span className="font-semibold text-foreground block sm:inline">
+                  {isEs ? "Prueba inmediata:" : "Instant test:"}
+                </span>{" "}
+                {isEs
+                  ? "Abre el motor de IA con una foto de ejemplo"
+                  : "Launch the AI engine with a sample photo"}
+              </div>
+              <div className="flex items-center gap-2">
+                {SAMPLE_IMAGES.map((img) => (
+                  <button
+                    key={img.id}
+                    type="button"
+                    onClick={() => onSelectDemo(img.src)}
+                    className="group relative w-11 h-11 rounded-lg overflow-hidden border border-border hover:border-primary transition-all shadow-soft bg-card shrink-0"
+                    title={
+                      isEs
+                        ? `Probar eliminación de fondo con: ${img.name}`
+                        : `Test background removal with: ${img.name}`
+                    }
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Right - Comparison */}
-          <div className="relative">
-            <div className="relative bg-card rounded-2xl border border-border overflow-hidden shadow-medium">
-              <div className="absolute top-4 left-4 z-10">
-                <span className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full font-accent">{t.comparison.processed}</span>
-              </div>
-              <div className="absolute top-4 right-4 z-10">
-                <span className="px-3 py-1.5 bg-foreground/80 backdrop-blur text-card text-xs font-medium rounded-full font-accent">{t.comparison.original}</span>
+          {/* Right Column: Interactive Accessible Before/After Workspace Demo */}
+          <div className="lg:col-span-6">
+            <div className="bg-card rounded-2xl border border-border shadow-medium overflow-hidden">
+              {/* Studio Window Header */}
+              <div className="px-4 py-3 border-b border-border bg-muted/50 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                  <span className="ml-1 text-xs font-mono font-medium text-muted-foreground">
+                    {isEs
+                      ? "Demostración interactiva (imagen de ejemplo)"
+                      : "Interactive comparison (sample image)"}
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded font-medium">
+                  {comparisonPos}%
+                </span>
               </div>
 
+              {/* Interactive Before/After Viewport */}
               <div
-                className="relative aspect-4/3 cursor-ew-resize select-none"
+                ref={sliderContainerRef}
+                role="slider"
+                tabIndex={0}
+                aria-label={
+                  isEs
+                    ? "Comparador interactivo antes y después de eliminación de fondo. Usa las flechas izquierda y derecha para comparar."
+                    : "Interactive before and after background removal comparison slider. Use left and right arrow keys to compare."
+                }
+                aria-valuemin={5}
+                aria-valuemax={95}
+                aria-valuenow={comparisonPos}
+                onKeyDown={handleKeyDown}
                 onMouseMove={(e) => {
                   if (e.buttons !== 1) return;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = ((e.clientX - rect.left) / rect.width) * 100;
-                  setComparisonPos(Math.max(10, Math.min(90, x)));
+                  updateSliderFromClientX(e.clientX);
                 }}
-                onMouseDown={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = ((e.clientX - rect.left) / rect.width) * 100;
-                  setComparisonPos(Math.max(10, Math.min(90, x)));
+                onMouseDown={(e) => updateSliderFromClientX(e.clientX)}
+                onTouchMove={(e) => {
+                  if (e.touches[0]) updateSliderFromClientX(e.touches[0].clientX);
                 }}
+                onTouchStart={(e) => {
+                  if (e.touches[0]) updateSliderFromClientX(e.touches[0].clientX);
+                }}
+                className="relative aspect-[4/3] cursor-ew-resize select-none touch-pan-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
               >
-                {/* Original */}
+                {/* Original Layer (Right side) */}
                 <div className="absolute inset-0">
-                  <img src="/demos/demo-original.png" alt="Original" className="w-full h-full object-cover" fetchPriority="high" decoding="async" />
+                  <img
+                    src="/demos/demo-original.png"
+                    alt={isEs ? "Imagen de ejemplo con fondo original" : "Sample image with original background"}
+                    className="w-full h-full object-cover"
+                    fetchPriority="high"
+                    decoding="async"
+                    draggable={false}
+                  />
                 </div>
 
-                {/* Processed */}
-                <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - comparisonPos}% 0 0)` }}>
+                {/* Processed Transparent Layer (Left side clipped) */}
+                <div
+                  className="absolute inset-0 overflow-hidden"
+                  style={{ clipPath: `inset(0 ${100 - comparisonPos}% 0 0)` }}
+                >
                   <div className="w-full h-full checkerboard">
-                    <img src="/demos/demo-processed.avif" alt="Sin fondo" className="w-full h-full object-cover" decoding="async" />
+                    <img
+                      src="/demos/demo-processed.avif"
+                      alt={isEs ? "Imagen de ejemplo con fondo eliminado" : "Sample image with background removed"}
+                      className="w-full h-full object-cover"
+                      decoding="async"
+                      draggable={false}
+                    />
                   </div>
                 </div>
 
-                {/* Slider */}
-                <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${comparisonPos}%` }}>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border border-border">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-                      <path d="M8 3L4 7l4 4M16 3l4 4-4 4" />
-                    </svg>
+                {/* Top Labels */}
+                <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                  <span className="px-2.5 py-1 bg-card/95 backdrop-blur-sm border border-border text-foreground text-xs font-semibold rounded-md shadow-soft font-accent">
+                    {isEs ? "Sin fondo (PNG/AVIF)" : "Removed background (PNG/AVIF)"}
+                  </span>
+                </div>
+                <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                  <span className="px-2.5 py-1 bg-slate-900/85 backdrop-blur-sm text-white text-xs font-semibold rounded-md shadow-soft font-accent">
+                    {isEs ? "Original" : "Original"}
+                  </span>
+                </div>
+
+                {/* Divider Line & Handle */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(15,23,42,0.4)] pointer-events-none"
+                  style={{ left: `${comparisonPos}%` }}
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-card rounded-full shadow-medium flex items-center justify-center border border-border text-foreground">
+                    <MoveHorizontal className="w-4 h-4 text-primary" />
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Floating badges */}
-            <div className="absolute -top-3 font-accent -right-3 px-4 py-2 bg-success/10 border border-success/20 text-success text-sm font-medium rounded-full animate-float hidden lg:flex items-center gap-2 shadow-soft">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {t.comparison.badgeProcessed}
-            </div>
-
-            <div className="absolute -bottom-3 -left-3 font-accent px-4 py-2 bg-card border border-border text-foreground text-sm font-medium rounded-full animate-float-delayed hidden lg:flex items-center gap-2 shadow-medium">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
-                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
-              </svg>
-              {t.comparison.badgeOriginal}
-            </div>
-
-            {/* Sample thumbnails */}
-            <div className="absolute -bottom-6 right-6 hidden lg:flex gap-2 z-20">
-              {SAMPLE_IMAGES.slice(1, 4).map((img) => (
+              {/* Studio Window Footer Bar */}
+              <div className="px-4 py-3 border-t border-border bg-card flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground font-accent">
+                <span>
+                  {isEs
+                    ? "Arrastra el control o usa las teclas ← → para comparar el recorte."
+                    : "Drag the handle or use ← → arrow keys to inspect the cutout."}
+                </span>
                 <button
-                  key={img.id}
-                  onClick={() => onSelectDemo(img.src)}
-                  className="w-14 h-14 rounded-xl overflow-hidden border-2 border-card hover:border-primary transition-all hover:scale-105 shadow-medium bg-card"
+                  type="button"
+                  onClick={() => onSelectDemo("/demos/demo-original.png")}
+                  className="text-primary hover:underline font-semibold inline-flex items-center gap-1"
                 >
-                  <img src={img.src} alt={img.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                  <span>
+                    {isEs ? "Abrir esta imagen en el editor" : "Open this sample in editor"}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-              ))}
+              </div>
             </div>
           </div>
-          <p className="text-[11px] text-muted-foreground/80 text-center lg:text-left mt-2 lg:mt-3 font-accent lg:absolute lg:-bottom-8 lg:left-0">
-            {t.comparison.disclaimer}
-          </p>
         </div>
       </div>
     </section>
