@@ -9,8 +9,8 @@ export function ApiDisclaimer({ lang = "en" }: { lang?: string }) {
         </div>
         <div className="flex-1">
           <h4 className="text-lg md:text-xl font-bold font-heading text-foreground mb-3">
-            {lang === 'es'
-              ? 'Transparencia Técnica y Procesamiento Futuro'
+            {lang === 'es' 
+              ? 'Transparencia Técnica y Procesamiento Futuro' 
               : 'Technical Transparency & Future Processing'}
           </h4>
           <div className="space-y-4 text-sm md:text-base text-muted-foreground font-accent leading-relaxed">

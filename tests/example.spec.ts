@@ -69,6 +69,11 @@ test.describe('ClearCut Studio 2026 E2E Suite', () => {
       expect(response?.status(), `Expected 200 on ${route}`).toBe(200);
       await expect(page.locator('main')).toHaveCount(1);
     }
+
+    await page.goto('/es/pricing');
+    await expect(page.locator('#pricing')).toContainText('PLAN 01 // ESTUDIO LOCAL');
+    await expect(page.locator('#pricing')).toContainText('HYBRID // EXPLICIT NOTICE');
+    await expect(page.locator('#pricing')).not.toContainText('☕');
   });
 
   test('renders redesigned Blog index and Blog articles in ES and EN', async ({ page }) => {

@@ -16,14 +16,14 @@ export function FaqSection({ dict, lang = "en" }: FaqSectionProps) {
   const faqs = [
     {
       q: lang === "es" ? "¿ClearCut Studio es realmente 100% gratis?" : "Is ClearCut Studio really 100% free?",
-      a: lang === "es"
-        ? "Sí, nuestra suite es totalmente gratuita y no tiene muros de pago obligatorios ni anuncios molestos. Lo mantenemos así gracias a las donaciones voluntarias de la comunidad y a nuestra filosofía de procesamiento local, que elimina los altísimos costos de servidores en la nube."
+      a: lang === "es" 
+        ? "Sí, nuestra suite es totalmente gratuita y no tiene muros de pago obligatorios ni anuncios molestos. Lo mantenemos así gracias a las donaciones voluntarias de la comunidad y a nuestra filosofía de procesamiento local, que elimina los altísimos costos de servidores en la nube." 
         : "Yes, our suite is completely free and has no mandatory paywalls or annoying ads. We keep it this way thanks to voluntary community donations and our local processing philosophy, which eliminates huge cloud server costs."
     },
     {
       q: lang === "es" ? "¿Mis fotos o imágenes se suben a la nube?" : "Are my photos or images uploaded to the cloud?",
-      a: lang === "es"
-        ? "No. Tu privacidad es nuestra prioridad absoluta. Todo el procesamiento (como la eliminación de fondos o la optimización) ocurre localmente en tu dispositivo, directamente dentro de tu navegador web. Tus archivos nunca viajan a nuestros servidores."
+      a: lang === "es" 
+        ? "No. Tu privacidad es nuestra prioridad absoluta. Todo el procesamiento (como la eliminación de fondos o la optimización) ocurre localmente en tu dispositivo, directamente dentro de tu navegador web. Tus archivos nunca viajan a nuestros servidores." 
         : "No. Your privacy is our absolute priority. All processing (like background removal or optimization) happens locally on your device, right inside your web browser. Your files never travel to our servers."
     },
     {
@@ -68,18 +68,18 @@ export function FaqSection({ dict, lang = "en" }: FaqSectionProps) {
     <section className="py-24 bg-background relative border-t border-border overflow-hidden">
       {/* Subtle Background Gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.04),transparent_60%)] pointer-events-none" />
-
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
-
+          
           {/* Left Column: Title & Desc */}
           <div className="sticky top-24">
             <h2 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-6 leading-tight">
               {lang === "es" ? "Preguntas Frecuentes" : "Frequently asked questions"}
             </h2>
             <p className="text-lg text-muted-foreground font-accent max-w-md">
-              {lang === "es"
-                ? "Explora las respuestas a las preguntas más comunes de nuestros usuarios sobre privacidad, costos y el futuro de ClearCut."
+              {lang === "es" 
+                ? "Explora las respuestas a las preguntas más comunes de nuestros usuarios sobre privacidad, costos y el futuro de ClearCut." 
                 : "Explore answers to the most common questions from our users about privacy, costs, and the future of ClearCut."}
             </p>
           </div>
@@ -88,9 +88,9 @@ export function FaqSection({ dict, lang = "en" }: FaqSectionProps) {
           <div className="w-full mt-4 md:mt-0">
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
-                <AccordionItem
-                  key={index}
-                  value={`item-${index}`}
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`} 
                   className="border-b border-border/60"
                 >
                   <AccordionTrigger className="text-left text-base md:text-lg font-semibold font-heading text-foreground hover:text-primary py-6 hover:no-underline group">

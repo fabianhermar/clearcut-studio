@@ -12,8 +12,8 @@ export default function OfflinePage() {
       <p className="text-muted-foreground max-w-md mx-auto mb-8">
         No tienes conexión a internet en este momento. Sin embargo, si ya tenías la aplicación cargada en otra pestaña, ClearCut Studio puede seguir funcionando localmente en tu dispositivo.
       </p>
-      <button
-        onClick={() => window.location.reload()}
+      <button 
+        onClick={() => window.location.reload()} 
         className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
       >
         Reintentar conexión
