@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 2,
   timeout: 60000,
-  reporter: 'list',
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:3099',
     trace: 'on-first-retry',
@@ -15,11 +15,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+      use: process.env.CI
+        ? { ...devices['Desktop Chrome'] }
+        : { ...devices['Desktop Edge'], channel: 'msedge' },
     },
   ],
   webServer: {
-    command: 'npx next start -p 3099',
+    command: 'pnpm exec next start -p 3099',
     url: 'http://localhost:3099/es',
     reuseExistingServer: false,
     timeout: 60000,
