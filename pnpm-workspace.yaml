@@ -13,3 +13,4 @@ minimumReleaseAgeExclude:
   - '@next/swc-win32-x64-msvc@16.4.3'
   - next@16.4.3
   - react-hook-form@7.91.0
+  - react-resizable-panels@4.22.0
