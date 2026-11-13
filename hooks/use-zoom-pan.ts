@@ -7,11 +7,11 @@ export function useZoomPan(initialZoom = 1) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
   const zoomIn = useCallback(() => {
-    setZoom((z) => Math.min(4, z + 0.25));
+    setZoom((z) => Math.min(4, Number((z + 0.25).toFixed(2))));
   }, []);
 
   const zoomOut = useCallback(() => {
-    setZoom((z) => Math.max(0.25, z - 0.25));
+    setZoom((z) => Math.max(0.25, Number((z - 0.25).toFixed(2))));
   }, []);
 
   const resetZoom = useCallback(() => {
@@ -19,5 +19,5 @@ export function useZoomPan(initialZoom = 1) {
     setPan({ x: 0, y: 0 });
   }, []);
 
-  return { zoom, pan, setPan, zoomIn, zoomOut, resetZoom };
+  return { zoom, setZoom, pan, setPan, zoomIn, zoomOut, resetZoom };
 }
