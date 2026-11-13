@@ -1,5 +1,12 @@
-import { CheckCircle2, Info } from "lucide-react";
-import React from "react";
+import {
+  Check,
+  ShieldCheck,
+  Monitor,
+  Users,
+  Coffee,
+  ArrowUpRight,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { ApiDisclaimer } from "./api-disclaimer";
 
@@ -8,235 +15,313 @@ interface PricingSectionProps {
   lang?: string;
 }
 
-export function PricingSection({ dict, lang = "en" }: PricingSectionProps) {
+export function PricingSection({ dict, lang = "es" }: PricingSectionProps) {
+  const isEs = lang === "es";
   const t = dict?.pricing || {
-    title: "Simple & Transparent Pricing",
-    subtitle: "Choose the perfect plan that fits your needs",
+    title: isEs ? "Precios Simples y Transparentes" : "Simple & Transparent Pricing",
+    subtitle: isEs
+      ? "ClearCut es gratis, pero puedes apoyarnos."
+      : "ClearCut Studio is free for everyone, sustained voluntarily.",
     free: {
-      title: "Free",
-      desc: "Perfect for testing out our platform and processing unlimited images locally.",
+      title: isEs ? "Gratis" : "Free",
+      desc: isEs
+        ? "Perfecto para probar nuestra plataforma y procesar imágenes ilimitadas."
+        : "Everything unlocked to process unlimited images right inside your browser.",
       price: "$0",
-      period: "/forever",
-      whatsIncluded: "What's Included?",
-      features: [
-        "Unlimited background removals",
-        "Unlimited image optimizations",
-        "100% private local processing",
-        "No watermarks on exports",
-        "High quality results"
-      ],
-      btn: "Start for free"
+      period: isEs ? "/para siempre" : "/forever",
+      whatsIncluded: isEs ? "¿Qué incluye?" : "What's Included?",
+      features: isEs
+        ? [
+            "Eliminación de fondos ilimitada",
+            "Optimización de imágenes ilimitada",
+            "Procesamiento local 100% privado",
+            "Sin marcas de agua",
+            "Resultados de alta calidad",
+          ]
+        : [
+            "Unlimited background removals",
+            "Unlimited image optimizations",
+            "100% private local processing",
+            "No watermarks on exports",
+            "High quality results",
+          ],
+      btn: isEs ? "Comenzar gratis" : "Start for free",
     },
     sponsor: {
-      title: "Support the Project",
-      desc: "Help us keep ClearCut Studio free and fund new feature development.",
-      whatsIncluded: "Why Support?",
-      features: [
-        "Cover domain and hosting costs",
-        "Fund new feature development",
-        "Keep the tool 100% free",
-        "No ads or data tracking",
-        "Our eternal gratitude 💙"
-      ],
-      btn: "Sponsor us"
-    }
+      title: isEs ? "Apoyar el Proyecto" : "Support the Project",
+      desc: isEs
+        ? "Ayúdanos a mantener ClearCut Studio gratis y desarrollar nuevas herramientas."
+        : "Help us keep ClearCut Studio free and fund new feature development.",
+      whatsIncluded: isEs ? "¿Por qué apoyar?" : "Why Support?",
+      features: isEs
+        ? [
+            "Cubrir costos de dominio y hosting",
+            "Financiar nuevas herramientas",
+            "Mantener la app 100% gratuita",
+            "Sin anuncios ni rastreo de datos",
+            "Impulsar mejoras continuas en WebAssembly",
+          ]
+        : [
+            "Cover domain and hosting costs",
+            "Fund new feature development",
+            "Keep the tool 100% free",
+            "No ads or data tracking",
+            "Support continuous WebAssembly improvements",
+          ],
+      btn: isEs ? "Patrocinarnos" : "Sponsor us",
+    },
   };
 
+  const pillars = isEs
+    ? [
+        {
+          code: "01",
+          icon: ShieldCheck,
+          title: "Siempre será gratis",
+          desc: "Nunca habrá un plan de pago obligatorio. Las herramientas locales principales de ClearCut Studio permanecerán gratuitas.",
+        },
+        {
+          code: "02",
+          icon: Monitor,
+          title: "Tu privacidad primero",
+          desc: "El procesamiento local ocurre dentro de tu navegador. Tus fotografías jamás llegan a nuestros servidores.",
+        },
+        {
+          code: "03",
+          icon: Users,
+          title: "Financiado por la comunidad",
+          desc: "El dominio, infraestructura y desarrollo continuo se sostienen mediante aportes voluntarios, sin anuncios ni presión.",
+        },
+      ]
+    : [
+        {
+          code: "01",
+          icon: ShieldCheck,
+          title: "Always free",
+          desc: "There will never be a mandatory paid tier. ClearCut Studio's core local tools remain free forever.",
+        },
+        {
+          code: "02",
+          icon: Monitor,
+          title: "Your privacy first",
+          desc: "Local processing executes strictly in your browser. Your photographs never touch our servers.",
+        },
+        {
+          code: "03",
+          icon: Users,
+          title: "Community-funded",
+          desc: "Domain, hosting, and ongoing development are sustained through voluntary contributions with zero ads.",
+        },
+      ];
+
+  const cleanSponsorFeatures: string[] = (t.sponsor?.features || []).map((item: string) =>
+    item.replace(/\s*💙\s*$/, "").trim()
+  );
+
   return (
-    <section id="pricing" className="py-24 bg-background relative overflow-hidden">
-      {/* Decorative background gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/10 rounded-full blur-[120px] -z-10 opacity-50"></div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading mb-6 text-foreground">
-            {t.title}
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground font-accent">
-            {t.subtitle}
-          </p>
+    <section id="pricing" className="px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Swiss Editorial Header */}
+        <div className="pb-10 mb-12 border-b border-border grid lg:grid-cols-12 gap-6 items-end">
+          <div className="lg:col-span-7">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary mb-3">
+              {isEs ? "01 // ACCESO Y SOSTENIBILIDAD" : "01 // ACCESS & SUSTAINABILITY"}
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading text-foreground tracking-tight leading-[1.04]">
+              {t.title}
+            </h1>
+          </div>
+          <div className="lg:col-span-5">
+            <p className="text-base sm:text-lg text-muted-foreground font-accent leading-relaxed">
+              {t.subtitle}
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Free Card (Blue Highlighted style) */}
-          <div className="bg-gradient-to-b from-primary/20 to-primary/5 border border-primary/30 rounded-3xl p-8 relative shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent rounded-t-3xl"></div>
-            
-            <h3 className="text-3xl font-bold font-heading text-foreground mb-2">
-              {t.free.title}
-            </h3>
-            <p className="text-muted-foreground font-accent mb-6 min-h-[48px]">
-              {t.free.desc}
-            </p>
-            
-            <div className="flex items-end gap-1 mb-8">
-              <span className="text-5xl font-bold font-heading text-foreground">{t.free.price}</span>
-              <span className="text-muted-foreground font-accent mb-1">{t.free.period}</span>
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-6">
-                <hr className="flex-1 border-border" />
-                <span className="text-sm font-semibold font-heading text-muted-foreground uppercase tracking-wider">{t.free.whatsIncluded}</span>
-                <hr className="flex-1 border-border" />
+        {/* Light Optical Atelier Bento Pricing Grid */}
+        <div className="grid lg:grid-cols-12 gap-6 items-stretch mb-20">
+          {/* Free Tier — Precision Highlighted Light Studio Plate */}
+          <div className="lg:col-span-7 rounded-3xl bg-card border-2 border-primary p-7 sm:p-10 flex flex-col justify-between relative overflow-hidden shadow-[0_24px_60px_-28px_rgba(30,64,255,0.22)]">
+            <div className="absolute top-0 inset-x-0 h-1.5 bg-primary" aria-hidden="true" />
+
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-6">
+                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary font-bold">
+                  {isEs ? "PLAN 01 // ESTUDIO LOCAL" : "TIER 01 // LOCAL STUDIO"}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-700/20 font-mono text-[10px] font-semibold text-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" aria-hidden="true" />
+                  <span>{isEs ? "ACTIVO · SIN CUENTA" : "ACTIVE · NO SIGNUP"}</span>
+                </span>
               </div>
-              
-              <ul className="space-y-4 mb-8">
-                {t.free.features.map((feature: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-                    <span className="font-accent text-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-7 border-b border-border">
+                <div>
+                  <h2 className="text-3xl sm:text-4xl font-bold font-heading text-foreground mb-2">
+                    {t.free.title}
+                  </h2>
+                  <p className="text-sm sm:text-base text-muted-foreground font-accent max-w-md leading-relaxed">
+                    {t.free.desc}
+                  </p>
+                </div>
+                <div className="flex items-baseline gap-1.5 shrink-0 px-4 py-2.5 rounded-2xl bg-background border border-border">
+                  <span className="text-4xl sm:text-5xl font-extrabold font-heading text-foreground tabular-nums tracking-tight">
+                    {t.free.price}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">{t.free.period}</span>
+                </div>
+              </div>
+
+              <div className="py-7">
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground mb-5">
+                  {t.free.whatsIncluded}
+                </div>
+                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3.5">
+                  {t.free.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-sm text-foreground font-accent">
+                      <span className="w-5 h-5 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3" aria-hidden="true" />
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            
-            <Link 
+
+            <Link
               href={`/${lang}/?tool=background-remover`}
-              className="w-full py-4 px-6 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold font-accent transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/25 text-center"
+              className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 bg-primary hover:bg-primary-hover text-white rounded-full font-semibold font-accent transition-all shadow-[0_12px_28px_-10px_rgba(30,64,255,0.55)]"
             >
-              {t.free.btn}
+              <span>{t.free.btn}</span>
+              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
 
-          {/* Sponsor Card (Dark style) */}
-          <div className="bg-card border border-border rounded-3xl p-8 flex flex-col hover:border-border/80 transition-colors">
-            <h3 className="text-3xl font-bold font-heading text-foreground mb-2">
-              {t.sponsor.title}
-            </h3>
-            <p className="text-muted-foreground font-accent mb-6 min-h-[48px]">
-              {t.sponsor.desc}
-            </p>
-            
-            <div className="flex items-end gap-1 mb-8">
-              <span className="text-5xl font-bold font-heading text-foreground">☕</span>
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-6">
-                <hr className="flex-1 border-border" />
-                <span className="text-sm font-semibold font-heading text-muted-foreground uppercase tracking-wider">{t.sponsor.whatsIncluded}</span>
-                <hr className="flex-1 border-border" />
+          {/* Sponsor Tier — Clean Architectural Surface */}
+          <div className="lg:col-span-5 rounded-3xl bg-card border border-border p-7 sm:p-10 flex flex-col justify-between shadow-soft">
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-6">
+                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+                  {isEs ? "PLAN 02 // COMUNIDAD" : "TIER 02 // COMMUNITY"}
+                </span>
+                <div className="w-9 h-9 rounded-xl bg-amber-400/15 border border-amber-500/30 text-amber-800 flex items-center justify-center">
+                  <Coffee className="w-4 h-4" aria-hidden="true" />
+                </div>
               </div>
-              
-              <ul className="space-y-4 mb-8">
-                {t.sponsor.features.map((feature: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-muted-foreground shrink-0" />
-                    <span className="font-accent text-muted-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+
+              <div className="pb-7 border-b border-border">
+                <h2 className="text-2xl sm:text-3xl font-bold font-heading text-foreground mb-2">
+                  {t.sponsor.title}
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground font-accent leading-relaxed">
+                  {t.sponsor.desc}
+                </p>
+              </div>
+
+              <div className="py-7">
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground mb-5">
+                  {t.sponsor.whatsIncluded}
+                </div>
+                <ul className="space-y-3.5">
+                  {cleanSponsorFeatures.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-sm text-foreground font-accent">
+                      <span className="w-5 h-5 rounded-full bg-background border border-border text-foreground flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3" aria-hidden="true" />
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            
-            <a 
-              href="https://www.buymeacoffee.com/fabianhermar" 
-              target="_blank" 
+
+            <a
+              href="https://www.buymeacoffee.com/fabianhermar"
+              target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-yellow-400 hover:bg-yellow-500 text-black rounded-xl font-semibold font-accent transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full inline-flex items-center justify-center gap-2.5 py-4 px-6 bg-[#ffdd00] hover:bg-[#f2d000] text-[#111318] border border-[#111318]/10 rounded-full font-semibold font-accent transition-colors"
             >
-              <img 
-                src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" 
-                alt="Buy me a coffee" 
-                className="w-6 h-6" 
+              <img
+                src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg"
+                alt="Buy me a coffee"
+                className="w-5 h-5"
               />
-              {t.sponsor.btn}
+              <span>{t.sponsor.btn}</span>
+              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
             </a>
           </div>
         </div>
 
-        {/* Why Free — Philosophy Section */}
-        <div className="max-w-4xl mx-auto mt-24 px-4">
-          {/* Divider with label */}
-          <div className="flex items-center gap-4 mb-16">
-            <hr className="flex-1 border-border" />
-            <span className="text-xs font-bold font-heading uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-              {lang === 'es' ? 'Por qué es gratis' : 'Why it\'s free'}
-            </span>
-            <hr className="flex-1 border-border" />
-          </div>
-
-          {/* Story */}
-          <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-6 text-balance">
-              {lang === 'es'
-                ? 'Una herramienta construida por frustración, para todos.'
-                : 'A tool built out of frustration, for everyone.'}
-            </h3>
-            <p className="text-lg text-muted-foreground font-accent leading-relaxed max-w-2xl mx-auto">
-              {lang === 'es'
-                ? 'ClearCut Studio nació porque las mejores herramientas de edición de imágenes terminan siempre detrás de un muro de pago. Cansados de eso, decidimos construir algo diferente: una suite que respeta tu privacidad, procesa todo en tu navegador y que no te pide ni un centavo para usarla.'
-                : 'ClearCut Studio was born out of frustration. The best image editing tools always end up behind a paywall. Tired of that, we decided to build something different — a suite that respects your privacy, processes everything in your browser, and never asks you for a single cent to use it.'}
-            </p>
-          </div>
-
-          {/* Three pillars */}
-          <div className="grid sm:grid-cols-3 gap-6 mb-16">
-            {[
-              {
-                icon: (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                ),
-                title: lang === 'es' ? 'Siempre será gratis' : 'Always free',
-                desc: lang === 'es'
-                  ? 'Nunca habrá un plan de pago obligatorio. Nuestro compromiso es claro: las herramientas principales de ClearCut Studio serán gratis para siempre.'
-                  : 'There will never be a mandatory paid plan. Our commitment is clear: ClearCut Studio\'s core tools will be free forever.'
-              },
-              {
-                icon: (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                    <line x1="8" y1="21" x2="16" y2="21"/>
-                    <line x1="12" y1="17" x2="12" y2="21"/>
-                  </svg>
-                ),
-                title: lang === 'es' ? 'Tu privacidad primero' : 'Your privacy first',
-                desc: lang === 'es'
-                  ? 'Todo el procesamiento ocurre en tu navegador. Tus imágenes jamás llegan a nuestros servidores. Lo que es tuyo, es tuyo.'
-                  : 'All processing happens in your browser. Your images never reach our servers. What\'s yours stays yours.'
-              },
-              {
-                icon: (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                ),
-                title: lang === 'es' ? 'Financiado por la comunidad' : 'Community-funded',
-                desc: lang === 'es'
-                  ? 'Los servidores, el dominio y el desarrollo continuo se sostienen gracias a las personas que eligen apoyar el proyecto voluntariamente. Sin presión.'
-                  : 'Servers, the domain, and ongoing development are sustained by people who choose to support the project voluntarily. No pressure.'
-              }
-            ].map(({ icon, title, desc }) => (
-              <div key={title} className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4 hover:border-primary/30 transition-colors">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  {icon}
-                </div>
-                <div>
-                  <h4 className="font-heading font-bold text-foreground mb-2">{title}</h4>
-                  <p className="text-sm text-muted-foreground font-accent leading-relaxed">{desc}</p>
-                </div>
+        {/* Philosophy & 3 Pillars (Swiss Hairline Grid) */}
+        <div className="mb-16">
+          <div className="grid lg:grid-cols-12 gap-8 items-end mb-10">
+            <div className="lg:col-span-6">
+              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary mb-3">
+                {isEs ? "02 // POR QUÉ ES GRATIS" : "02 // WHY IT'S FREE"}
               </div>
-            ))}
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-foreground tracking-tight leading-[1.08]">
+                {isEs
+                  ? "Una herramienta construida por frustración, para todos."
+                  : "A tool built out of frustration, for everyone."}
+              </h2>
+            </div>
+            <div className="lg:col-span-6">
+              <p className="text-base text-muted-foreground font-accent leading-relaxed">
+                {isEs
+                  ? "ClearCut Studio nació porque las utilidades básicas de edición y compresión de imágenes terminan casi siempre detrás de muros de pago o marcas de agua. Trasladar los motores a WebAssembly en tu navegador elimina costes por archivo y respeta tu privacidad."
+                  : "ClearCut Studio was born because everyday image editing and optimization tools constantly hide behind paywalls and watermarks. Moving processing to in-browser WebAssembly removes per-file server costs and keeps your assets private."}
+              </p>
+            </div>
           </div>
 
-          {/* Commitment banner */}
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 text-center relative overflow-hidden mb-16">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)]" />
-            <p className="relative text-base md:text-lg font-accent text-foreground leading-relaxed max-w-2xl mx-auto">
-              {lang === 'es'
-                ? '💙 Si alguna vez ClearCut Studio te ahorró tiempo o dinero, considera invitarnos un café. No es obligatorio, pero nos ayuda a seguir construyendo para todos.'
-                : '💙 If ClearCut Studio ever saved you time or money, consider buying us a coffee. It\'s not required, but it helps us keep building for everyone.'}
+          <div className="rounded-3xl border border-border bg-card overflow-hidden grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+            {pillars.map((pillar) => {
+              const Icon = pillar.icon;
+              return (
+                <div key={pillar.code} className="p-7 sm:p-8 flex flex-col justify-between gap-6">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-primary">{pillar.code}</span>
+                    <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center text-foreground">
+                      <Icon className="w-4 h-4" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-bold text-lg text-foreground mb-2">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground font-accent leading-relaxed">
+                      {pillar.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Commitment Callout Strip */}
+        <div className="rounded-2xl bg-card border border-border px-6 py-5 mb-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Sparkles className="w-4 h-4 text-primary shrink-0 mt-1" aria-hidden="true" />
+            <p className="text-sm sm:text-base font-accent text-foreground leading-relaxed">
+              {isEs
+                ? "Si alguna vez ClearCut Studio te ahorró tiempo o dinero, considera invitarnos un café. No es obligatorio, pero nos ayuda a mantener el proyecto vivo."
+                : "If ClearCut Studio ever saved you time or money, consider buying us a coffee. Never required, always appreciated."}
             </p>
           </div>
-
-          {/* Third-party API Disclaimer */}
-          <ApiDisclaimer lang={lang} />
+          <a
+            href="https://www.buymeacoffee.com/fabianhermar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs font-semibold text-primary hover:underline whitespace-nowrap shrink-0"
+          >
+            buymeacoffee.com/fabianhermar →
+          </a>
         </div>
+
+        {/* Third-party API / BYOK Architectural Disclaimer */}
+        <ApiDisclaimer lang={lang} />
       </div>
     </section>
   );
