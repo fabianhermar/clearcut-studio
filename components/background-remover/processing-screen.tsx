@@ -21,39 +21,39 @@ export function ProcessingScreen({
 
   const statusText = isEn
     ? clamped < 30
-      ? "Initializing ONNX model in browser..."
+      ? "Initializing ONNX neural runtime in browser..."
       : clamped < 65
-      ? "Analyzing subject edges and foreground..."
+      ? "Isolating subject boundaries and foreground..."
       : clamped < 92
-      ? "Generating alpha mask..."
-      : "Preparing editor workspace..."
+      ? "Generating high-precision alpha channel..."
+      : "Preparing studio editor workspace..."
     : clamped < 30
-    ? "Inicializando modelo ONNX en el navegador..."
+    ? "Inicializando motor neuronal ONNX en tu navegador..."
     : clamped < 65
-    ? "Analizando bordes del sujeto y primer plano..."
+    ? "Aislando contornos del sujeto y primer plano..."
     : clamped < 92
-    ? "Generando máscara de transparencia..."
+    ? "Generando máscara de transparencia alpha..."
     : "Preparando el espacio de edición...";
 
   const steps = isEn
-    ? ["Model", "Analysis", "Mask", "Ready"]
-    : ["Modelo", "Análisis", "Máscara", "Listo"];
+    ? ["Model", "Analysis", "Alpha", "Studio"]
+    : ["Modelo", "Análisis", "Alpha", "Estudio"];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background studio-grid text-foreground flex flex-col">
       <WorkspaceHeader
         slug="background-remover"
         lang={lang}
         onClose={onCancel}
-        subtitle={isEn ? "Processing locally..." : "Procesando localmente..."}
+        subtitle={isEn ? "Segmenting subject locally..." : "Segmentando sujeto localmente..."}
       />
 
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-md p-6 sm:p-8">
+        <div className="w-full max-w-lg rounded-3xl bg-card border border-border p-6 sm:p-8 shadow-[0_24px_70px_-30px_rgba(12,14,18,0.18)]">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
-              <Cpu className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
-              <span>{isEn ? "Local WebAssembly Execution" : "Ejecución local WebAssembly"}</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background border border-border font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-6">
+              <Cpu className="w-3.5 h-3.5 text-primary animate-pulse" aria-hidden="true" />
+              <span>{isEn ? "ONNX // WASM LOCAL RUNTIME" : "ONNX // EJECUCIÓN WASM LOCAL"}</span>
             </div>
 
             {/* Progress Ring */}
@@ -63,7 +63,7 @@ export function ProcessingScreen({
                   cx="56"
                   cy="56"
                   r="48"
-                  stroke="#e2e8f0"
+                  stroke="#e6e3da"
                   strokeWidth="7"
                   fill="none"
                 />
@@ -71,7 +71,7 @@ export function ProcessingScreen({
                   cx="56"
                   cy="56"
                   r="48"
-                  stroke="#2563eb"
+                  stroke="#1e40ff"
                   strokeWidth="7"
                   fill="none"
                   strokeDasharray={301.59}
@@ -83,44 +83,39 @@ export function ProcessingScreen({
               <div className="absolute inset-0 flex items-center justify-center">
                 <span
                   aria-live="polite"
-                  className="text-2xl font-bold font-mono text-foreground"
+                  className="text-2xl font-bold font-mono text-foreground tabular-nums"
                 >
                   {clamped}%
                 </span>
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-foreground font-heading mb-1.5">
-              {isEn ? "Removing background" : "Eliminando el fondo"}
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground font-heading mb-1.5">
+              {isEn ? "Isolating subject" : "Eliminando fondo"}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6">{statusText}</p>
+            <p className="text-sm text-muted-foreground font-accent mb-6">{statusText}</p>
 
             {/* Step indicators */}
-            <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="grid grid-cols-4 gap-2 mb-6">
               {steps.map((step, i) => {
                 const stepThreshold = (i + 1) * 25;
                 const isActive = clamped >= stepThreshold - 25;
                 const isComplete = clamped >= stepThreshold;
                 return (
-                  <div key={step} className="flex items-center gap-2">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                        isComplete
-                          ? "bg-primary text-white"
-                          : isActive
-                          ? "bg-primary/15 text-primary border border-primary/30"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {isComplete ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                  <div
+                    key={step}
+                    className={`py-2 px-2 rounded-xl border text-center transition-colors ${
+                      isComplete
+                        ? "bg-primary/10 border-primary/40 text-primary"
+                        : isActive
+                        ? "bg-background border-border text-foreground"
+                        : "bg-muted/40 border-border/60 text-muted-foreground"
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-1 font-mono text-[11px] font-semibold">
+                      {isComplete ? <Check className="w-3 h-3 text-emerald-700" /> : <span>0{i + 1}</span>}
+                      <span>{step}</span>
                     </div>
-                    {i < 3 && (
-                      <div
-                        className={`w-6 h-0.5 rounded ${
-                          isComplete ? "bg-primary" : "bg-border"
-                        }`}
-                      />
-                    )}
                   </div>
                 );
               })}
@@ -128,7 +123,7 @@ export function ProcessingScreen({
           </div>
 
           {originalImage && (
-            <div className="rounded-xl overflow-hidden border border-border bg-muted/40 mb-5">
+            <div className="relative rounded-2xl overflow-hidden border border-border bg-background mb-5 p-2">
               <img
                 src={originalImage}
                 alt={isEn ? "Image being processed" : "Imagen en proceso"}
@@ -141,10 +136,10 @@ export function ProcessingScreen({
             <button
               type="button"
               onClick={onCancel}
-              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-background hover:bg-muted border border-border text-xs font-mono font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" aria-hidden="true" />
-              {isEn ? "Cancel processing" : "Cancelar procesamiento"}
+              <span>{isEn ? "Cancel processing" : "Cancelar procesamiento"}</span>
             </button>
           )}
         </div>

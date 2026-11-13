@@ -1,7 +1,7 @@
 "use client";
 
 import { WorkspaceHeader } from "@/components/studio/workspace-header";
-import { Undo2, Redo2, ImagePlus } from "lucide-react";
+import { Undo2, Redo2, ImagePlus, Eye } from "lucide-react";
 
 interface EditorToolbarProps {
   canvasSize: { width: number; height: number };
@@ -11,6 +11,8 @@ interface EditorToolbarProps {
   onRedo: () => void;
   onReset: () => void;
   onClose?: () => void;
+  showOriginal?: boolean;
+  onToggleOriginal?: (show: boolean) => void;
   lang?: string;
 }
 
@@ -22,6 +24,8 @@ export function EditorToolbar({
   onRedo,
   onReset,
   onClose,
+  showOriginal = false,
+  onToggleOriginal,
   lang = "es",
 }: EditorToolbarProps) {
   const isEn = lang === "en";
@@ -33,41 +37,67 @@ export function EditorToolbar({
       onClose={onClose || onReset}
       centerSlot={
         canvasSize.width > 0 ? (
-          <span className="font-mono text-xs font-medium text-muted-foreground px-2.5 py-1 rounded-md bg-muted border border-border">
-            {canvasSize.width} × {canvasSize.height} px
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[11px] font-semibold text-foreground px-3 py-1 rounded-full bg-background border border-border tabular-nums">
+              {canvasSize.width} × {canvasSize.height} px
+            </span>
+            <span className="hidden xl:inline-flex font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-2.5 py-1 rounded-full bg-muted/60 border border-border">
+              RGBA // 8-BIT
+            </span>
+          </div>
         ) : null
       }
       rightSlot={
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={onUndo}
-            disabled={!canUndo}
-            aria-label={isEn ? "Undo" : "Deshacer"}
-            title={isEn ? "Undo" : "Deshacer"}
-            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <Undo2 className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={onRedo}
-            disabled={!canRedo}
-            aria-label={isEn ? "Redo" : "Rehacer"}
-            title={isEn ? "Redo" : "Rehacer"}
-            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <Redo2 className="w-4 h-4" />
-          </button>
-          <div className="h-4 w-px bg-border mx-1" aria-hidden="true" />
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {onToggleOriginal && (
+            <button
+              type="button"
+              onMouseDown={() => onToggleOriginal(true)}
+              onMouseUp={() => onToggleOriginal(false)}
+              onMouseLeave={() => showOriginal && onToggleOriginal(false)}
+              onClick={() => onToggleOriginal(!showOriginal)}
+              title={isEn ? "Compare Original (Hold Space)" : "Comparar Original (Espacio)"}
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-mono font-semibold transition-colors cursor-pointer ${
+                showOriginal
+                  ? "bg-accent border-accent text-white"
+                  : "bg-background hover:bg-muted border-border text-foreground"
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{showOriginal ? (isEn ? "Original" : "Original") : isEn ? "Compare" : "Comparar"}</span>
+            </button>
+          )}
+
+          <div className="flex items-center bg-background border border-border rounded-full p-0.5">
+            <button
+              type="button"
+              onClick={onUndo}
+              disabled={!canUndo}
+              aria-label={isEn ? "Undo (Ctrl+Z)" : "Deshacer (Ctrl+Z)"}
+              title={isEn ? "Undo (Ctrl+Z)" : "Deshacer (Ctrl+Z)"}
+              className="p-1.5 text-foreground hover:bg-muted rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={onRedo}
+              disabled={!canRedo}
+              aria-label={isEn ? "Redo (Ctrl+Shift+Z)" : "Rehacer (Ctrl+Shift+Z)"}
+              title={isEn ? "Redo (Ctrl+Shift+Z)" : "Rehacer (Ctrl+Shift+Z)"}
+              className="p-1.5 text-foreground hover:bg-muted rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <Redo2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-lg transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-full transition-colors cursor-pointer"
           >
             <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{isEn ? "New image" : "Nueva imagen"}</span>
+            <span className="hidden sm:inline">{isEn ? "New image" : "Nueva imagen"}</span>
           </button>
         </div>
       }
