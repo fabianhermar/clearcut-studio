@@ -41,6 +41,17 @@ test.describe('ClearCut Studio 2026 E2E Suite', () => {
     }
   });
 
+  test('opens Darkroom post-processing editor workspace in image-optimizer when loading a local file', async ({ page }) => {
+    await page.goto('/es?tool=image-optimizer');
+    const fileInput = page.locator('input[type="file"]').first();
+    await fileInput.setInputFiles('public/demos/cat.jpg');
+
+    await expect(page.getByText('CÓDEC DE SALIDA')).toBeVisible();
+    await expect(page.getByText('TELEMETRÍA DE ARCHIVO')).toBeVisible();
+    await expect(page.getByRole('slider', { name: /Comparar imagen optimizada y original/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Descargar/i }).first()).toBeEnabled({ timeout: 15000 });
+  });
+
   test('renders corporate and legal pages cleanly with a single <main> landmark', async ({ page }) => {
     const routes = [
       '/es/pricing',

@@ -219,7 +219,7 @@ export function OptimizerWorkspace({
     optimizedSize !== null && optimizedSize > originalSize && format !== "png";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen lg:h-screen bg-background text-foreground flex flex-col lg:overflow-hidden">
       <canvas ref={canvasRef} className="hidden" />
 
       <WorkspaceHeader
@@ -242,7 +242,7 @@ export function OptimizerWorkspace({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-border/60 border border-border text-foreground text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background hover:bg-muted border border-border text-foreground text-xs font-semibold rounded-full transition-colors cursor-pointer"
             >
               <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">{isEn ? "New image" : "Otra imagen"}</span>
@@ -251,7 +251,7 @@ export function OptimizerWorkspace({
               type="button"
               onClick={handleDownload}
               disabled={!optimizedSrc || isProcessing}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-full transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{isEn ? "Download" : "Descargar"}</span>
@@ -260,14 +260,13 @@ export function OptimizerWorkspace({
         }
       />
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden min-h-0">
+        {/* Optical Atelier Inspector Rail */}
         <aside className="w-full lg:w-80 border-t lg:border-t-0 lg:border-r border-border bg-card p-5 overflow-y-auto space-y-5 shrink-0 order-2 lg:order-1">
           <FormatSelector selected={format} onChange={handleFormatChange} />
 
-          {/* WASM encoder badge */}
           {WASM_FORMATS.includes(format) && !encodeError && (
-            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-foreground text-xs flex items-start gap-2.5">
+            <div className="p-3 rounded-xl bg-primary/8 border border-primary/25 text-foreground text-xs flex items-start gap-2.5">
               <Cpu className="w-4 h-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
               <span>
                 <strong className="font-mono font-semibold text-primary">
@@ -278,7 +277,6 @@ export function OptimizerWorkspace({
             </div>
           )}
 
-          {/* Encode error */}
           {encodeError && (
             <div
               role="alert"
@@ -289,9 +287,8 @@ export function OptimizerWorkspace({
             </div>
           )}
 
-          {/* Larger than original */}
           {isLargerThanOriginal && (
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800 text-xs flex items-start gap-2">
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 text-xs flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
               <span>
                 {isEn
@@ -301,29 +298,27 @@ export function OptimizerWorkspace({
             </div>
           )}
 
-          {/* PNG notice */}
           {format === "png" && (
-            <div className="p-3 rounded-xl bg-muted border border-border text-muted-foreground text-xs flex items-start gap-2">
+            <div className="p-3 rounded-xl bg-background border border-border text-muted-foreground text-xs flex items-start gap-2">
               <Info className="w-4 h-4 mt-0.5 shrink-0 text-primary" aria-hidden="true" />
               <span>
                 {isEn
                   ? "PNG is lossless. To reduce file weight significantly, select WebP or AVIF."
-                  : "PNG es un formato sin pérdida. Para reducir el peso drásticamente, elige WebP o AVIF."}
+                  : "PNG es sin pérdida. Para reducir el peso drásticamente, elige WebP o AVIF."}
               </span>
             </div>
           )}
 
-          {/* Quality slider */}
           {supportsQuality && (
-            <div className="space-y-3">
+            <div className="p-3.5 rounded-2xl bg-background border border-border space-y-3">
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="optimizer-quality-slider"
-                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                  className="font-mono text-[10px] font-bold text-muted-foreground uppercase tracking-[0.18em]"
                 >
-                  {isEn ? "Quality" : "Calidad"}
+                  {isEn ? "QUALITY" : "CALIDAD"}
                 </label>
-                <span className="text-sm font-bold text-foreground font-mono tabular-nums">
+                <span className="font-mono text-xs font-bold text-foreground tabular-nums px-2 py-0.5 rounded bg-card border border-border">
                   {quality}%
                 </span>
               </div>
@@ -334,25 +329,25 @@ export function OptimizerWorkspace({
                 max={100}
                 value={quality}
                 onChange={(e) => handleQualityChange(Number(e.target.value))}
-                className="w-full"
+                className="w-full cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-muted-foreground">
-                <span>{isEn ? "Smallest file" : "Máx. compresión"}</span>
-                <span>{isEn ? "Highest fidelity" : "Máx. calidad"}</span>
+              <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
+                <span>{isEn ? "Smallest" : "Máx. compresión"}</span>
+                <span>{isEn ? "Max fidelity" : "Máx. fidelidad"}</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="grid grid-cols-3 gap-1.5">
                 {qualityPresets.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
                     onClick={() => handleQualityChange(preset.value)}
-                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                    className={`py-1.5 text-[11px] font-mono font-semibold rounded-lg border transition-all cursor-pointer ${
                       quality === preset.value
                         ? "bg-primary text-white border-primary"
-                        : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
                     }`}
                   >
-                    {preset.label} ({preset.value})
+                    {preset.label}
                   </button>
                 ))}
               </div>
@@ -372,16 +367,16 @@ export function OptimizerWorkspace({
             type="button"
             onClick={handleDownload}
             disabled={!optimizedSrc || isProcessing}
-            className="lg:hidden w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-hover disabled:opacity-40 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+            className="lg:hidden w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-hover disabled:opacity-40 text-white text-sm font-semibold rounded-full transition-colors cursor-pointer"
           >
             <Download className="w-4 h-4" aria-hidden="true" />
             <span>{isEn ? "Download optimized image" : "Descargar imagen optimizada"}</span>
           </button>
         </aside>
 
-        {/* Preview */}
-        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 flex items-center justify-center p-4 lg:p-8 bg-canvas shrink-0 order-1 lg:order-2">
-          <div className="w-full h-full max-w-5xl max-h-[76vh] min-h-[320px]">
+        {/* Central Light Studio Preview */}
+        <main className="w-full h-[50vh] lg:h-auto lg:flex-1 flex items-center justify-center p-4 lg:p-8 bg-[#ebe8e0] studio-grid shrink-0 order-1 lg:order-2">
+          <div className="w-full h-full max-w-5xl max-h-[78vh] min-h-[320px]">
             {originalSrc ? (
               <ComparisonSlider
                 originalSrc={originalSrc}
@@ -390,8 +385,8 @@ export function OptimizerWorkspace({
                 lang={lang}
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                {isEn ? "Loading image..." : "Cargando imagen..."}
+              <div className="flex items-center justify-center h-full font-mono text-xs text-muted-foreground">
+                {isEn ? "LOADING PLATE..." : "CARGANDO IMAGEN..."}
               </div>
             )}
           </div>

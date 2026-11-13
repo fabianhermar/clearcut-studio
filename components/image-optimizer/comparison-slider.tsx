@@ -87,12 +87,12 @@ export function ComparisonSlider({
       aria-valuemax={96}
       aria-valuenow={Math.round(sliderPos)}
       onKeyDown={handleKeyDown}
-      className="relative w-full h-full select-none overflow-hidden rounded-2xl border border-border shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
+      className="relative w-full h-full select-none overflow-hidden rounded-2xl border border-border bg-card shadow-[0_24px_60px_-20px_rgba(17,19,24,0.18)] focus-visible:ring-2 focus-visible:ring-primary"
       style={{ cursor: isDragging ? "grabbing" : "ew-resize" }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-      {/* Checkerboard background for transparency */}
+      {/* Light transparency checkerboard */}
       <div className="absolute inset-0 checkerboard" />
 
       {/* Original (right side) */}
@@ -126,11 +126,11 @@ export function ComparisonSlider({
           className="absolute inset-0 overflow-hidden"
           style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
         >
-          <div className="w-full h-full flex items-center justify-center bg-card/80 backdrop-blur-xs">
-            <div className="flex flex-col items-center gap-2.5 p-4 rounded-xl bg-card border border-border shadow-sm">
+          <div className="w-full h-full flex items-center justify-center bg-card/85 backdrop-blur-xs">
+            <div className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-card border border-border shadow-md">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs text-foreground font-semibold">
-                {isEn ? "Encoding with WASM..." : "Codificando con WASM..."}
+              <span className="font-mono text-xs text-foreground font-semibold">
+                {isEn ? "ENCODING // WASM..." : "CODIFICANDO // WASM..."}
               </span>
             </div>
           </div>
@@ -138,14 +138,14 @@ export function ComparisonSlider({
       )}
 
       {/* Labels */}
-      <div className="absolute top-3 left-3 z-10 pointer-events-none">
-        <span className="px-2.5 py-1 bg-primary text-white text-xs font-semibold rounded-md shadow-xs">
-          {isEn ? "Optimized" : "Optimizada"}
+      <div className="absolute top-3.5 left-3.5 z-10 pointer-events-none">
+        <span className="px-2.5 py-1 bg-primary text-white font-mono text-[11px] uppercase tracking-wider rounded-md shadow-xs">
+          {isEn ? "OPT // OUTPUT" : "OPT // OPTIMIZADA"}
         </span>
       </div>
-      <div className="absolute top-3 right-3 z-10 pointer-events-none">
-        <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-semibold rounded-md">
-          {isEn ? "Original" : "Original"}
+      <div className="absolute top-3.5 right-3.5 z-10 pointer-events-none">
+        <span className="px-2.5 py-1 bg-card/90 backdrop-blur-md border border-border text-foreground font-mono text-[11px] uppercase tracking-wider rounded-md shadow-2xs">
+          RAW // ORIGINAL
         </span>
       </div>
 
@@ -155,8 +155,8 @@ export function ComparisonSlider({
           className="absolute top-0 bottom-0 z-20 pointer-events-none"
           style={{ left: `${sliderPos}%` }}
         >
-          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 bg-white shadow-md" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-300 text-slate-800">
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 bg-white shadow-[0_0_10px_rgba(17,19,24,0.45)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border border-border text-foreground">
             <MoveHorizontal className="w-4 h-4" aria-hidden="true" />
           </div>
         </div>
