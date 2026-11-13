@@ -6,30 +6,33 @@
   --font-accent: 'Albert Sans Variable', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   
-  /* ClearCut Studio 2026 Design System Tokens (WCAG 2.2 AA verified) */
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #475569;
-  --color-border: #e2e8f0;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-secondary: #f1f5f9;
-  --color-accent: #0284c7;
-  --color-success: #15803d;
+  /* ClearCut Studio 2026–2027 "Optical Atelier" Design Tokens */
+  --color-background: #f4f3ef;
+  --color-foreground: #0c0e12;
+  --color-muted: #eae8e1;
+  --color-muted-foreground: #4e525e;
+  --color-border: #dcdad0;
+  --color-primary: #1e40ff;
+  --color-primary-hover: #1530cc;
+  --color-secondary: #eae8e1;
+  --color-accent: #ff4d00;
+  --color-success: #0f766e;
   --color-warning: #b45309;
   --color-card: #ffffff;
-  --color-card-hover: #f8fafc;
+  --color-card-hover: #faf9f5;
   --color-sidebar: #ffffff;
-  --color-canvas: #f1f5f9;
+  --color-canvas: #eae8e1;
+  --color-darkroom: #0c0e12;
+  --color-darkroom-elevated: #14171f;
+  --color-darkroom-border: #242936;
   
   /* Semantic UI tokens */
   --color-destructive: #b91c1c;
   --color-destructive-foreground: #ffffff;
-  --color-ring: #2563eb;
-  --color-input: #cbd5e1;
+  --color-ring: #1e40ff;
+  --color-input: #c9c6ba;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0f172a;
+  --color-popover-foreground: #0c0e12;
   --radius: 0.75rem;
 }
 
@@ -59,29 +62,65 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c5c2b6;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9c988a;
 }
 
-/* Studio transparency checkerboard */
+/* Calibrated optical transparency checkerboard */
 .checkerboard {
   background-image: 
-    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
-    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
-    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+    linear-gradient(45deg, #dfddd5 25%, transparent 25%),
+    linear-gradient(-45deg, #dfddd5 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #dfddd5 75%),
+    linear-gradient(-45deg, transparent 75%, #dfddd5 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-  background-color: #f8fafc;
+  background-color: #f4f3ef;
 }
 
+.checkerboard-dark {
+  background-image:
+    linear-gradient(45deg, #1b1f29 25%, transparent 25%),
+    linear-gradient(-45deg, #1b1f29 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1b1f29 75%),
+    linear-gradient(-45deg, transparent 75%, #1b1f29 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: #11141b;
+}
+
+/* Precision Swiss drafting & optical studio grid */
 .studio-grid {
-  background-size: 24px 24px;
-  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(12, 14, 18, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(12, 14, 18, 0.045) 1px, transparent 1px);
+}
+
+.darkroom-grid {
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* Tactile hardware button & card shadows */
+.tactile-button {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 2px 6px -1px rgba(12, 14, 18, 0.16),
+    0 1px 2px 0 rgba(12, 14, 18, 0.12);
+}
+
+.tactile-surface {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.85) inset,
+    0 10px 30px -12px rgba(12, 14, 18, 0.08),
+    0 1px 3px 0 rgba(12, 14, 18, 0.04);
 }
 
 /* Accessible & Consistent Range Inputs */
@@ -93,8 +132,8 @@ input[type="range"] {
   width: 100%;
 }
 
-input[type="range"]::-webkit-slider-track {
-  background: #cbd5e1;
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #d2cfc4;
   height: 6px;
   border-radius: 9999px;
 }
@@ -105,20 +144,20 @@ input[type="range"]::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #1e40ff;
   border: 2px solid #ffffff;
   margin-top: -6px;
   transition: transform 0.15s ease, background-color 0.15s ease;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 2px 5px rgba(12, 14, 18, 0.28);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  background: #1d4ed8;
+  background: #1530cc;
   transform: scale(1.08);
 }
 
 input[type="range"]::-moz-range-track {
-  background: #cbd5e1;
+  background: #d2cfc4;
   height: 6px;
   border-radius: 9999px;
 }
@@ -127,9 +166,9 @@ input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #1e40ff;
   border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 2px 5px rgba(12, 14, 18, 0.28);
 }
 
 @keyframes slide-up {
@@ -165,24 +204,29 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .gradient-text {
-  color: #2563eb;
+  color: #1e40ff;
 }
 
 .shadow-soft {
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(12, 14, 18, 0.05), 0 1px 2px -1px rgba(12, 14, 18, 0.04);
 }
 
 .shadow-medium {
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 12px 28px -8px rgba(12, 14, 18, 0.12), 0 4px 10px -4px rgba(12, 14, 18, 0.06);
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.15);
-  color: #0f172a;
+  background: #1e40ff;
+  color: #ffffff;
+}
+
+.bg-primary ::selection {
+  background: #ffffff;
+  color: #1e40ff;
 }
 
 :focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #1e40ff;
   outline-offset: 2px;
 }
 

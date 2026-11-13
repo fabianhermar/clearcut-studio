@@ -7,12 +7,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang } = await params;
   const isEs = lang === "es";
   return {
-    title: isEs
-      ? "Precios y Modelo Abierto | ClearCut Studio"
-      : "Pricing & Open Model | ClearCut Studio",
+    title: isEs ? "Precios | ClearCut Studio" : "Pricing | ClearCut Studio",
     description: isEs
-      ? "ClearCut Studio es 100% gratuito para todas sus herramientas locales. Conoce nuestro modelo abierto y cómo apoyar el proyecto."
-      : "ClearCut Studio is 100% free for all local tools. Learn about our open model and how to support the project.",
+      ? "ClearCut Studio es 100% gratis para procesamiento local. Conoce nuestro acceso libre, cómo apoyar el proyecto y el modelo futuro BYOK."
+      : "ClearCut Studio is 100% free for local processing. Explore our free studio access, voluntary sponsorship, and upcoming BYOK transparency.",
     alternates: {
       canonical: `https://studio.fabianh.me/${lang}/pricing`,
       languages: {
@@ -28,9 +26,9 @@ export default async function PricingPage({ params }: { params: Promise<{ lang: 
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pt-16">
+    <div className="min-h-screen bg-background studio-grid flex flex-col">
       <Header dict={dict} lang={lang} />
-      <main className="flex-1 w-full flex flex-col justify-center">
+      <main className="flex-1 pt-24 sm:pt-28 pb-24">
         <PricingSection dict={dict} lang={lang} />
       </main>
       <Footer dict={dict} lang={lang} />

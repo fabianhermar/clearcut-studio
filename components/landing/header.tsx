@@ -11,7 +11,6 @@ import {
   X,
   ChevronDown,
   ArrowUpRight,
-  Sparkles,
   Tag,
 } from "lucide-react";
 import {
@@ -57,7 +56,6 @@ export function Header({
   const pricingLabel = dict?.header?.pricing || (isEs ? "Precios" : "Pricing");
   const soonLabel = dict?.common?.comingSoon || (isEs ? "Pronto" : "Soon");
 
-  // Close menus on route change or Escape key
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsToolsOpen(false);
@@ -115,9 +113,9 @@ export function Header({
   };
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+    <header className="sticky top-0 left-0 right-0 z-50 bg-[#f4f3ef]/88 backdrop-blur-xl border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-[72px] sm:h-20 gap-4">
           {/* Brand Logo */}
           <div className="flex items-center shrink-0">
             <Link
@@ -128,15 +126,15 @@ export function Header({
               <img
                 src="/logos/ClearCut-logo.avif"
                 alt="ClearCut Studio"
-                className="h-12 w-auto object-contain"
+                className="h-14 sm:h-16 w-auto object-contain"
               />
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation — Architectural Studio Pill Rail */}
           <nav
             aria-label={isEs ? "Navegación principal" : "Main navigation"}
-            className="hidden md:flex items-center gap-1"
+            className="hidden md:flex items-center gap-0.5 bg-card/80 border border-border rounded-full px-1.5 py-1 shadow-soft"
           >
             {/* Tools Mega Menu Dropdown */}
             <div
@@ -149,50 +147,57 @@ export function Header({
                 aria-expanded={isToolsOpen}
                 aria-haspopup="true"
                 onClick={() => setIsToolsOpen((v) => !v)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold text-foreground hover:bg-muted transition-colors font-accent cursor-pointer"
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-colors font-accent cursor-pointer ${
+                  isToolsOpen
+                    ? "bg-foreground text-white"
+                    : "text-foreground hover:bg-muted"
+                }`}
               >
                 <span>{isEs ? "Herramientas" : "Tools"}</span>
                 <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground transition-transform duration-150 ${
-                    isToolsOpen ? "rotate-180 text-foreground" : ""
+                  className={`w-3.5 h-3.5 transition-transform duration-150 ${
+                    isToolsOpen ? "rotate-180" : "opacity-65"
                   }`}
                 />
               </button>
 
               {isToolsOpen && (
-                <div className="absolute left-0 top-full pt-2 w-[720px] lg:w-[860px] z-50">
-                  <div className="bg-card border border-border rounded-2xl shadow-medium p-5 grid grid-cols-12 gap-5">
-                    {/* Left Column: Active Tools (6) */}
-                    <div className="col-span-6 space-y-2.5 pr-4 border-r border-border">
-                      <div className="flex items-center justify-between px-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground font-heading">
-                          {isEs ? "Disponibles ahora" : "Available now"}
+                <div className="absolute left-0 top-full pt-3 w-[740px] lg:w-[880px] z-50">
+                  <div className="bg-card border border-border rounded-2xl shadow-medium overflow-hidden grid grid-cols-12">
+                    {/* Left Column: Active Studio Tools (6) */}
+                    <div className="col-span-6 p-5 border-r border-border">
+                      <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-border/70">
+                        <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
+                          01 // {isEs ? "Disponibles ahora" : "Available now"}
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-mono text-emerald-900 bg-emerald-500/12 border border-emerald-600/20 px-2 py-0.5 rounded-full font-semibold">
                           {STUDIO_TOOLS.length} {isEs ? "activas" : "active"}
                         </span>
                       </div>
                       <div className="grid grid-cols-1 gap-1">
-                        {STUDIO_TOOLS.map((tool) => {
+                        {STUDIO_TOOLS.map((tool, idx) => {
                           const copy = isEs ? tool.es : tool.en;
                           return (
                             <Link
                               key={tool.slug}
                               href={`/${lang}/?tool=${tool.slug}`}
                               onClick={(e) => handleToolTrigger(e, tool)}
-                              className="group flex items-start gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-border"
+                              className="group flex items-center gap-3 p-2.5 rounded-xl hover:bg-background transition-colors border border-transparent hover:border-border"
                             >
-                              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                              <span className="text-[10px] font-mono text-muted-foreground w-5 shrink-0">
+                                {String(idx + 1).padStart(2, "0")}
+                              </span>
+                              <div className="w-8 h-8 rounded-lg bg-foreground text-white flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
                                 <ToolIcon slug={tool.slug} className="w-4 h-4" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-xs sm:text-sm font-bold text-foreground font-heading group-hover:text-primary transition-colors truncate">
+                                  <span className="text-sm font-bold text-foreground font-heading group-hover:text-primary transition-colors truncate">
                                     {copy.shortName}
                                   </span>
-                                  <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                  <ArrowUpRight className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                                 </div>
-                                <p className="text-[11px] text-muted-foreground font-accent truncate mt-0.5">
+                                <p className="text-[11px] text-muted-foreground font-accent truncate">
                                   {copy.tagline}
                                 </p>
                               </div>
@@ -202,16 +207,14 @@ export function Header({
                       </div>
                     </div>
 
-                    {/* Right Column: In Testing & Coming Soon */}
-                    <div className="col-span-6 flex flex-col justify-between space-y-2.5">
+                    {/* Right Column: Studio Lab / Testing & Upcoming */}
+                    <div className="col-span-6 p-5 bg-[#faf9f5] flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center justify-between px-2 mb-2">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground font-heading">
-                            {isEs
-                              ? "En pruebas y próximamente"
-                              : "In testing & coming soon"}
+                        <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-border/70">
+                          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
+                            02 // {isEs ? "Studio Lab · Pruebas" : "Studio Lab · Testing"}
                           </span>
-                          <span className="text-[10px] font-mono text-slate-600 bg-slate-100 border border-border px-1.5 py-0.5 rounded uppercase">
+                          <span className="text-[10px] font-mono text-foreground bg-muted border border-border px-2 py-0.5 rounded-full uppercase font-semibold">
                             {soonLabel}
                           </span>
                         </div>
@@ -222,23 +225,20 @@ export function Header({
                               <div
                                 key={tool.slug}
                                 aria-disabled="true"
-                                className="flex items-start gap-2.5 p-2 rounded-xl bg-muted/40 border border-transparent opacity-70 select-none cursor-not-allowed"
+                                className="flex items-start gap-2.5 p-2 rounded-xl bg-card/60 border border-border/60 opacity-75 select-none cursor-not-allowed"
                               >
-                                <div className="w-8 h-8 rounded-lg bg-slate-100 border border-border text-muted-foreground flex items-center justify-center shrink-0">
-                                  <ToolIcon slug={tool.slug} className="w-4 h-4" />
+                                <div className="w-7 h-7 rounded-md bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5">
+                                  <ToolIcon slug={tool.slug} className="w-3.5 h-3.5" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center gap-1">
                                     <span className="text-xs font-bold text-foreground font-heading truncate">
                                       {copy.shortName}
                                     </span>
-                                    <span className="text-[9px] uppercase bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-bold shrink-0">
-                                      {soonLabel}
-                                    </span>
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground font-accent truncate mt-0.5">
-                                    {copy.tagline}
-                                  </p>
+                                  <span className="inline-block text-[9px] font-mono uppercase text-muted-foreground mt-0.5">
+                                    {soonLabel}
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -246,18 +246,18 @@ export function Header({
                         </div>
                       </div>
 
-                      <div className="pt-2.5 mt-2 border-t border-border flex items-center justify-between px-2">
-                        <span className="text-xs text-muted-foreground font-accent">
+                      <div className="pt-3 mt-3 border-t border-border flex items-center justify-between px-1">
+                        <span className="text-[11px] font-mono text-muted-foreground">
                           {isEs
-                            ? "Nuevas herramientas se integran progresivamente."
-                            : "New tools are integrated progressively."}
+                            ? "Lanzamientos progresivos"
+                            : "Progressive releases"}
                         </span>
                         <Link
                           href={`/${lang}/#tools`}
                           onClick={() => setIsToolsOpen(false)}
-                          className="text-xs font-semibold text-primary hover:underline font-accent"
+                          className="text-xs font-bold text-primary hover:underline font-accent"
                         >
-                          {isEs ? "Ver catálogo completo →" : "View full catalog →"}
+                          {isEs ? "Explorar catálogo →" : "Explore catalog →"}
                         </Link>
                       </div>
                     </div>
@@ -268,17 +268,17 @@ export function Header({
 
             <Link
               href={`/${lang}/#tools`}
-              className="px-3.5 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors font-accent"
+              className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors font-accent"
             >
               {isEs ? "Catálogo" : "Catalog"}
             </Link>
 
             <Link
               href={`/${lang}/blog`}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors font-accent ${
+              className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors font-accent ${
                 pathname?.includes("/blog")
-                  ? "text-primary bg-primary/5 font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
               }`}
             >
               Blog
@@ -286,10 +286,10 @@ export function Header({
 
             <Link
               href={`/${lang}/about`}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors font-accent ${
+              className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors font-accent ${
                 pathname?.includes("/about")
-                  ? "text-primary bg-primary/5 font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
               }`}
             >
               {isEs ? "Acerca de" : "About"}
@@ -297,31 +297,31 @@ export function Header({
 
             <Link
               href={`/${lang}/pricing`}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors font-accent ${
+              className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors font-accent ${
                 pathname?.includes("/pricing")
-                  ? "text-primary bg-primary/5 font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
               }`}
             >
               {pricingLabel}
             </Link>
           </nav>
 
-          {/* Right Controls: Language Switcher + Primary CTA + Mobile Toggle */}
+          {/* Right Controls: Language Switcher + Tactile Primary CTA + Mobile Toggle */}
           <div className="flex items-center gap-2.5">
             {/* Language Switcher */}
             <div
               role="group"
               aria-label={isEs ? "Selector de idioma" : "Language selector"}
-              className="flex bg-muted p-0.5 rounded-lg border border-border font-accent text-xs"
+              className="flex bg-card border border-border p-0.5 rounded-full font-mono text-[11px] shadow-2xs"
             >
               <button
                 type="button"
                 onClick={() => switchLanguage("es")}
                 aria-current={lang === "es" ? "true" : undefined}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-full font-semibold transition-colors cursor-pointer ${
                   lang === "es"
-                    ? "bg-card text-foreground shadow-soft"
+                    ? "bg-foreground text-white"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -331,9 +331,9 @@ export function Header({
                 type="button"
                 onClick={() => switchLanguage("en")}
                 aria-current={lang === "en" ? "true" : undefined}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-full font-semibold transition-colors cursor-pointer ${
                   lang === "en"
-                    ? "bg-card text-foreground shadow-soft"
+                    ? "bg-foreground text-white"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -341,14 +341,14 @@ export function Header({
               </button>
             </div>
 
-            {/* Primary CTA */}
+            {/* Tactile Studio Action */}
             <Link
               href={`/${lang}/?tool=background-remover`}
               onClick={(e) => handleToolTrigger(e, STUDIO_TOOLS[0])}
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl transition-colors shadow-soft font-accent"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-[#0c0e12] hover:bg-primary text-white text-xs sm:text-sm font-semibold rounded-full transition-all tactile-button font-accent"
             >
-              <Sparkles className="w-3.5 h-3.5" />
               <span>{isEs ? "Abrir Estudio" : "Open Studio"}</span>
+              <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
 
             {/* Mobile Hamburger Button */}
@@ -365,7 +365,7 @@ export function Header({
                   ? "Abrir menú"
                   : "Open menu"
               }
-              className="md:hidden p-2 rounded-lg text-foreground hover:bg-muted border border-border transition-colors"
+              className="md:hidden p-2 rounded-full text-foreground bg-card hover:bg-muted border border-border transition-colors"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -377,20 +377,16 @@ export function Header({
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-card shadow-medium max-h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="px-4 py-5 space-y-6">
-            {/* Active Tools Grid on Mobile */}
             <div>
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-heading">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
                   {isEs
                     ? `Herramientas Disponibles (${STUDIO_TOOLS.length})`
                     : `Available Tools (${STUDIO_TOOLS.length})`}
                 </span>
-                <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  100% Local
-                </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {STUDIO_TOOLS.map((tool) => {
+                {STUDIO_TOOLS.map((tool, idx) => {
                   const copy = isEs ? tool.es : tool.en;
                   return (
                     <Link
@@ -399,7 +395,10 @@ export function Header({
                       onClick={(e) => handleToolTrigger(e, tool)}
                       className="flex items-center gap-3 p-3 rounded-xl bg-background hover:bg-muted border border-border transition-colors"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      <div className="w-8 h-8 rounded-lg bg-foreground text-white flex items-center justify-center shrink-0">
                         <ToolIcon slug={tool.slug} className="w-4 h-4" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -416,13 +415,12 @@ export function Header({
               </div>
             </div>
 
-            {/* Upcoming Tools on Mobile */}
             <div className="border-t border-border pt-4">
               <div className="flex items-center justify-between mb-2.5 px-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-heading">
-                  {isEs ? "En pruebas / Próximamente" : "In testing / Coming soon"}
+                <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
+                  {isEs ? "Studio Lab · Próximamente" : "Studio Lab · Coming soon"}
                 </span>
-                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 border border-border px-2 py-0.5 rounded-full uppercase">
+                <span className="text-[10px] font-mono text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-full uppercase">
                   {soonLabel}
                 </span>
               </div>
@@ -433,7 +431,7 @@ export function Header({
                     <div
                       key={tool.slug}
                       aria-disabled="true"
-                      className="flex items-center gap-2 p-2 rounded-lg bg-muted/40 border border-border/60 opacity-65 select-none"
+                      className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/60 opacity-70 select-none"
                     >
                       <ToolIcon slug={tool.slug} className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                       <span className="text-xs font-semibold text-foreground font-heading truncate">
@@ -445,10 +443,9 @@ export function Header({
               </div>
             </div>
 
-            {/* Pages & Resources */}
             <div className="border-t border-border pt-4">
-              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-heading mb-2 px-1">
-                {isEs ? "Navegación y Recursos" : "Navigation & Resources"}
+              <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">
+                {isEs ? "Navegación" : "Navigation"}
               </div>
               <div className="grid grid-cols-2 gap-2 font-accent text-sm">
                 <Link
@@ -473,7 +470,7 @@ export function Header({
                   className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-muted text-foreground font-medium"
                 >
                   <Layers className="w-4 h-4 text-primary" />
-                  <span>{isEs ? "Marca y Proyecto" : "Brand & Project"}</span>
+                  <span>{isEs ? "Marca" : "Brand"}</span>
                 </Link>
                 <Link
                   href={`/${lang}/pricing`}
@@ -486,17 +483,16 @@ export function Header({
               </div>
             </div>
 
-            {/* Mobile Primary Action */}
             <div className="pt-2">
               <Link
                 href={`/${lang}/?tool=background-remover`}
                 onClick={(e) => handleToolTrigger(e, STUDIO_TOOLS[0])}
-                className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 shadow-soft font-accent"
+                className="w-full py-3 px-4 bg-[#0c0e12] hover:bg-primary text-white font-semibold text-sm rounded-full flex items-center justify-center gap-2 tactile-button font-accent"
               >
-                <Sparkles className="w-4 h-4" />
                 <span>
-                  {isEs ? "Comenzar gratis en el estudio" : "Start for free in studio"}
+                  {isEs ? "Abrir Estudio Ahora" : "Open Studio Now"}
                 </span>
+                <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

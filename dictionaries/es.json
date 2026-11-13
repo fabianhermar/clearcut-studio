@@ -69,16 +69,20 @@
     "desc": "ClearCut utiliza WebAssembly y modelos de IA optimizados para el navegador. Esto significa que todo el procesamiento pesado ocurre en tu propia computadora, no en nuestros servidores.",
     "steps": [
       {
-        "title": "1. Selecciona o arrastra",
-        "desc": "Carga tu imagen. Soporta los formatos más populares (JPG, PNG, WebP)."
+        "title": "Selecciona o arrastra",
+        "desc": "Carga tu imagen en memoria local. Compatible con PNG, JPG, WebP y AVIF sin subidas externas."
       },
       {
-        "title": "2. Procesamiento local",
-        "desc": "La IA y el motor WASM analizan y editan tu imagen directamente en el navegador."
+        "title": "Procesamiento WebAssembly",
+        "desc": "El modelo neuronal ONNX o códec WASM procesa píxeles en paralelo sin bloquear la interfaz."
       },
       {
-        "title": "3. Afina y descarga",
-        "desc": "Ajusta los últimos detalles en el editor y descarga tu resultado final."
+        "title": "Refina y calibra en vivo",
+        "desc": "Perfecciona bordes con el pincel manual, ajusta calidades AVIF/WebP o cambia el encuadre."
+      },
+      {
+        "title": "Exportación limpia final",
+        "desc": "Descarga tu archivo en resolución completa sin marcas de agua ni límites artificiales."
       }
     ]
   },

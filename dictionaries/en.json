@@ -69,16 +69,20 @@
     "desc": "ClearCut uses WebAssembly and browser-optimized AI models. This means all the heavy processing happens on your own computer, not on our servers.",
     "steps": [
       {
-        "title": "1. Select or drag",
-        "desc": "Upload your image. We support the most popular formats (JPG, PNG, WebP)."
+        "title": "Select or drag & drop",
+        "desc": "Load your image into local browser memory across PNG, JPG, WebP, and AVIF with zero uploads."
       },
       {
-        "title": "2. Local processing",
-        "desc": "The AI and WASM engine analyze and edit your image directly in the browser."
+        "title": "WebAssembly execution",
+        "desc": "ONNX neural segmentation or WASM codecs process pixels inside a dedicated parallel worker."
       },
       {
-        "title": "3. Tweak and download",
-        "desc": "Adjust the final details in the editor and download your final result."
+        "title": "Refine and calibrate live",
+        "desc": "Fine-tune mask edges with the manual brush, dial in AVIF/WebP targets, or adjust framing."
+      },
+      {
+        "title": "Clean production export",
+        "desc": "Download full-resolution results instantly without watermarks or artificial caps."
       }
     ]
   },

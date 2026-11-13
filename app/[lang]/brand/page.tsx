@@ -1,19 +1,18 @@
 import { Header } from "@/components/landing/header";
 import { Footer } from "@/components/landing/footer";
-import { getDictionary, Locale } from "@/lib/dictionaries";
 import { BrandSwatches } from "@/components/studio/brand-swatches";
-import { HeartHandshake, Type, Palette, Sparkles } from "lucide-react";
+import { getDictionary, Locale } from "@/lib/dictionaries";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const isEs = lang === "es";
   return {
     title: isEs
-      ? "Proyecto, Manifiesto y Guía de Marca | ClearCut Studio"
-      : "Project Manifesto & Brand Guidelines | ClearCut Studio",
+      ? "Manifiesto y Sistema de Marca — ClearCut Studio"
+      : "Manifesto & Brand System — ClearCut Studio",
     description: isEs
-      ? "Conoce el manifiesto del proyecto, los tokens de color oficiales, tipografía y recursos de marca de ClearCut Studio."
-      : "Read the project manifesto, official color tokens, typography, and brand assets of ClearCut Studio.",
+      ? "Sistema visual de ClearCut Studio: dirección Optical Atelier & Tactile Darkroom, paleta interactiva, tipografía Urbanist/Albert Sans y directrices de marca."
+      : "ClearCut Studio visual system: Optical Atelier & Tactile Darkroom direction, interactive palette, Urbanist/Albert Sans typography, and brand guidelines.",
     alternates: {
       canonical: `https://studio.fabianh.me/${lang}/brand`,
       languages: {
@@ -29,177 +28,168 @@ export default async function BrandPage({ params }: { params: Promise<{ lang: st
   const dict = await getDictionary(lang as Locale);
   const isEs = lang === "es";
 
+  const principles = isEs
+    ? [
+        {
+          code: "01",
+          title: "Simplicidad",
+          desc: "Operaciones complejas de imagen sin fricción técnica innecesaria ni menús ocultos.",
+        },
+        {
+          code: "02",
+          title: "Rendimiento",
+          desc: "Interfaz ágil y motores WebAssembly ejecutados en paralelo fuera del hilo principal.",
+        },
+        {
+          code: "03",
+          title: "Privacidad",
+          desc: "Transparencia técnica verificable: los procesos locales declaran exactamente cero envíos de red.",
+        },
+      ]
+    : [
+        {
+          code: "01",
+          title: "Simplicity",
+          desc: "Complex image processing without unnecessary technical friction or buried menus.",
+        },
+        {
+          code: "02",
+          title: "Performance",
+          desc: "Responsive workspaces powered by WebAssembly engines running off the main thread.",
+        },
+        {
+          code: "03",
+          title: "Privacy",
+          desc: "Verifiable technical transparency: local pipelines declare zero network file transfers.",
+        },
+      ];
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background studio-grid flex flex-col">
       <Header dict={dict} lang={lang} />
-      <main className="flex-1 pt-28 pb-24 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pt-28 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto space-y-16">
-          {/* Hero Header */}
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{isEs ? "Manifiesto y Sistema Visual" : "Manifesto & Visual System"}</span>
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-5">
-              {isEs ? "El Proyecto y Guía de Marca" : "Project Manifesto & Brand Kit"}
+          {/* Editorial Index Header */}
+          <div className="pb-10 border-b border-border">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+              {isEs ? "SISTEMA VISUAL // OPTICAL ATELIER" : "VISUAL SYSTEM // OPTICAL ATELIER"}
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading text-foreground tracking-tight leading-[1.05] mb-5">
+              {isEs ? "Manifiesto y Sistema de Marca" : "Manifesto & Brand System"}
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-3xl">
               {isEs
-                ? "Principios del proyecto, modelo de sostenibilidad abierto y tokens visuales oficiales del sistema de diseño ClearCut Studio 2026."
-                : "Project principles, open sustainability model, and official visual tokens of the ClearCut Studio 2026 design system."}
+                ? "Directrices visuales, retícula suiza, visores Darkroom, paleta de tokens interactiva y jerarquía tipográfica de ClearCut Studio."
+                : "Visual guidelines, Swiss grid hairlines, Darkroom viewports, interactive color tokens, and typographic hierarchy for ClearCut Studio."}
             </p>
           </div>
 
-          {/* Manifesto Section */}
-          <section className="bg-card border border-border rounded-2xl p-6 sm:p-10 shadow-2xs space-y-5">
-            <h2 className="text-2xl font-bold font-heading text-foreground">
-              {isEs ? "Manifiesto del Producto" : "Product Manifesto"}
+          {/* 3 Principles Strip */}
+          <section className="space-y-5">
+            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {isEs ? "01 // PRINCIPIOS RECTORES" : "01 // CORE PRINCIPLES"}
             </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {isEs
-                ? "ClearCut Studio nació con una premisa técnica clara: demostrar que la web contemporánea permite ejecutar herramientas gráficas de alta precisión directamente en el navegador del usuario sin depender de suscripciones obligatorias ni servidores que almacenen fotografías privadas."
-                : "ClearCut Studio was built with a clear technical premise: proving that the modern web can run high-precision graphic utilities directly inside the user's browser without mandatory subscriptions or remote servers storing private photographs."}
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              {isEs
-                ? "Todas las herramientas locales de ClearCut Studio son gratuitas, no imponen marcas de agua y no establecen límites diarios artificiales. Si el estudio te ahorra tiempo en tu flujo de diseño o desarrollo, puedes apoyar voluntariamente su mantenimiento."
-                : "All local tools in ClearCut Studio are free, impose no watermarks, and set no artificial daily quotas. If the studio saves you time in your design or development workflow, you can voluntarily support its maintenance."}
-            </p>
-
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <a
-                href="https://www.buymeacoffee.com/fabianhermar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-sm transition-colors shadow-2xs"
-              >
-                <HeartHandshake className="w-4 h-4" aria-hidden="true" />
-                <span>{isEs ? "Apoyar en Buy Me a Coffee" : "Support on Buy Me a Coffee"}</span>
-              </a>
-              <a
-                href="https://github.com/sponsors"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-background hover:bg-muted border border-border text-foreground font-semibold text-sm transition-colors"
-              >
-                <span>{isEs ? "GitHub Sponsors" : "GitHub Sponsors"}</span>
-              </a>
+            <div className="rounded-3xl border border-border bg-card overflow-hidden grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+              {principles.map((p) => (
+                <div key={p.code} className="p-6 sm:p-8 flex flex-col justify-between gap-4">
+                  <span className="font-mono text-xs font-bold text-primary">{p.code}</span>
+                  <div>
+                    <h3 className="font-heading font-bold text-xl text-foreground mb-2">
+                      {p.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed font-accent">
+                      {p.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
-          {/* Logo Showcase */}
+          {/* Logo Specimens (Warm Paper vs Obsidian Darkroom) */}
+          <section className="space-y-5">
+            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {isEs ? "02 // LOGOTIPO Y CONTRASTE" : "02 // LOGOMARK & CONTRAST"}
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="p-10 rounded-3xl bg-card border border-border flex flex-col items-center justify-center gap-5 min-h-[210px]">
+                <img
+                  src="/logos/ClearCut-logo.avif"
+                  alt="ClearCut Studio Logo Light"
+                  className="h-16 w-auto object-contain"
+                />
+                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {isEs ? "Superficie clara · #FFFFFF / #F4F3EF" : "Light Surface · #FFFFFF / #F4F3EF"}
+                </span>
+              </div>
+              <div className="p-10 rounded-3xl bg-darkroom border border-white/10 flex flex-col items-center justify-center gap-5 min-h-[210px]">
+                <img
+                  src="/logos/ClearCut-logo.avif"
+                  alt="ClearCut Studio Logo Darkroom"
+                  className="h-16 w-auto object-contain brightness-0 invert"
+                />
+                <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                  {isEs ? "Visor Darkroom · #0C0E12" : "Darkroom Viewport · #0C0E12"}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* Color Palette with Interactive Copy */}
           <section className="space-y-5">
             <div>
-              <h2 className="text-2xl font-bold font-heading text-foreground">
-                {isEs ? "Logotipo Oficial" : "Official Logotype"}
+              <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                {isEs ? "03 // TOKENS CROMÁTICOS" : "03 // COLOR TOKENS"}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground font-accent">
                 {isEs
-                  ? "Mantén siempre una zona de respeto limpia alrededor del logotipo y evita alterar sus proporciones."
-                  : "Always preserve clear space around the logotype and avoid distorting its aspect ratio."}
+                  ? "Haz clic en cualquier token para copiar su valor hexadecimal exacto."
+                  : "Click any token to copy its exact hexadecimal color value."}
               </p>
             </div>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="p-10 bg-card border border-border rounded-2xl flex flex-col items-center justify-center gap-4 shadow-2xs">
-                <img
-                  src="/logos/ClearCut-logo.avif"
-                  alt="ClearCut Studio Logo (Light surface)"
-                  className="h-24 w-auto object-contain"
-                />
-                <span className="text-xs font-mono text-muted-foreground">
-                  {isEs ? "Superficie clara (#FFFFFF)" : "Light surface (#FFFFFF)"}
-                </span>
-              </div>
-              <div className="p-10 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-4 shadow-2xs">
-                <img
-                  src="/logos/ClearCut-logo.avif"
-                  alt="ClearCut Studio Logo (Dark surface)"
-                  className="h-24 w-auto object-contain brightness-110"
-                />
-                <span className="text-xs font-mono text-slate-400">
-                  {isEs ? "Superficie oscura (#0F172A)" : "Dark surface (#0F172A)"}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* Interactive Color Tokens */}
-          <section className="space-y-5">
-            <div className="flex items-center gap-2.5">
-              <Palette className="w-5 h-5 text-primary" aria-hidden="true" />
-              <div>
-                <h2 className="text-2xl font-bold font-heading text-foreground">
-                  {isEs ? "Paleta de Color y Tokens (2026)" : "Color Palette & Design Tokens (2026)"}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {isEs
-                    ? "Haz clic en cualquier muestra para copiar su valor hexadecimal al portapapeles."
-                    : "Click any swatch button to copy its hexadecimal value to the clipboard."}
-                </p>
-              </div>
-            </div>
-
             <BrandSwatches lang={lang} />
           </section>
 
-          {/* Typography System */}
+          {/* Typography Scale */}
           <section className="space-y-5">
-            <div className="flex items-center gap-2.5">
-              <Type className="w-5 h-5 text-primary" aria-hidden="true" />
-              <div>
-                <h2 className="text-2xl font-bold font-heading text-foreground">
-                  {isEs ? "Sistema Tipográfico" : "Typography System"}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {isEs
-                    ? "Jerarquía tipográfica optimizada para legibilidad editorial e interfaces técnicas."
-                    : "Typographic hierarchy optimized for editorial legibility and technical interfaces."}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-5">
-              <div className="p-6 rounded-2xl bg-card border border-border shadow-2xs">
-                <span className="text-xs font-mono font-semibold text-primary uppercase">
-                  Heading Font
-                </span>
-                <h3 className="text-2xl font-bold font-heading text-foreground mt-2 mb-2">
-                  Urbanist Variable
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {isEs
-                    ? "Utilizada en titulares principales, encabezados de sección y nombres de herramientas con pesos 600–700."
-                    : "Used for main headlines, section headers, and tool titles in weights 600–700."}
-                </p>
+            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {isEs ? "04 // ESCALA TIPOGRÁFICA" : "04 // TYPOGRAPHIC SYSTEM"}
+            </h2>
+            <div className="rounded-3xl border border-border bg-card divide-y divide-border overflow-hidden">
+              <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                <div>
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-primary block mb-1.5">
+                    Heading · Urbanist Variable
+                  </span>
+                  <p className="text-3xl sm:text-4xl font-bold font-heading text-foreground tracking-tight">
+                    Aa Bb Cc — Precisión visual en tu navegador
+                  </p>
+                </div>
+                <span className="font-mono text-xs text-muted-foreground shrink-0">700 / 800</span>
               </div>
 
-              <div className="p-6 rounded-2xl bg-card border border-border shadow-2xs">
-                <span className="text-xs font-mono font-semibold text-primary uppercase">
-                  Body & UI Controls
-                </span>
-                <h3 className="text-2xl font-bold font-sans text-foreground mt-2 mb-2">
-                  Albert Sans Variable
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {isEs
-                    ? "Utilizada en texto de lectura, controles de interfaz, etiquetas de formularios y navegación."
-                    : "Used for body copy, interface controls, form labels, and navigation."}
-                </p>
+              <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                <div>
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-primary block mb-1.5">
+                    Body & Controls · Albert Sans Variable
+                  </span>
+                  <p className="text-base sm:text-lg font-sans text-foreground max-w-2xl leading-relaxed">
+                    Interfaz limpia y equilibrada para controles de compresión, pinceles de recorte y documentación técnica.
+                  </p>
+                </div>
+                <span className="font-mono text-xs text-muted-foreground shrink-0">400 / 600</span>
               </div>
 
-              <div className="p-6 rounded-2xl bg-card border border-border shadow-2xs">
-                <span className="text-xs font-mono font-semibold text-primary uppercase">
-                  Technical Metrics
-                </span>
-                <h3 className="text-2xl font-bold font-mono text-foreground mt-2 mb-2">
-                  UI Monospace
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {isEs
-                    ? "Reservada para dimensiones en píxeles, pesos en KB/MB, porcentajes, códigos HEX/RGB y bloques CSS."
-                    : "Reserved for pixel dimensions, KB/MB file weights, percentages, HEX/RGB codes, and CSS snippets."}
-                </p>
+              <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                <div>
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-primary block mb-1.5">
+                    Telemetry & Metadata · UI Monospace
+                  </span>
+                  <p className="font-mono text-sm sm:text-base text-foreground">
+                    1920 × 1080 px · #1E40FF · AVIF 245 KB (-90%) · 0 B UPLOADED
+                  </p>
+                </div>
+                <span className="font-mono text-xs text-muted-foreground shrink-0">tabular-nums</span>
               </div>
             </div>
           </section>

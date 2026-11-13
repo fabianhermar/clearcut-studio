@@ -3,7 +3,7 @@ import Script from "next/script";
 import "../globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#f8fafc",
+  themeColor: "#f4f3ef",
   minimumScale: 1,
   initialScale: 1,
   width: "device-width",
@@ -76,7 +76,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
   const { lang } = await params;
   return (
     <html lang={lang} className="scroll-smooth">
-      <body className="antialiased min-h-screen flex flex-col font-accent text-foreground bg-[#f8fafc] selection:bg-blue-600/15 selection:text-blue-700">
+      <body className="antialiased min-h-screen flex flex-col font-accent text-foreground bg-[#f4f3ef]">
         <div className="flex-1 flex flex-col">{children}</div>
 
         <Script id="microsoft-clarity" strategy="afterInteractive">

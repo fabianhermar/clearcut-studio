@@ -32,21 +32,25 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
   const stackItems = isEs
     ? [
         {
+          code: "STACK 01",
           icon: Cpu,
           title: "ONNX Runtime Web y WebAssembly",
           desc: "La segmentación de sujetos y eliminación de fondos se ejecuta en el navegador mediante modelos neuronales cuantizados, evitando subir tus fotos a servidores externos.",
         },
         {
+          code: "STACK 02",
           icon: Zap,
           title: "Códecs nativos en Web Workers",
           desc: "El optimizador utiliza compilaciones WebAssembly de libavif, libwebp y MozJPEG en un hilo dedicado para comprimir sin bloquear la interfaz.",
         },
         {
+          code: "STACK 03",
           icon: Layers,
-          title: "HTML5 Canvas 2D y procesamiento por lotes",
-          desc: "La limpieza de metadatos EXIF, generación de favicons, ajuste de relación de aspecto y marcas de agua operan directamente sobre buffers de píxeles en memoria RAM.",
+          title: "HTML5 Canvas 2D y buffers locales",
+          desc: "La limpieza de metadatos EXIF, generación de favicons y ajuste de relación de aspecto operan directamente sobre buffers de píxeles en memoria RAM.",
         },
         {
+          code: "STACK 04",
           icon: ShieldCheck,
           title: "Privacidad verificable por diseño",
           desc: "Puedes abrir las herramientas de desarrollo de tu navegador (pestaña Red/Network) y comprobar que ningún archivo de imagen se transmite fuera de tu equipo.",
@@ -54,21 +58,25 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
       ]
     : [
         {
+          code: "STACK 01",
           icon: Cpu,
           title: "ONNX Runtime Web & WebAssembly",
           desc: "Subject segmentation and background removal run inside the browser using quantized neural models, avoiding external server uploads.",
         },
         {
+          code: "STACK 02",
           icon: Zap,
           title: "Native Codecs in Web Workers",
           desc: "The image optimizer runs WebAssembly builds of libavif, libwebp, and MozJPEG inside a dedicated worker thread for non-blocking compression.",
         },
         {
+          code: "STACK 03",
           icon: Layers,
-          title: "HTML5 Canvas 2D & Batch Buffers",
-          desc: "EXIF sanitization, favicon generation, aspect-ratio fitting, and batch watermarking operate directly on in-memory pixel buffers.",
+          title: "HTML5 Canvas 2D & Local Buffers",
+          desc: "EXIF sanitization, favicon generation, and aspect-ratio fitting operate directly on in-memory pixel buffers.",
         },
         {
+          code: "STACK 04",
           icon: ShieldCheck,
           title: "Verifiable Privacy by Design",
           desc: "Open your browser's DevTools Network tab while editing to verify that zero image bytes are transmitted outside your device.",
@@ -76,64 +84,77 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
       ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background studio-grid flex flex-col">
       <Header dict={dict} lang={lang} />
-      <main className="flex-1 pt-28 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-12">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-              {isEs ? "Sobre el producto" : "About the product"}
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-5">
+      <main className="flex-1 pt-28 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Editorial Index Header */}
+          <div className="pb-10 mb-12 border-b border-border">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+              {isEs ? "ARQUITECTURA // SOBRE CLEARCUT STUDIO" : "ARCHITECTURE // ABOUT CLEARCUT STUDIO"}
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading text-foreground tracking-tight leading-[1.05] mb-5">
               {isEs
-                ? "Herramientas visuales de precisión ejecutadas en tu propio navegador"
+                ? "Herramientas visuales de precisión ejecutadas en tu navegador"
                 : "Precision visual tools executed right inside your browser"}
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
+            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-3xl">
               {isEs
-                ? "ClearCut Studio reúne 8 utilidades especializadas para diseñadores, desarrolladores y creadores de contenido que necesitan velocidad, control técnico y privacidad verificable sin muros de pago."
-                : "ClearCut Studio brings together 8 specialized utilities for designers, developers, and creators who need speed, technical control, and verifiable privacy without paywalls."}
+                ? "ClearCut Studio reúne utilidades especializadas para diseñadores, desarrolladores y creadores que exigen control técnico, velocidad WebAssembly y privacidad verificable."
+                : "ClearCut Studio brings together specialized utilities for designers, developers, and creators demanding technical control, WebAssembly speed, and verifiable privacy."}
             </p>
           </div>
 
-          {/* Editorial Content */}
-          <div className="bg-card border border-border rounded-2xl p-6 sm:p-10 shadow-2xs space-y-6 text-foreground leading-relaxed mb-12">
-            <h2 className="text-2xl font-bold font-heading text-foreground">
-              {isEs ? "Nuestra misión" : "Our Mission"}
+          {/* Editorial Mission Block */}
+          <div className="rounded-3xl bg-darkroom text-darkroom-foreground p-7 sm:p-11 mb-12 border border-white/10">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent mb-3">
+              {isEs ? "MANIFIESTO DE DISEÑO" : "ENGINEERING MANIFESTO"}
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold font-heading text-white mb-5">
+              {isEs ? "Por qué trasladamos el estudio al cliente" : "Why we moved the studio into the client"}
             </h2>
-            <p className="text-muted-foreground">
-              {isEs
-                ? "La mayoría de las utilidades web para trabajar con imágenes obligan al usuario a subir sus fotografías a servidores remotos, imponiendo límites artificiales de resolución, marcas de agua o suscripciones mensuales para tareas cotidianas como recortar un fondo, convertir a AVIF o eliminar coordenadas GPS."
-                : "Most web image utilities force users to upload their photographs to remote servers, imposing artificial resolution caps, watermarks, or monthly subscriptions for everyday tasks like removing a background, converting to AVIF, or stripping GPS coordinates."}
-            </p>
-            <p className="text-muted-foreground">
-              {isEs
-                ? "ClearCut Studio invierte ese modelo: aprovechamos las capacidades de los navegadores modernos (WebAssembly, Web Workers, Canvas 2D y almacenamiento en caché local) para trasladar el motor de procesamiento directamente a tu dispositivo."
-                : "ClearCut Studio inverts that model: we leverage modern browser capabilities (WebAssembly, Web Workers, Canvas 2D, and local cache storage) to deliver the processing engine directly to your device."}
-            </p>
+            <div className="grid md:grid-cols-2 gap-6 text-slate-300 text-sm sm:text-base leading-relaxed font-accent">
+              <p>
+                {isEs
+                  ? "La mayoría de las utilidades web para imágenes obligan a subir fotografías a servidores remotos, imponiendo límites de resolución, marcas de agua o suscripciones mensuales para tareas cotidianas como recortar un fondo o limpiar coordenadas GPS."
+                  : "Most web image utilities force users to upload photographs to remote servers, imposing resolution caps, watermarks, or monthly paywalls for everyday tasks like background cutouts or stripping GPS metadata."}
+              </p>
+              <p>
+                {isEs
+                  ? "ClearCut Studio invierte ese modelo: aprovechamos WebAssembly, Web Workers, Canvas 2D y caché local del navegador para ejecutar los motores directamente en tu dispositivo sin coste de servidor ni esperas de red."
+                  : "ClearCut Studio inverts that model: we harness WebAssembly, Web Workers, Canvas 2D, and local browser cache so the processing engine runs directly on your machine with zero upload queue."}
+              </p>
+            </div>
           </div>
 
-          {/* Technical Architecture Grid */}
+          {/* Swiss Hairline Architecture Grid */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold font-heading text-foreground mb-6">
-              {isEs ? "Arquitectura técnica" : "Technical Architecture"}
+            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-5">
+              {isEs ? "PILARES TÉCNICOS" : "TECHNICAL STACK"}
             </h2>
-            <div className="grid sm:grid-cols-2 gap-5">
+            <div className="rounded-3xl border border-border bg-card overflow-hidden grid sm:grid-cols-2">
               {stackItems.map((item, idx) => {
                 const Icon = item.icon;
+                const cellBorders = [
+                  "border-b border-border sm:border-r",
+                  "border-b border-border",
+                  "border-b sm:border-b-0 border-border sm:border-r",
+                  "",
+                ][idx];
                 return (
-                  <div
-                    key={idx}
-                    className="p-6 rounded-2xl bg-card border border-border shadow-2xs flex flex-col gap-3"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                      <Icon className="w-5 h-5" aria-hidden="true" />
+                  <div key={item.code} className={`p-6 sm:p-8 flex flex-col gap-3.5 ${cellBorders}`}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[11px] font-bold text-primary">
+                        {item.code}
+                      </span>
+                      <div className="w-9 h-9 rounded-xl bg-muted border border-border flex items-center justify-center text-foreground">
+                        <Icon className="w-4 h-4" aria-hidden="true" />
+                      </div>
                     </div>
                     <h3 className="text-lg font-bold font-heading text-foreground">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed font-accent">
                       {item.desc}
                     </p>
                   </div>
@@ -143,23 +164,26 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
           </div>
 
           {/* Author & Credits */}
-          <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="rounded-3xl bg-card border border-border p-7 sm:p-9 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+                {isEs ? "MANTENIMIENTO INDEPENDIENTE" : "INDEPENDENT STEWARDSHIP"}
+              </div>
               <h2 className="text-xl font-bold font-heading text-foreground mb-2">
-                {isEs ? "Desarrollo y mantenimiento" : "Development & Stewardship"}
+                {isEs ? "Desarrollo y arquitectura" : "Development & Architecture"}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xl font-accent">
                 {isEs
-                  ? "ClearCut Studio es diseñado y desarrollado por Fabian Herrera como un estudio web independiente, gratuito y enfocado en la comunidad."
-                  : "ClearCut Studio is designed and developed by Fabian Herrera as an independent, free, community-focused web studio."}
+                  ? "ClearCut Studio es diseñado y desarrollado por Fabian Herrera como un estudio web independiente, gratuito y enfocado en herramientas visuales de precisión."
+                  : "ClearCut Studio is designed and developed by Fabian Herrera as an independent, free studio focused on precision visual utilities."}
               </p>
             </div>
             <Link
               href={`/${lang}/?tool=background-remover`}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-semibold transition-colors shrink-0"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-darkroom hover:bg-primary text-white text-sm font-semibold transition-colors shrink-0"
             >
               <span>{isEs ? "Explorar herramientas" : "Explore tools"}</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
