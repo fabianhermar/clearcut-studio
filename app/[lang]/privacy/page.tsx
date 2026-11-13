@@ -1,18 +1,16 @@
 import { Header } from "@/components/landing/header";
 import { Footer } from "@/components/landing/footer";
 import { getDictionary, Locale } from "@/lib/dictionaries";
-import { ShieldCheck, Lock, Cpu, EyeOff, KeyRound } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const isEs = lang === "es";
   return {
-    title: isEs
-      ? "Política de Privacidad y Procesamiento Local | ClearCut Studio"
-      : "Privacy Policy & Local Processing | ClearCut Studio",
+    title: isEs ? "Política de Privacidad — ClearCut Studio" : "Privacy Policy — ClearCut Studio",
     description: isEs
-      ? "Explicación técnica verificable sobre cómo ClearCut Studio procesa tus imágenes localmente en el navegador, qué recursos descarga y cómo protege tu privacidad."
-      : "Verifiable technical breakdown of how ClearCut Studio processes your images locally in the browser, what assets are downloaded, and how your privacy is protected.",
+      ? "Política de privacidad verificable de ClearCut Studio: procesamiento 100% local de imágenes en el navegador sin subidas ni rastreo de archivos."
+      : "Verifiable privacy policy for ClearCut Studio: 100% in-browser local image processing with zero file uploads or tracking.",
     alternates: {
       canonical: `https://studio.fabianh.me/${lang}/privacy`,
       languages: {
@@ -30,101 +28,106 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
 
   const summaryRows = isEs
     ? [
+        { tool: "Eliminador de Fondos IA", execution: "Local (ONNX Runtime Web)", network: "0 bytes de imagen enviados" },
+        { tool: "Optimizador AVIF / WebP / JPEG", execution: "Local (WebAssembly Worker)", network: "0 bytes de imagen enviados" },
+        { tool: "Limpiador de Metadatos EXIF", execution: "Local (exifr + Canvas 2D)", network: "0 bytes de imagen enviados" },
+        { tool: "Extractor de Colores y Degradados", execution: "Local (Canvas Pixel Buffer)", network: "0 bytes de imagen enviados" },
+        { tool: "Generador de Favicons", execution: "Local (Canvas + JSZip)", network: "0 bytes de imagen enviados" },
+        { tool: "Adaptador de Relación de Aspecto", execution: "Local (Canvas 2D)", network: "0 bytes de imagen enviados" },
+        { tool: "Futuro Generador IA en Streaming", execution: "Nube (requerirá API externa)", network: "Se avisará explícitamente" },
+      ]
+    : [
+        { tool: "AI Background Remover", execution: "Local (ONNX Runtime Web)", network: "0 image bytes sent" },
+        { tool: "AVIF / WebP / JPEG Optimizer", execution: "Local (WebAssembly Worker)", network: "0 image bytes sent" },
+        { tool: "EXIF Metadata Stripper", execution: "Local (exifr + Canvas 2D)", network: "0 image bytes sent" },
+        { tool: "Color & Gradient Extractor", execution: "Local (Canvas Pixel Buffer)", network: "0 image bytes sent" },
+        { tool: "Favicon Generator", execution: "Local (Canvas + JSZip)", network: "0 image bytes sent" },
+        { tool: "Aspect Ratio Fitter", execution: "Local (Canvas 2D)", network: "0 image bytes sent" },
+        { tool: "Upcoming Streaming AI Generator", execution: "Cloud (external API required)", network: "Explicit notice shown" },
+      ];
+
+  const sections = isEs
+    ? [
         {
-          scope: "Imágenes y fotografías cargadas",
-          where: "100% local en la memoria RAM del navegador",
-          external: "Nunca se envían a ningún servidor",
+          title: "1. Procesamiento local de archivos",
+          body: "Todas las herramientas disponibles actualmente en ClearCut Studio ejecutan la lectura, edición, segmentación y codificación de tus imágenes íntegramente dentro de tu propio navegador utilizando HTML5 Canvas, Web Workers y WebAssembly. No almacenamos copias de tus fotografías en servidores remotos.",
         },
         {
-          scope: "Pesos del modelo IA (@imgly/background-removal)",
-          where: "Descargados 1ª vez y guardados en Cache Storage local",
-          external: "Solo descarga estática del modelo (~40 MB), sin envío de fotos",
+          title: "2. Descarga inicial de modelos y caché del navegador",
+          body: "La primera vez que utilizas el eliminador de fondos o los códecs de compresión, tu navegador descarga los archivos binarios estáticos del modelo neuronal (ONNX) y los módulos WASM desde la red de entrega de contenido para guardarlos localmente. A partir de ese momento, tus imágenes se procesan sin salir de tu dispositivo.",
         },
         {
-          scope: "Preferencias de usuario",
-          where: "LocalStorage del navegador",
-          external: "Permanecen en tu dispositivo",
+          title: "3. Cookies y almacenamiento local",
+          body: "ClearCut Studio no requiere cuentas de usuario ni utiliza cookies publicitarias invasivas. Podemos almacenar preferencias mínimas de interfaz (como tu idioma seleccionado) en el almacenamiento local del navegador.",
         },
         {
-          scope: "Analítica de navegación (Microsoft Clarity)",
-          where: "Métricas anónimas de interacción en páginas públicas",
-          external: "Jamás captura ni transmite los buffers de imagen de Canvas/WASM",
+          title: "4. Transparencia ante futuras funciones externas",
+          body: "Si en futuras versiones se habilitan utilidades experimentales que dependan de APIs externas (como el futuro generador de imágenes IA en streaming), se indicará de forma visible y explícita antes de iniciar cualquier envío fuera del navegador.",
         },
       ]
     : [
         {
-          scope: "Uploaded images & photographs",
-          where: "100% local in browser RAM",
-          external: "Never transmitted to any server",
+          title: "1. Local File Processing",
+          body: "All currently active tools inside ClearCut Studio read, edit, segment, and encode your images strictly inside your own browser using HTML5 Canvas, Web Workers, and WebAssembly. We never store copies of your photographs on remote servers.",
         },
         {
-          scope: "AI model weights (@imgly/background-removal)",
-          where: "Downloaded on first run & cached in local Cache Storage",
-          external: "Static model download (~40 MB) only; zero photo uploads",
+          title: "2. Initial Model & Codec Caching",
+          body: "The first time you run the background remover or compression codecs, your browser downloads the static neural model binaries (ONNX) and WASM encoder modules into local browser storage. Once loaded, your image bytes never leave your device.",
         },
         {
-          scope: "User preferences",
-          where: "Browser LocalStorage",
-          external: "Remains on your device",
+          title: "3. Cookies & Local Storage",
+          body: "ClearCut Studio requires no user accounts and sets no invasive advertising cookies. Minimal UI preferences (such as active locale) may stay in local browser storage.",
         },
         {
-          scope: "Navigation analytics (Microsoft Clarity)",
-          where: "Anonymized UI interaction metrics",
-          external: "Never captures or transmits Canvas/WASM image buffers",
+          title: "4. Disclosure of Future Cloud Features",
+          body: "If future experimental modules connect to external cloud APIs (such as the upcoming streaming AI image generator), ClearCut Studio will display an explicit disclosure prior to transmitting any prompt or asset.",
         },
       ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background studio-grid flex flex-col">
       <Header dict={dict} lang={lang} />
-      <main className="flex-1 pt-28 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 text-xs font-semibold uppercase tracking-wider mb-4">
-              <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{isEs ? "Privacidad Verificable" : "Verifiable Privacy"}</span>
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-3">
+      <main className="flex-1 pt-28 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Editorial Header */}
+          <div className="pb-10 mb-10 border-b border-border">
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-800 mb-4">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" aria-hidden="true" />
+              <span>{isEs ? "PRIVACIDAD VERIFICABLE // SPEC" : "VERIFIABLE PRIVACY // SPEC"}</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-4">
               {isEs ? "Política de Privacidad" : "Privacy Policy"}
             </h1>
-            <p className="text-sm font-mono text-muted-foreground">
-              {isEs ? "Última actualización: Junio de 2026" : "Last updated: June 2026"}
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-3xl">
+              {isEs
+                ? "Cómo manejamos tus archivos e información técnica en ClearCut Studio, explicado herramienta por herramienta de forma auditable."
+                : "How ClearCut Studio handles your files and runtime behavior, documented tool by tool for straightforward auditing."}
             </p>
           </div>
 
-          {/* Technical Summary Table */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-2xs mb-12">
-            <div className="p-4 sm:p-5 border-b border-border bg-muted/40">
-              <h2 className="text-sm font-bold font-heading text-foreground uppercase tracking-wider">
-                {isEs
-                  ? "Resumen técnico de flujo de datos"
-                  : "Technical Data Flow Summary"}
+          {/* Audit Matrix Table */}
+          <div className="rounded-3xl border border-border bg-card overflow-hidden mb-12">
+            <div className="px-6 py-4 bg-darkroom text-white flex items-center justify-between">
+              <h2 className="font-heading font-bold text-sm sm:text-base">
+                {isEs ? "Matriz de ejecución y red por herramienta" : "Per-tool runtime & network transfer matrix"}
               </h2>
+              <span className="font-mono text-[11px] text-emerald-400">VERIFIED // CLIENT-SIDE</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+              <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/20 text-muted-foreground">
-                    <th className="py-3 px-4 font-semibold">
-                      {isEs ? "Tipo de dato" : "Data Type"}
-                    </th>
-                    <th className="py-3 px-4 font-semibold">
-                      {isEs ? "Dónde se procesa / almacena" : "Where it is processed / stored"}
-                    </th>
-                    <th className="py-3 px-4 font-semibold">
-                      {isEs ? "Transferencia externa" : "External Transfer"}
-                    </th>
+                  <tr className="border-b border-border bg-muted/40 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <th className="py-3.5 px-6 font-semibold">{isEs ? "Herramienta" : "Tool"}</th>
+                    <th className="py-3.5 px-6 font-semibold">{isEs ? "Entorno de ejecución" : "Execution Layer"}</th>
+                    <th className="py-3.5 px-6 font-semibold">{isEs ? "Tráfico de imagen" : "Image Network Traffic"}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
-                  {summaryRows.map((row, idx) => (
-                    <tr key={idx} className="hover:bg-muted/20">
-                      <td className="py-3.5 px-4 font-semibold text-foreground">{row.scope}</td>
-                      <td className="py-3.5 px-4 text-muted-foreground">{row.where}</td>
-                      <td className="py-3.5 px-4 font-mono text-xs text-emerald-800 font-medium">
-                        {row.external}
-                      </td>
+                <tbody className="divide-y divide-border font-accent">
+                  {summaryRows.map((row) => (
+                    <tr key={row.tool} className="hover:bg-muted/20 transition-colors">
+                      <td className="py-4 px-6 font-semibold text-foreground">{row.tool}</td>
+                      <td className="py-4 px-6 font-mono text-xs text-muted-foreground">{row.execution}</td>
+                      <td className="py-4 px-6 font-mono text-xs font-semibold text-emerald-800">{row.network}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -132,84 +135,16 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
             </div>
           </div>
 
-          {/* Detailed Sections */}
-          <div className="space-y-8">
-            <section className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Lock className="w-4 h-4" aria-hidden="true" />
-                </div>
-                <h2 className="text-xl font-bold font-heading text-foreground">
-                  {isEs
-                    ? "1. Procesamiento local de imágenes en el navegador"
-                    : "1. In-Browser Local Image Processing"}
-                </h2>
-              </div>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {isEs
-                  ? "Todas las herramientas actuales de ClearCut Studio (Eliminador de Fondos con IA, Optimizador WASM, Limpiador EXIF, Generador de Favicons, Extractor de Degradados, Ajuste de Proporción, Marca de Agua por Lotes y Estudio de Mockups) se ejecutan íntegramente dentro de tu navegador web utilizando WebAssembly, Web Workers y HTML5 Canvas."
-                  : "All current ClearCut Studio utilities (AI Background Remover, WASM Image Optimizer, EXIF Stripper, Favicon Generator, Gradient Extractor, Aspect Ratio Fitter, Batch Watermarker, and Mockup Studio) execute entirely inside your web browser using WebAssembly, Web Workers, and HTML5 Canvas."}
-              </p>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {isEs
-                  ? "Tus archivos de imagen jamás se envían a nuestros servidores. Todo el cálculo se realiza utilizando la memoria RAM y el procesador de tu propio dispositivo."
-                  : "Your image files are never uploaded to our servers. All computation is performed using your own device's RAM and processor."}
-              </p>
-            </section>
-
-            <section className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Cpu className="w-4 h-4" aria-hidden="true" />
-                </div>
-                <h2 className="text-xl font-bold font-heading text-foreground">
-                  {isEs
-                    ? "2. Descarga y caché local de modelos de IA y códecs WASM"
-                    : "2. Local Caching of AI Models & WASM Codecs"}
-                </h2>
-              </div>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {isEs
-                  ? "Cuando utilizas por primera vez el Eliminador de Fondos con IA, tu navegador descarga los pesos estáticos del modelo neuronal ONNX (~40 MB) y los almacena en el almacenamiento en caché local de tu navegador (Cache Storage / IndexedDB). Este tráfico de red es exclusivamente de descarga (hacia tu navegador) y nunca envía tus fotografías al exterior."
-                  : "When you run the AI Background Remover for the first time, your browser downloads the static ONNX neural model weights (~40 MB) and stores them in your browser's local Cache Storage / IndexedDB. This network traffic is strictly inbound (downloading the model to your browser) and never sends your photographs externally."}
-              </p>
-            </section>
-
-            <section className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <KeyRound className="w-4 h-4" aria-hidden="true" />
-                </div>
-                <h2 className="text-xl font-bold font-heading text-foreground">
-                  {isEs
-                    ? "3. Integración opcional futura de APIs externas (Modelo BYOK)"
-                    : "3. Future Optional Third-Party API Integration (BYOK Model)"}
-                </h2>
-              </div>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {isEs
-                  ? "Para futuras funciones de IA generativa pesada que no puedan ejecutarse localmente en un navegador estándar, ClearCut Studio implementará un modelo opcional 'Bring Your Own Key' (BYOK). El uso de cualquier API externa será siempre opcional y explícito: se te informará claramente antes de que cualquier imagen salga de tu dispositivo hacia el proveedor de API que tú elijas conectar."
-                  : "For future heavy generative AI capabilities that cannot run locally inside a standard browser, ClearCut Studio will implement an optional 'Bring Your Own Key' (BYOK) model. Using any external API will always be opt-in and explicit: you will be clearly notified before any image leaves your device toward the API provider you choose to connect."}
-              </p>
-            </section>
-
-            <section className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <EyeOff className="w-4 h-4" aria-hidden="true" />
-                </div>
-                <h2 className="text-xl font-bold font-heading text-foreground">
-                  {isEs
-                    ? "4. Analítica de uso y almacenamiento local"
-                    : "4. Usage Analytics & Local Storage"}
-                </h2>
-              </div>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {isEs
-                  ? "ClearCut Studio no requiere cuentas de usuario ni registro. Utilizamos Microsoft Clarity únicamente para comprender de forma agregada y anónima la ergonomía de la interfaz (clics y desplazamiento). Los buffers de imagen procesados en WebAssembly y Canvas están aislados en memoria y no son accesibles ni registrados por herramientas analíticas. Asimismo, utilizamos LocalStorage únicamente para recordar preferencias técnicas de la interfaz en tu propio navegador."
-                  : "ClearCut Studio requires no user accounts or registration. We use Microsoft Clarity solely to understand anonymized, aggregate interface ergonomics (clicks and scrolling). Image buffers processed in WebAssembly and Canvas are isolated in memory and are never accessed or recorded by analytics scripts. We also use LocalStorage strictly to remember technical UI preferences in your own browser."}
-              </p>
-            </section>
+          {/* Numbered Policy Sections */}
+          <div className="rounded-3xl border border-border bg-card divide-y divide-border overflow-hidden">
+            {sections.map((sec) => (
+              <section key={sec.title} className="p-6 sm:p-8 space-y-2.5">
+                <h2 className="font-heading font-bold text-xl text-foreground">{sec.title}</h2>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-accent">
+                  {sec.body}
+                </p>
+              </section>
+            ))}
           </div>
         </div>
       </main>

@@ -1,18 +1,15 @@
 import { Header } from "@/components/landing/header";
 import { Footer } from "@/components/landing/footer";
 import { getDictionary, Locale } from "@/lib/dictionaries";
-import { FileCheck2 } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const isEs = lang === "es";
   return {
-    title: isEs
-      ? "Términos y Condiciones de Uso | ClearCut Studio"
-      : "Terms & Conditions of Use | ClearCut Studio",
+    title: isEs ? "Términos de Uso — ClearCut Studio" : "Terms of Use — ClearCut Studio",
     description: isEs
-      ? "Términos de servicio para el uso personal y comercial de las herramientas de ClearCut Studio."
-      : "Terms of service for personal and commercial use of ClearCut Studio utilities.",
+      ? "Condiciones transparentes de uso de ClearCut Studio para proyectos personales y comerciales."
+      : "Transparent terms of use for ClearCut Studio across personal and commercial projects.",
     alternates: {
       canonical: `https://studio.fabianh.me/${lang}/terms`,
       languages: {
@@ -31,79 +28,92 @@ export default async function TermsPage({ params }: { params: Promise<{ lang: st
   const sections = isEs
     ? [
         {
-          title: "1. Uso del servicio",
-          body: "ClearCut Studio se ofrece como una suite de herramientas web gratuitas para uso personal, académico y comercial. No se requiere registro de cuenta para utilizar ninguna de las utilidades de procesamiento local.",
+          code: "01",
+          title: "Uso permitido del servicio",
+          body: "ClearCut Studio pone a tu disposición un conjunto de utilidades web gratuitas para editar, comprimir, convertir y preparar imágenes en tu propio navegador. Puedes utilizar los archivos exportados en proyectos personales, educativos o comerciales sin marcas de agua ni regalías.",
         },
         {
-          title: "2. Propiedad intelectual y derechos sobre tus imágenes",
-          body: "Tú conservas el 100% de los derechos de autor y propiedad sobre todas las imágenes que procesas en ClearCut Studio. Dado que el procesamiento ocurre localmente en tu navegador, nosotros no almacenamos, inspeccionamos ni reclamamos derecho alguno sobre tus archivos. Eres responsable de contar con los permisos necesarios sobre el material que edites.",
+          code: "02",
+          title: "Propiedad intelectual de tus archivos",
+          body: "Conservas el 100% de los derechos de autor y titularidad sobre las fotografías e ilustraciones que proceses con nuestras herramientas. Al ejecutarse localmente en tu dispositivo, ClearCut Studio no adquiere licencia alguna sobre tus contenidos.",
         },
         {
-          title: "3. Garantías y limitación de responsabilidad",
-          body: "Las herramientas de segmentación con IA, codificación WASM y manipulación de lienzo se proporcionan 'tal cual' (as-is). Aunque buscamos la máxima precisión técnica, los algoritmos de recorte o compresión pueden presentar variaciones según la imagen de entrada. ClearCut Studio no se hace responsable por pérdidas de datos o daños derivados del uso de los archivos exportados.",
+          code: "03",
+          title: "Responsabilidad del usuario",
+          body: "Eres responsable de garantizar que cuentas con los derechos necesarios sobre las imágenes que editas y de verificar que los activos exportados cumplan con los requisitos técnicos de tu plataforma de destino.",
         },
         {
-          title: "4. Uso de claves de API de terceros (Modelo híbrido BYOK)",
-          body: "Para futuras herramientas que permitan conectar credenciales propias de proveedores externos (como OpenAI o Google Gemini), el usuario acepta regirse por los términos de servicio y facturación del proveedor externo correspondiente. ClearCut Studio actúa únicamente como interfaz cliente.",
+          code: "04",
+          title: "Disponibilidad de funciones experimentales",
+          body: "Algunas utilidades listadas en Studio Lab (marcadas como Pronto) se encuentran en fase de desarrollo o evaluación. Sus especificaciones pueden ajustarse antes de habilitarse en el estudio principal.",
         },
         {
-          title: "5. Disponibilidad y actualizaciones",
-          body: "Podemos mejorar, actualizar o modificar las herramientas del estudio en cualquier momento para optimizar su rendimiento o compatibilidad con los estándares web modernos.",
+          code: "05",
+          title: "Contacto y soporte",
+          body: "Si encuentras errores técnicos o deseas proponer mejoras de compatibilidad, puedes escribirnos a soporte@clearcut.studio.",
         },
       ]
     : [
         {
-          title: "1. Use of Service",
-          body: "ClearCut Studio is provided as a free suite of web utilities for personal, academic, and commercial use. No account registration is required to use any of the local processing tools.",
+          code: "01",
+          title: "Permitted Service Usage",
+          body: "ClearCut Studio provides free browser-based utilities for editing, compressing, converting, and preparing visual assets. You may use exported outputs in personal, educational, and commercial projects without watermarks or royalties.",
         },
         {
-          title: "2. Intellectual Property & Image Rights",
-          body: "You retain 100% of the copyright and ownership over all images you process in ClearCut Studio. Because processing happens locally inside your browser, we never store, inspect, or claim any rights over your files. You are responsible for ensuring you hold the necessary rights to modify the material you load.",
+          code: "02",
+          title: "Ownership of Your Files",
+          body: "You retain 100% of copyright and ownership over any images processed through our tools. Because processing stays local on your device, ClearCut Studio receives no license or claim over your files.",
         },
         {
-          title: "3. Warranties & Limitation of Liability",
-          body: "AI segmentation, WASM encoding, and canvas manipulation utilities are provided 'as-is'. While we engineer for maximum technical accuracy, automated cutouts or compression codecs may vary depending on source imagery. ClearCut Studio is not liable for data loss or damages arising from exported assets.",
+          code: "03",
+          title: "User Responsibility",
+          body: "You remain responsible for ensuring you hold appropriate rights for the media you edit and for validating exported files before production deployment.",
         },
         {
-          title: "4. Third-Party API Keys (Hybrid BYOK Model)",
-          body: "For future utilities that allow connecting your own credentials from external providers (such as OpenAI or Google Gemini), you agree to abide by the respective provider's terms of service and billing policies. ClearCut Studio acts strictly as a client interface.",
+          code: "04",
+          title: "Experimental Studio Lab Modules",
+          body: "Certain upcoming utilities listed in Studio Lab (marked Soon) remain in active testing and progressive rollout; specifications may evolve prior to general availability.",
         },
         {
-          title: "5. Availability & Updates",
-          body: "We may enhance, update, or modify studio utilities at any time to improve performance or compatibility with modern web standards.",
+          code: "05",
+          title: "Support & Inquiries",
+          body: "For bug reports or compatibility feedback, reach out to soporte@clearcut.studio.",
         },
       ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background studio-grid flex flex-col">
       <Header dict={dict} lang={lang} />
-      <main className="flex-1 pt-28 pb-24 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pt-28 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-              <FileCheck2 className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{isEs ? "Condiciones Legales" : "Legal Terms"}</span>
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-3">
-              {isEs ? "Términos y Condiciones" : "Terms & Conditions"}
+          <div className="pb-10 mb-10 border-b border-border">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+              {isEs ? "MARCO LEGAL // CONDICIONES" : "LEGAL // TERMS OF USE"}
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold font-heading text-foreground tracking-tight mb-4">
+              {isEs ? "Términos de Uso" : "Terms of Use"}
             </h1>
-            <p className="text-sm font-mono text-muted-foreground">
-              {isEs ? "Última actualización: Junio de 2026" : "Last updated: June 2026"}
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              {isEs
+                ? "Reglas claras, directas y sin letra pequeña sobre el uso de ClearCut Studio."
+                : "Clear, direct rules with zero fine print governing the use of ClearCut Studio."}
             </p>
           </div>
 
-          <div className="space-y-5">
-            {sections.map((sec, idx) => (
-              <section
-                key={idx}
-                className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-2xs space-y-2.5"
-              >
-                <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-                  {sec.title}
-                </h2>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {sec.body}
-                </p>
+          <div className="rounded-3xl border border-border bg-card divide-y divide-border overflow-hidden">
+            {sections.map((sec) => (
+              <section key={sec.code} className="p-6 sm:p-8 grid sm:grid-cols-12 gap-4 items-start">
+                <span className="sm:col-span-2 font-mono text-xs font-bold text-primary pt-1">
+                  TERM {sec.code}
+                </span>
+                <div className="sm:col-span-10 space-y-2">
+                  <h2 className="font-heading font-bold text-xl text-foreground">
+                    {sec.title}
+                  </h2>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-accent">
+                    {sec.body}
+                  </p>
+                </div>
               </section>
             ))}
           </div>
