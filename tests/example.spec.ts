@@ -72,7 +72,7 @@ test.describe('ClearCut Studio 2026 E2E Suite', () => {
 
     await page.goto('/es/pricing');
     await expect(page.locator('#pricing')).toContainText('PLAN 01 // ESTUDIO LOCAL');
-    await expect(page.locator('#pricing')).toContainText('HYBRID // EXPLICIT NOTICE');
+    await expect(page.locator('#pricing')).toContainText('Transparencia Técnica y Procesamiento Futuro');
     await expect(page.locator('#pricing')).not.toContainText('☕');
   });
 
