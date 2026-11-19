@@ -69,12 +69,8 @@ export function saveGoogleDriveSession(session: GoogleDriveSession | null): void
   window.sessionStorage.setItem(GOOGLE_DRIVE_SESSION_KEY, JSON.stringify(session));
 }
 
-export function startGoogleDriveOAuth(clientId: string, lang: string = "es"): void {
+export function startGoogleDriveOAuth(lang: string = "es"): void {
   if (typeof window === "undefined") return;
-  const trimmed = clientId.trim();
-  if (!trimmed) {
-    throw new Error("Missing Google OAuth Client ID");
-  }
 
   const stateBytes = new Uint8Array(16);
   crypto.getRandomValues(stateBytes);
@@ -84,16 +80,11 @@ export function startGoogleDriveOAuth(clientId: string, lang: string = "es"): vo
   window.sessionStorage.setItem(GOOGLE_DRIVE_RETURN_LANG_KEY, lang);
 
   const params = new URLSearchParams({
-    client_id: trimmed,
-    redirect_uri: getGoogleRedirectUri(),
-    response_type: "token",
-    scope: GOOGLE_OAUTH_SCOPES,
-    include_granted_scopes: "true",
-    prompt: "consent select_account",
+    lang,
     state,
   });
 
-  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  window.location.href = `/api/auth/google-drive/start?${params.toString()}`;
 }
 
 export async function fetchGoogleUserProfile(accessToken: string): Promise<GoogleDriveUser> {

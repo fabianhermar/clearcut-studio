@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Cloud,
   CloudUpload,
   CheckCircle2,
   ExternalLink,
   FolderOpen,
   LogOut,
   RefreshCw,
-  Copy,
-  Check,
   ShieldCheck,
   Loader2,
   X,
@@ -18,12 +15,8 @@ import {
 } from "lucide-react";
 import {
   disconnectGoogleDrive,
-  getEnvGoogleClientId,
-  getGoogleRedirectUri,
-  getStoredGoogleClientId,
   GOOGLE_DRIVE_FOLDER_NAME,
   listClearCutDriveFiles,
-  saveCustomGoogleClientId,
   startGoogleDriveOAuth,
 } from "@/lib/ai-studio/google-drive";
 import { formatFileSize } from "@/lib/ai-studio/export-utils";
@@ -32,6 +25,29 @@ import type {
   GoogleDriveFileItem,
   GoogleDriveSession,
 } from "@/lib/ai-studio/types";
+
+function GoogleLogoIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"
+      />
+    </svg>
+  );
+}
 
 interface GoogleDrivePanelProps {
   session: GoogleDriveSession | null;
@@ -51,18 +67,9 @@ export function GoogleDrivePanel({
   lang = "es",
 }: GoogleDrivePanelProps) {
   const isEn = lang === "en";
-  const envClientId = getEnvGoogleClientId();
-  const [clientId, setClientId] = useState("");
-  const [redirectUri, setRedirectUri] = useState("");
-  const [copiedUri, setCopiedUri] = useState(false);
   const [files, setFiles] = useState<GoogleDriveFileItem[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setClientId(getStoredGoogleClientId());
-    setRedirectUri(getGoogleRedirectUri());
-  }, []);
 
   const refreshFiles = async () => {
     if (!session) return;
@@ -92,31 +99,12 @@ export function GoogleDrivePanel({
 
   const handleConnect = () => {
     setError(null);
-    const activeId = envClientId || clientId.trim();
-    if (!activeId) {
-      setError(
-        isEn
-          ? "Please enter a Google OAuth 2.0 Client ID below to connect your Google Drive."
-          : "Ingresa tu Google OAuth 2.0 Client ID abajo para conectar tu cuenta de Google Drive."
-      );
-      return;
-    }
-    if (!envClientId) {
-      saveCustomGoogleClientId(activeId);
-    }
-    startGoogleDriveOAuth(activeId, lang);
+    startGoogleDriveOAuth(lang);
   };
 
   const handleDisconnect = async () => {
     await disconnectGoogleDrive(session?.accessToken);
     onSessionChange(null);
-  };
-
-  const handleCopyRedirect = () => {
-    if (!redirectUri) return;
-    navigator.clipboard.writeText(redirectUri);
-    setCopiedUri(true);
-    setTimeout(() => setCopiedUri(false), 1800);
   };
 
   const unsavedAssets = assets.filter((a) => !a.driveFileId);
@@ -136,8 +124,8 @@ export function GoogleDrivePanel({
             </h2>
             <p className="text-sm text-muted-foreground max-w-2xl">
               {isEn
-                ? "ClearCut Studio never hosts your generated images, videos, or audio. Connect your Google account to save individual files or entire batches directly into your own Drive folder."
-                : "ClearCut Studio nunca aloja tus imágenes, videos ni audios en servidores propios. Conecta tu cuenta de Google para guardar archivos uno por uno o por lotes directamente en tu carpeta personal de Google Drive."}
+                ? "Sign in with your Google account in one click to save individual images, videos, or full batches directly into your personal Google Drive folder."
+                : "Inicia sesión con tu cuenta de Google en un solo clic para guardar tus imágenes, videos o lotes completos directamente en tu carpeta personal de Google Drive."}
             </p>
           </div>
 
@@ -165,7 +153,7 @@ export function GoogleDrivePanel({
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive/25 text-xs text-destructive font-medium">
+          <div className="mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-600/25 text-xs text-amber-950 font-medium">
             {error}
           </div>
         )}
@@ -238,61 +226,38 @@ export function GoogleDrivePanel({
             </div>
           </div>
         ) : (
-          <div className="mt-5 pt-5 border-t border-border grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="mt-5 pt-5 border-t border-border grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div className="lg:col-span-7 space-y-4">
-              {!envClientId && (
-                <div className="space-y-2">
-                  <label
-                    htmlFor="google-oauth-client-id"
-                    className="block text-[11px] font-mono font-bold uppercase text-muted-foreground"
-                  >
-                    Google OAuth 2.0 Client ID (Web Application)
-                  </label>
-                  <input
-                    id="google-oauth-client-id"
-                    type="text"
-                    value={clientId}
-                    onChange={(e) => setClientId(e.target.value)}
-                    placeholder="1234567890-abcdefg.apps.googleusercontent.com"
-                    className="w-full h-10 px-3.5 rounded-xl bg-background border border-border text-xs font-mono text-foreground focus:outline-none focus:border-primary"
-                  />
-                  <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#faf9f5] border border-border text-[11px] font-mono text-muted-foreground">
-                    <span className="truncate">
-                      Redirect URI: <strong className="text-foreground">{redirectUri}</strong>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleCopyRedirect}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-card border border-border text-foreground hover:border-primary cursor-pointer shrink-0"
-                    >
-                      {copiedUri ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedUri ? "OK" : isEn ? "Copy" : "Copiar"}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Official-style 1-Click Sign in with Google Button */}
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleConnect}
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white hover:bg-[#faf9f5] text-[#0c0e12] border border-[#c9c6ba] hover:border-primary/60 text-sm font-semibold shadow-soft transition-all cursor-pointer"
+                >
+                  <GoogleLogoIcon className="w-5 h-5 shrink-0" />
+                  <span>
+                    {isEn ? "Continue with Google" : "Continuar con Google"}
+                  </span>
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={handleConnect}
-                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#0c0e12] hover:bg-primary text-white text-sm font-semibold tactile-button transition-colors cursor-pointer"
-              >
-                <Cloud className="w-4 h-4" />
-                <span>
-                  {isEn ? "Connect Google Account & Drive" : "Conectar cuenta de Google con Drive"}
-                </span>
-              </button>
+              <p className="text-xs text-muted-foreground">
+                {isEn
+                  ? "Choose your Google account, grant access to the ClearCut AI Studio folder, and start saving images, videos, and audio automatically."
+                  : "Elige tu cuenta de Google, autoriza la carpeta ClearCut AI Studio y guarda tus imágenes, videos y audios en segundos."}
+              </p>
             </div>
 
             <div className="lg:col-span-5 p-4 rounded-xl bg-[#faf9f5] border border-border space-y-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-1.5 font-mono font-bold text-foreground text-[11px] uppercase">
                 <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                <span>{isEn ? "Minimal Scope Permission" : "Permiso Mínimo (drive.file)"}</span>
+                <span>{isEn ? "Private & Minimal Access" : "Acceso Privado y Seguro (drive.file)"}</span>
               </div>
               <p className="leading-relaxed">
                 {isEn
-                  ? "We only request `drive.file` access — ClearCut Studio can only create and manage files inside its own `ClearCut AI Studio` folder and can never read your other private Google Drive documents."
-                  : "Solo solicitamos el permiso `drive.file`: ClearCut Studio únicamente puede crear y gestionar los archivos que tú guardes dentro de la carpeta `ClearCut AI Studio`, nunca leer otros documentos privados de tu Drive."}
+                  ? "We only request `drive.file` access — ClearCut Studio can only save into its own `ClearCut AI Studio` folder and can never read your other private Google Drive files."
+                  : "Solo solicitamos el permiso `drive.file`: ClearCut Studio únicamente guarda dentro de su propia carpeta `ClearCut AI Studio` y nunca puede leer otros documentos privados de tu Drive."}
               </p>
             </div>
           </div>
@@ -378,33 +343,11 @@ export function GoogleDriveConnectModal({
   lang = "es",
 }: GoogleDriveConnectModalProps) {
   const isEn = lang === "en";
-  const envClientId = getEnvGoogleClientId();
-  const [clientId, setClientId] = useState("");
-  const [redirectUri, setRedirectUri] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (open) {
-      setClientId(getStoredGoogleClientId());
-      setRedirectUri(getGoogleRedirectUri());
-      setError(null);
-    }
-  }, [open]);
 
   if (!open) return null;
 
   const handleConnect = () => {
-    const activeId = envClientId || clientId.trim();
-    if (!activeId) {
-      setError(
-        isEn
-          ? "Enter your Google OAuth Client ID to connect."
-          : "Ingresa tu Google OAuth Client ID para continuar."
-      );
-      return;
-    }
-    if (!envClientId) saveCustomGoogleClientId(activeId);
-    startGoogleDriveOAuth(activeId, lang);
+    startGoogleDriveOAuth(lang);
   };
 
   return (
@@ -413,11 +356,11 @@ export function GoogleDriveConnectModal({
       aria-modal="true"
       className="fixed inset-0 z-50 bg-[#0c0e12]/70 backdrop-blur-xs flex items-center justify-center p-4"
     >
-      <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-medium space-y-4">
+      <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-medium space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">
-              GOOGLE DRIVE // {isEn ? "REQUIRED TO SAVE" : "REQUERIDO PARA GUARDAR"}
+              GOOGLE DRIVE // {isEn ? "SIGN IN TO SAVE" : "INICIA SESIÓN PARA GUARDAR"}
             </span>
             <h3 className="text-xl font-heading font-bold text-foreground mt-0.5">
               {isEn ? "Connect your Google Account" : "Conecta tu cuenta de Google"}
@@ -435,53 +378,25 @@ export function GoogleDriveConnectModal({
 
         <p className="text-sm text-muted-foreground leading-relaxed">
           {isEn
-            ? "To save your AI-generated photos, videos, or audio persistently in the cloud, connect your Google account linked to Google Drive. Files are stored in your personal `ClearCut AI Studio` folder."
-            : "Para guardar tus fotos, videos o audios generados con IA en la nube, necesitas conectar tu cuenta de Google vinculada a Google Drive. Tus creaciones se guardarán en tu carpeta personal `ClearCut AI Studio`."}
+            ? "Sign in with Google to save your AI-generated photos, videos, and audio directly into your personal `ClearCut AI Studio` Drive folder."
+            : "Inicia sesión con tu cuenta de Google para guardar tus fotos, videos y audios generados con IA directamente en tu carpeta personal `ClearCut AI Studio` de Google Drive."}
         </p>
 
-        {!envClientId && (
-          <div className="space-y-2">
-            <label
-              htmlFor="modal-gdrive-client-id"
-              className="block text-[11px] font-mono font-bold uppercase text-muted-foreground"
-            >
-              Google OAuth Client ID
-            </label>
-            <input
-              id="modal-gdrive-client-id"
-              type="text"
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              placeholder="1234567890-xyz.apps.googleusercontent.com"
-              className="w-full h-10 px-3 rounded-xl bg-background border border-border text-xs font-mono text-foreground focus:outline-none focus:border-primary"
-            />
-            <p className="text-[11px] font-mono text-muted-foreground truncate">
-              Redirect URI: {redirectUri}
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <div className="p-2.5 rounded-lg bg-destructive/10 text-destructive text-xs font-medium">
-            {error}
-          </div>
-        )}
-
-        <div className="flex items-center justify-end gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-full bg-background hover:bg-muted border border-border text-xs font-semibold cursor-pointer"
+            className="px-4 py-2.5 rounded-full bg-background hover:bg-muted border border-border text-xs font-semibold cursor-pointer"
           >
             {isEn ? "Cancel" : "Cancelar"}
           </button>
           <button
             type="button"
             onClick={handleConnect}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary hover:bg-primary-hover text-white text-xs font-semibold tactile-button cursor-pointer"
+            className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-white hover:bg-[#faf9f5] text-[#0c0e12] border border-[#c9c6ba] hover:border-primary/60 text-xs font-bold shadow-soft transition-all cursor-pointer"
           >
-            <Cloud className="w-3.5 h-3.5" />
-            <span>{isEn ? "Continue with Google Drive" : "Conectar con Google Drive"}</span>
+            <GoogleLogoIcon className="w-4 h-4 shrink-0" />
+            <span>{isEn ? "Continue with Google" : "Continuar con Google"}</span>
           </button>
         </div>
       </div>
