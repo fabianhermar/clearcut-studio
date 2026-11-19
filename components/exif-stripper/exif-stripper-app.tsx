@@ -5,17 +5,19 @@ import { UploadSection } from "./upload-section";
 import { EditorSection } from "./editor-section";
 
 interface ExifStripperAppProps {
+  initialFile?: File | null;
   onClose: () => void;
   dict?: any;
   lang?: string;
 }
 
 export default function ExifStripperApp({
+  initialFile = null,
   onClose,
   dict,
   lang = "es",
 }: ExifStripperAppProps) {
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(initialFile);
 
   const handleSampleSelect = useCallback(async (src: string) => {
     try {

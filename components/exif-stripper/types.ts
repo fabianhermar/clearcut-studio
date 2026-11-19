@@ -1,4 +1,8 @@
-// Types for EXIF Stripper
+export type ExifCategory = "gps" | "camera" | "datetime" | "software" | "other";
+
+export type PrivacyRiskLevel = "high" | "medium" | "clean";
+
+export type ExifOutputFormat = "original" | "jpeg" | "png" | "webp";
 
 export interface ExifData {
   // Camera info
@@ -24,26 +28,52 @@ export interface ExifData {
   CreateDate?: Date | string;
   ModifyDate?: Date | string;
 
-  // Software
+  // Software & Author
   Software?: string;
   Artist?: string;
   Copyright?: string;
 
-  // Other
-  [key: string]: any;
+  // Other raw tags
+  [key: string]: unknown;
 }
 
+export interface RawMetadataEntry {
+  key: string;
+  value: string;
+  category: ExifCategory;
+  risk: "high" | "medium" | "low";
+}
+
+export interface PrivacyAssessment {
+  level: PrivacyRiskLevel;
+  hasGps: boolean;
+  hasCamera: boolean;
+  hasDates: boolean;
+  hasSoftwareOrAuthor: boolean;
+  totalTags: number;
+  highRiskCount: number;
+}
+
+export interface StripOptions {
+  format: ExifOutputFormat;
+  quality: number; // 70 to 100
+}
+
+export const DEFAULT_STRIP_OPTIONS: StripOptions = {
+  format: "original",
+  quality: 96,
+};
+
 export interface StripResult {
-  /** The clean image as a data URL */
   cleanDataUrl: string;
-  /** Original file size in bytes */
   originalSize: number;
-  /** Clean image size estimate in bytes */
   cleanSize: number;
-  /** The original file name */
+  width: number;
+  height: number;
   fileName: string;
-  /** Parsed EXIF data (null if no EXIF found or parse failed) */
   exifData: ExifData | null;
-  /** The output format */
+  rawEntries: RawMetadataEntry[];
+  assessment: PrivacyAssessment;
+  verifiedClean: boolean;
   outputType: string;
 }
