@@ -5,15 +5,17 @@ import { UploadSection } from "./upload-section";
 import { EditorSection } from "./editor-section";
 
 export default function GradientExtractorApp({
+  initialImage = null,
   onClose,
   dict,
   lang = "es",
 }: {
+  initialImage?: string | null;
   onClose: () => void;
   dict?: any;
   lang?: string;
 }) {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(initialImage);
 
   return (
     <>
