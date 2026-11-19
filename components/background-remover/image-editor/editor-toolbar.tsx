@@ -1,7 +1,7 @@
 "use client";
 
 import { WorkspaceHeader } from "@/components/studio/workspace-header";
-import { Undo2, Redo2, ImagePlus, Eye } from "lucide-react";
+import { Undo2, Redo2, ImagePlus, Eye, Download } from "lucide-react";
 
 interface EditorToolbarProps {
   canvasSize: { width: number; height: number };
@@ -10,6 +10,7 @@ interface EditorToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   onReset: () => void;
+  onQuickDownload?: () => void;
   onClose?: () => void;
   showOriginal?: boolean;
   onToggleOriginal?: (show: boolean) => void;
@@ -23,6 +24,7 @@ export function EditorToolbar({
   onUndo,
   onRedo,
   onReset,
+  onQuickDownload,
   onClose,
   showOriginal = false,
   onToggleOriginal,
@@ -38,11 +40,11 @@ export function EditorToolbar({
       centerSlot={
         canvasSize.width > 0 ? (
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] font-semibold text-foreground px-3 py-1 rounded-full bg-background border border-border tabular-nums">
+            <span className="font-mono text-[11px] font-semibold text-foreground px-3 py-1 rounded-full bg-muted border border-border tabular-nums">
               {canvasSize.width} × {canvasSize.height} px
             </span>
-            <span className="hidden xl:inline-flex font-mono text-[10px] uppercase tracking-wider text-muted-foreground px-2.5 py-1 rounded-full bg-muted/60 border border-border">
-              RGBA // 8-BIT
+            <span className="hidden xl:inline-flex font-mono text-[10px] uppercase tracking-wider text-emerald-800 font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-600/20">
+              ALPHA // RGBA
             </span>
           </div>
         ) : null
@@ -59,12 +61,12 @@ export function EditorToolbar({
               title={isEn ? "Compare Original (Hold Space)" : "Comparar Original (Espacio)"}
               className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-mono font-semibold transition-colors cursor-pointer ${
                 showOriginal
-                  ? "bg-accent border-accent text-white"
+                  ? "bg-[#ff4d00] border-[#ff4d00] text-white"
                   : "bg-background hover:bg-muted border-border text-foreground"
               }`}
             >
               <Eye className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{showOriginal ? (isEn ? "Original" : "Original") : isEn ? "Compare" : "Comparar"}</span>
+              <span>{showOriginal ? "ORIGINAL" : isEn ? "Compare" : "Comparar"}</span>
             </button>
           )}
 
@@ -94,11 +96,22 @@ export function EditorToolbar({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-full transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-foreground bg-muted hover:bg-border/60 border border-border rounded-full transition-colors cursor-pointer"
           >
             <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">{isEn ? "New image" : "Nueva imagen"}</span>
+            <span className="hidden md:inline">{isEn ? "New" : "Nueva"}</span>
           </button>
+
+          {onQuickDownload && (
+            <button
+              type="button"
+              onClick={onQuickDownload}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[#0c0e12] hover:bg-primary rounded-full transition-all tactile-button cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{isEn ? "Export PNG" : "Descargar PNG"}</span>
+            </button>
+          )}
         </div>
       }
     />

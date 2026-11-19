@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { removeBackground } from "@imgly/background-removal";
 
 import { UploadSection } from "./upload-section";
 import { ProcessingScreen } from "./processing-screen";
@@ -36,7 +35,10 @@ export default function BackgroundRemoverApp({
       setErrorMessage(null);
 
       try {
-        const response = await fetch(imageSrc);
+        const [{ removeBackground }, response] = await Promise.all([
+          import("@imgly/background-removal"),
+          fetch(imageSrc),
+        ]);
         const blob = await response.blob();
 
         const result = await removeBackground(blob, {

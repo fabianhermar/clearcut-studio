@@ -44,7 +44,7 @@ export function ImageEditor({
   const [brushSize, setBrushSize] = useState(30);
   const [adjustments, setAdjustments] = useState<Adjustments>({ ...DEFAULT_ADJUSTMENTS });
   const [activeTab, setActiveTab] = useState<"tools" | "adjust" | "export">("tools");
-  const [matteMode, setMatteMode] = useState<MatteMode>("checker-light");
+  const [matteMode, setMatteMode] = useState<MatteMode>("checker-dark");
   const [solidColor, setSolidColor] = useState("#ffffff");
   const [bakeBackground, setBakeBackground] = useState(false);
 
@@ -433,6 +433,7 @@ export function ImageEditor({
         onUndo={handleUndo}
         onRedo={handleRedo}
         onReset={onReset}
+        onQuickDownload={() => handleDownload("png")}
         onClose={onClose}
         showOriginal={showOriginal}
         onToggleOriginal={setShowOriginal}
@@ -528,7 +529,7 @@ export function ImageEditor({
           </div>
         </aside>
 
-        {/* Central Optical Drafting Stage (Light Mode) */}
+        {/* Central Darkroom Optical Cutting Stage */}
         <main
           ref={containerRef}
           onWheel={handleWheelZoom}
@@ -536,11 +537,17 @@ export function ImageEditor({
             setCursorPos(null);
             handleMouseUp();
           }}
-          className="w-full flex-1 relative shrink-0 order-1 lg:order-2 min-h-[46vh] bg-[#ebe8e0] studio-grid overflow-hidden select-none"
+          className="w-full flex-1 relative shrink-0 order-1 lg:order-2 min-h-[46vh] bg-[#0c0e12] darkroom-grid overflow-hidden select-none"
         >
-          {/* Top subtle stage indicator */}
-          <div className="pointer-events-none absolute top-3.5 left-4 z-10 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-card/95 backdrop-blur-md border border-border font-mono text-[10px] font-semibold uppercase tracking-wider text-foreground shadow-2xs">
+          {/* Viewfinder Corner Marks */}
+          <span className="pointer-events-none absolute top-3 left-3 w-3.5 h-3.5 border-t-2 border-l-2 border-white/25 z-10" />
+          <span className="pointer-events-none absolute top-3 right-3 w-3.5 h-3.5 border-t-2 border-r-2 border-white/25 z-10" />
+          <span className="pointer-events-none absolute bottom-3 left-3 w-3.5 h-3.5 border-b-2 border-l-2 border-white/25 z-10" />
+          <span className="pointer-events-none absolute bottom-3 right-3 w-3.5 h-3.5 border-b-2 border-r-2 border-white/25 z-10" />
+
+          {/* Top Floating Darkroom HUD */}
+          <div className="absolute top-3.5 left-4 right-4 z-20 flex items-center justify-between gap-2 pointer-events-none">
+            <span className="px-2.5 py-1 rounded-full bg-[#14171f]/90 backdrop-blur-md border border-white/15 font-mono text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
               {showOriginal
                 ? isEn
                   ? "VIEW // ORIGINAL"
@@ -549,12 +556,36 @@ export function ImageEditor({
                 ? `MATTE // ${solidColor.toUpperCase()}`
                 : "ALPHA // CUTOUT"}
             </span>
+
+            {/* Quick 1-Click Matte Switcher */}
+            <div className="pointer-events-auto inline-flex items-center p-0.5 rounded-full bg-[#14171f]/90 backdrop-blur-md border border-white/15 font-mono text-[10px] shadow-md">
+              {(
+                [
+                  { id: "checker-dark", label: isEn ? "DARK" : "OSCURO" },
+                  { id: "checker-light", label: isEn ? "LIGHT" : "CLARO" },
+                  { id: "solid", label: isEn ? "SOLID" : "SÓLIDO" },
+                ] as const
+              ).map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setMatteMode(m.id)}
+                  className={`px-2.5 py-1 rounded-full font-bold transition-colors cursor-pointer ${
+                    matteMode === m.id
+                      ? "bg-[#1e40ff] text-white"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Artboard Canvas Container */}
           <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10">
             <div
-              className={`relative rounded-xl overflow-hidden border border-border shadow-[0_24px_60px_-18px_rgba(17,19,24,0.22)] ${
+              className={`relative rounded-xl overflow-hidden border border-white/15 shadow-[0_28px_70px_-18px_rgba(0,0,0,0.85)] ${
                 matteMode === "checker-dark"
                   ? "checkerboard-dark"
                   : matteMode === "checker-light"

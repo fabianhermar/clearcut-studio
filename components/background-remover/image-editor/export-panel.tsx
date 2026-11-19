@@ -66,12 +66,12 @@ export function ExportPanel({
         </p>
       </div>
 
-      {/* Live Preview Specimen */}
+      {/* Live Darkroom Output Specimen */}
       <div className="p-4 border-b border-border bg-background/60">
-        <div className="flex items-center gap-3.5">
+        <div className="p-3 rounded-2xl bg-[#0c0e12] text-white border border-[#242936] flex items-center gap-3.5">
           <div
-            className={`w-14 h-14 rounded-xl overflow-hidden border border-border shrink-0 ${
-              solidMatteHex ? "" : "checkerboard"
+            className={`w-14 h-14 rounded-xl overflow-hidden border border-white/15 shrink-0 ${
+              solidMatteHex ? "" : "checkerboard-dark"
             }`}
             style={solidMatteHex ? { backgroundColor: solidMatteHex } : undefined}
           >
@@ -82,14 +82,14 @@ export function ExportPanel({
             />
           </div>
           <div className="min-w-0 space-y-1">
-            <p className="text-xs font-bold text-foreground truncate">
-              {isEn ? "Active Canvas Layer" : "Capa activa del lienzo"}
+            <p className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
+              {isEn ? "ACTIVE CUTOUT PLATE" : "PLACA ACTIVA"}
             </p>
-            <p className="font-mono text-[11px] text-muted-foreground tabular-nums">
+            <p className="font-mono text-xs font-bold text-white tabular-nums">
               {canvasSize.width} × {canvasSize.height} px
             </p>
-            <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-800 font-semibold">
-              <Layers className="w-3 h-3 text-emerald-700" aria-hidden="true" />
+            <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-400 font-semibold">
+              <Layers className="w-3 h-3 text-emerald-400" aria-hidden="true" />
               <span>
                 {solidMatteHex
                   ? `${isEn ? "Matte" : "Fondo"} ${solidMatteHex.toUpperCase()}`
