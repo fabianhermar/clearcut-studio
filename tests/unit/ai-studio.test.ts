@@ -48,7 +48,7 @@ describe("ai-studio providers & models", () => {
 
     // Verify models are cleanly grouped by provider/family sections
     const imgFamilies = groupModelsByFamily(getModelsByKind("image")).map((g) => g.family);
-    expect(imgFamilies).toContain("Google · Nano Banana & Imagen");
+    expect(imgFamilies).toContain("Google · Nano Banana");
     expect(imgFamilies).toContain("OpenAI · GPT Image");
     expect(imgFamilies).toContain("xAI · Grok");
     expect(imgFamilies).toContain("Black Forest Labs · FLUX");
@@ -56,12 +56,13 @@ describe("ai-studio providers & models", () => {
     expect(imgFamilies).toContain("Midjourney · Custom API");
 
     const vidFamilies = groupModelsByFamily(getModelsByKind("video")).map((g) => g.family);
-    expect(vidFamilies).toContain("Google · Veo");
+    expect(vidFamilies).toContain("Google · Gemini Omni & Veo");
     expect(vidFamilies).toContain("ByteDance · Seedance");
     expect(vidFamilies).toContain("Kling · Motion Pro");
 
     const audFamilies = groupModelsByFamily(getModelsByKind("audio")).map((g) => g.family);
-    expect(audFamilies).toContain("Google · Gemini Audio");
+    expect(audFamilies).toContain("Google · Gemini Audio (Voz)");
+    expect(audFamilies).toContain("Google · Lyria (Música)");
     expect(audFamilies).toContain("ElevenLabs · Voz & SFX");
     expect(audFamilies).toContain("Suno · Música & Custom Audio");
   });

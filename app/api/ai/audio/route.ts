@@ -126,8 +126,54 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 3. GOOGLE GEMINI TTS
+    // 3. GOOGLE AI STUDIO (LYRIA MUSIC INTERACTIONS API & GEMINI TTS)
     if (body.provider === "gemini") {
+      // Lyria music models use Google's Interactions API (/v1beta/interactions)
+      if (body.model.startsWith("lyria-")) {
+        const res = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            model: body.model,
+            input: body.prompt.trim(),
+          }),
+          signal: AbortSignal.timeout(55_000),
+        });
+        if (!res.ok) {
+          const err = await res.text().catch(() => res.statusText);
+          return Response.json({ error: `${res.status}: ${err.slice(0, 220)}` }, { status: res.status });
+        }
+        const data = (await res.json()) as {
+          output_audio?: { data?: string; mime_type?: string; uri?: string };
+          outputs?: Array<{ type?: string; data?: string; mime_type?: string; uri?: string }>;
+        };
+        const audioOut =
+          data.output_audio ||
+          data.outputs?.find((o) => o.type === "audio" || o.mime_type?.startsWith("audio/"));
+
+        if (audioOut?.data) {
+          const mimeType = audioOut.mime_type || "audio/mpeg";
+          return Response.json({
+            dataUrl: `data:${mimeType};base64,${audioOut.data}`,
+            mimeType,
+            sizeBytes: Math.round((audioOut.data.length * 3) / 4),
+          });
+        }
+        if (audioOut?.uri) {
+          const fetched = await fetchRemoteMediaAsDataUrl(
+            audioOut.uri,
+            { "x-goog-api-key": apiKey },
+            "audio/mpeg"
+          );
+          return Response.json(fetched);
+        }
+        return Response.json({ error: "Lyria returned no audio output." }, { status: 502 });
+      }
+
+      // Gemini TTS models use generateContent
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
         body.model
       )}:generateContent`;

@@ -53,17 +53,22 @@ export function CreateAudioPanel({
   const providerReady = hasProviderKey(vault, selectedModel.provider);
   const audioAssets = assets.filter((a) => a.kind === "audio");
 
+  const isLyriaMusic = selectedModel.id.startsWith("lyria-");
+
   const availableVoices =
     selectedModel.provider === "openai"
       ? AUDIO_VOICES.openai
       : selectedModel.provider === "elevenlabs" && selectedModel.id !== "eleven_sound_effects"
       ? AUDIO_VOICES.elevenlabs
-      : selectedModel.provider === "gemini"
+      : selectedModel.provider === "gemini" && !isLyriaMusic
       ? AUDIO_VOICES.gemini
       : [];
 
   const isMusicOrSfx =
-    selectedModel.id === "eleven_sound_effects" || selectedModel.provider === "fal";
+    isLyriaMusic ||
+    selectedModel.id === "eleven_sound_effects" ||
+    selectedModel.provider === "fal" ||
+    selectedModel.id.startsWith("suno-");
 
   const handleModelChange = (nextId: string) => {
     setSelectedModelId(nextId);

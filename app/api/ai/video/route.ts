@@ -53,8 +53,83 @@ export async function POST(req: NextRequest) {
         return Response.json({ error: "Prompt is required." }, { status: 400 });
       }
 
-      // 1. GOOGLE GEMINI VEO
+      // 1. GOOGLE AI STUDIO (GEMINI OMNI INTERACTIONS API & VEO 3.1)
       if (body.provider === "gemini") {
+        // Gemini Omni models use the Google Interactions API (/v1beta/interactions)
+        if (body.model.startsWith("gemini-omni-")) {
+          const inputPayload: unknown = body.referenceImage
+            ? [
+                {
+                  type: "image",
+                  data: stripDataUrlPrefix(body.referenceImage).base64,
+                  mime_type: stripDataUrlPrefix(body.referenceImage).mimeType,
+                },
+                {
+                  type: "text",
+                  text: `${body.prompt.trim()} (aspect ratio ${body.aspectRatio || "16:9"}, duration ~${body.durationSec || 5}s)`,
+                },
+              ]
+            : `${body.prompt.trim()} (aspect ratio ${body.aspectRatio || "16:9"}, duration ~${body.durationSec || 5}s)`;
+
+          const res = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            body: JSON.stringify({
+              model: body.model,
+              input: inputPayload,
+            }),
+            signal: AbortSignal.timeout(90_000),
+          });
+          if (!res.ok) return Response.json({ error: await parseErr(res) }, { status: res.status });
+          const data = (await res.json()) as {
+            id?: string;
+            status?: string;
+            output_video?: { data?: string; mime_type?: string; uri?: string };
+            outputs?: Array<{
+              type?: string;
+              data?: string;
+              mime_type?: string;
+              uri?: string;
+            }>;
+          };
+
+          const videoOutput =
+            data.output_video ||
+            data.outputs?.find(
+              (o) => o.type === "video" || o.mime_type?.startsWith("video/")
+            );
+
+          if (videoOutput?.data) {
+            const mimeType = videoOutput.mime_type || "video/mp4";
+            return Response.json({
+              status: "completed",
+              dataUrl: `data:${mimeType};base64,${videoOutput.data}`,
+              mimeType,
+              sizeBytes: Math.round((videoOutput.data.length * 3) / 4),
+            });
+          }
+          if (videoOutput?.uri) {
+            const media = await fetchRemoteMediaAsDataUrl(
+              videoOutput.uri,
+              { "x-goog-api-key": apiKey },
+              "video/mp4"
+            );
+            return Response.json({ status: "completed", ...media });
+          }
+          if (data.id) {
+            return Response.json({
+              status: "processing",
+              operationId: data.id,
+              pollUrl: `https://generativelanguage.googleapis.com/v1beta/interactions/${encodeURIComponent(data.id)}`,
+            });
+          }
+          return Response.json({ error: "Gemini Omni returned no video output." }, { status: 502 });
+        }
+
+        // Veo 3.1 models use predictLongRunning
         const instance: Record<string, unknown> = { prompt: body.prompt.trim() };
         if (body.referenceImage) {
           const { mimeType, base64 } = stripDataUrlPrefix(body.referenceImage);
@@ -243,13 +318,49 @@ export async function POST(req: NextRequest) {
         if (!res.ok) return Response.json({ error: await parseErr(res) }, { status: res.status });
         const data = (await res.json()) as {
           done?: boolean;
+          status?: string;
           error?: { message?: string };
+          output_video?: { data?: string; mime_type?: string; uri?: string };
+          outputs?: Array<{ type?: string; data?: string; mime_type?: string; uri?: string }>;
           response?: {
             generateVideoResponse?: {
               generatedSamples?: Array<{ video?: { uri?: string } }>;
             };
           };
         };
+
+        // Handle Interactions API poll response (Gemini Omni)
+        if (body.pollUrl.includes("/interactions/")) {
+          if (data.status === "failed" || data.error) {
+            return Response.json({
+              status: "failed",
+              error: data.error?.message || "Gemini Omni video failed",
+            });
+          }
+          const vidOut =
+            data.output_video ||
+            data.outputs?.find((o) => o.type === "video" || o.mime_type?.startsWith("video/"));
+          if (vidOut?.data) {
+            const mimeType = vidOut.mime_type || "video/mp4";
+            return Response.json({
+              status: "completed",
+              dataUrl: `data:${mimeType};base64,${vidOut.data}`,
+              mimeType,
+              sizeBytes: Math.round((vidOut.data.length * 3) / 4),
+            });
+          }
+          if (vidOut?.uri) {
+            const media = await fetchRemoteMediaAsDataUrl(
+              vidOut.uri,
+              { "x-goog-api-key": apiKey },
+              "video/mp4"
+            );
+            return Response.json({ status: "completed", ...media });
+          }
+          return Response.json({ status: "processing" });
+        }
+
+        // Handle Veo predictLongRunning poll response
         if (!data.done) return Response.json({ status: "processing" });
         if (data.error) return Response.json({ status: "failed", error: data.error.message });
         const videoUri =
