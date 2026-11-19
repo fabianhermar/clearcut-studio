@@ -1,14 +1,244 @@
 import JSZip from "jszip";
-import { FaviconSettings } from "./types";
+import { FaviconSettings, GeneratedFaviconBundle } from "./types";
 
-export interface FaviconAsset {
-  name: string;
-  blob: Blob;
-  size: number;
+/**
+ * Normalizes a user-provided public path prefix (e.g. "", "/", "/favicon", "assets/icons").
+ * Supports relative paths and http(s) CDN URLs without double slashes.
+ */
+export function normalizePublicPath(rawPath: string): string {
+  const trimmed = rawPath.trim();
+  if (!trimmed || trimmed === "/") return "/";
+
+  const isAbsoluteUrl = /^https?:\/\//i.test(trimmed);
+  const withLeading = isAbsoluteUrl
+    ? trimmed
+    : trimmed.startsWith("/")
+    ? trimmed
+    : `/${trimmed}`;
+
+  const withTrailing = withLeading.endsWith("/") ? withLeading : `${withLeading}/`;
+  return withTrailing.replace(/(?<!https?:)\/\/+/g, "/");
 }
 
 /**
- * Renders the image onto a canvas with the given settings.
+ * Joins a normalized base path and asset filename cleanly.
+ */
+export function resolveAssetUrl(rawPath: string, filename: string): string {
+  const base = normalizePublicPath(rawPath);
+  const cleanFile = filename.replace(/^\/+/, "");
+  if (base === "/") return `/${cleanFile}`;
+  return `${base}${cleanFile}`;
+}
+
+/**
+ * Escapes HTML attribute values safely to prevent injection in generated snippets.
+ */
+function escapeAttr(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
+ * Encodes one or more PNG byte arrays (e.g. 16x16, 32x32, 48x48) into a real
+ * spec-compliant multi-resolution binary .ICO container.
+ */
+export function encodePngsToIco(
+  entries: Array<{ size: number; pngBytes: Uint8Array }>
+): Uint8Array {
+  const count = entries.length;
+  const headerSize = 6;
+  const dirEntrySize = 16;
+  const dirTotalSize = headerSize + count * dirEntrySize;
+
+  let totalBytes = dirTotalSize;
+  for (const entry of entries) {
+    totalBytes += entry.pngBytes.byteLength;
+  }
+
+  const buffer = new ArrayBuffer(totalBytes);
+  const view = new DataView(buffer);
+  const out = new Uint8Array(buffer);
+
+  // ICONDIR header (6 bytes)
+  view.setUint16(0, 0, true); // Reserved (must be 0)
+  view.setUint16(2, 1, true); // Type: 1 = ICO
+  view.setUint16(4, count, true); // Number of images
+
+  let dataOffset = dirTotalSize;
+  entries.forEach((entry, index) => {
+    const entryOffset = headerSize + index * dirEntrySize;
+    const dim = entry.size >= 256 ? 0 : entry.size;
+
+    view.setUint8(entryOffset, dim); // Width
+    view.setUint8(entryOffset + 1, dim); // Height
+    view.setUint8(entryOffset + 2, 0); // Color palette
+    view.setUint8(entryOffset + 3, 0); // Reserved
+    view.setUint16(entryOffset + 4, 1, true); // Color planes
+    view.setUint16(entryOffset + 6, 32, true); // Bits per pixel
+    view.setUint32(entryOffset + 8, entry.pngBytes.byteLength, true); // Image size in bytes
+    view.setUint32(entryOffset + 12, dataOffset, true); // Offset to PNG bytes
+
+    out.set(entry.pngBytes, dataOffset);
+    dataOffset += entry.pngBytes.byteLength;
+  });
+
+  return out;
+}
+
+/**
+ * Builds the W3C site.webmanifest JSON object.
+ */
+export function buildWebManifest(settings: FaviconSettings) {
+  const appName = settings.appName.trim() || "My Web App";
+  const shortName = settings.shortName.trim() || appName.slice(0, 12);
+  const startUrl = settings.startUrl.trim() || "/";
+
+  return {
+    name: appName,
+    short_name: shortName,
+    start_url: startUrl,
+    display: settings.display,
+    theme_color: settings.themeColor,
+    background_color: settings.manifestBackgroundColor,
+    icons: [
+      {
+        src: resolveAssetUrl(settings.path, "web-app-manifest-192x192.png"),
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: resolveAssetUrl(settings.path, "web-app-manifest-512x512.png"),
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: resolveAssetUrl(settings.path, "web-app-manifest-maskable-512x512.png"),
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
+  };
+}
+
+/**
+ * Builds Windows browserconfig.xml for pinned Start tiles.
+ */
+export function buildBrowserConfigXml(settings: FaviconSettings): string {
+  const tileUrl = escapeAttr(resolveAssetUrl(settings.path, "mstile-150x150.png"));
+  const tileColor = escapeAttr(settings.themeColor);
+  return `<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="${tileUrl}"/>
+      <TileColor>${tileColor}</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>`;
+}
+
+/**
+ * Builds production-ready HTML <head> metadata tags.
+ */
+export function buildHtmlHeadCode(
+  settings: FaviconSettings,
+  hasDarkIcon: boolean
+): string {
+  const url = (file: string) => escapeAttr(resolveAssetUrl(settings.path, file));
+  const shortName = escapeAttr(settings.shortName.trim() || settings.appName.trim() || "My Web App");
+  const themeColor = escapeAttr(settings.themeColor);
+
+  const lines: string[] = [
+    `<!-- ClearCut Studio — Favicon & PWA Metadata -->`,
+    `<link rel="icon" href="${url("favicon.ico")}" sizes="48x48">`,
+  ];
+
+  if (hasDarkIcon) {
+    lines.push(
+      `<link rel="icon" type="image/png" sizes="96x96" href="${url("favicon-96x96.png")}" media="(prefers-color-scheme: light)">`,
+      `<link rel="icon" type="image/png" sizes="32x32" href="${url("favicon-32x32.png")}" media="(prefers-color-scheme: light)">`,
+      `<link rel="icon" type="image/png" sizes="16x16" href="${url("favicon-16x16.png")}" media="(prefers-color-scheme: light)">`,
+      `<link rel="icon" type="image/png" sizes="96x96" href="${url("favicon-dark-96x96.png")}" media="(prefers-color-scheme: dark)">`,
+      `<link rel="icon" type="image/png" sizes="32x32" href="${url("favicon-dark-32x32.png")}" media="(prefers-color-scheme: dark)">`,
+      `<link rel="icon" type="image/png" sizes="16x16" href="${url("favicon-dark-16x16.png")}" media="(prefers-color-scheme: dark)">`
+    );
+  } else {
+    lines.push(
+      `<link rel="icon" type="image/png" sizes="96x96" href="${url("favicon-96x96.png")}">`,
+      `<link rel="icon" type="image/png" sizes="32x32" href="${url("favicon-32x32.png")}">`,
+      `<link rel="icon" type="image/png" sizes="16x16" href="${url("favicon-16x16.png")}">`
+    );
+  }
+
+  lines.push(
+    `<link rel="apple-touch-icon" sizes="180x180" href="${url("apple-touch-icon.png")}">`,
+    `<meta name="apple-mobile-web-app-title" content="${shortName}">`,
+    `<link rel="manifest" href="${url("site.webmanifest")}">`,
+    `<meta name="theme-color" content="${themeColor}">`
+  );
+
+  if (settings.includeWindowsTile) {
+    lines.push(
+      `<meta name="msapplication-TileColor" content="${themeColor}">`,
+      `<meta name="msapplication-config" content="${url("browserconfig.xml")}">`
+    );
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Builds Next.js App Router Metadata API snippet (layout.tsx).
+ */
+export function buildNextjsMetadataCode(
+  settings: FaviconSettings,
+  hasDarkIcon: boolean
+): string {
+  const url = (file: string) => resolveAssetUrl(settings.path, file);
+  const shortName = settings.shortName.trim() || settings.appName.trim() || "My Web App";
+
+  const iconEntries = hasDarkIcon
+    ? `      { url: "${url("favicon-32x32.png")}", sizes: "32x32", type: "image/png", media: "(prefers-color-scheme: light)" },
+      { url: "${url("favicon-dark-32x32.png")}", sizes: "32x32", type: "image/png", media: "(prefers-color-scheme: dark)" },
+      { url: "${url("favicon-96x96.png")}", sizes: "96x96", type: "image/png" },`
+    : `      { url: "${url("favicon.ico")}", sizes: "48x48" },
+      { url: "${url("favicon-32x32.png")}", sizes: "32x32", type: "image/png" },
+      { url: "${url("favicon-96x96.png")}", sizes: "96x96", type: "image/png" },`;
+
+  return `// app/layout.tsx — Next.js App Router Metadata
+import type { Metadata, Viewport } from "next";
+
+export const viewport: Viewport = {
+  themeColor: "${settings.themeColor}",
+};
+
+export const metadata: Metadata = {
+  applicationName: "${settings.appName.trim() || "My Web App"}",
+  appleWebApp: {
+    capable: true,
+    title: "${shortName}",
+    statusBarStyle: "default",
+  },
+  manifest: "${url("site.webmanifest")}",
+  icons: {
+    icon: [
+${iconEntries}
+    ],
+    apple: [
+      { url: "${url("apple-touch-icon.png")}", sizes: "180x180", type: "image/png" },
+    ],
+  },
+};`;
+}
+
+/**
+ * Renders the image onto an offscreen canvas with the given settings.
  */
 function renderToCanvas(
   img: HTMLImageElement,
@@ -21,6 +251,9 @@ function renderToCanvas(
     canvas.height = size;
     const ctx = canvas.getContext("2d");
     if (!ctx) return reject(new Error("No 2d context"));
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     // 1. Draw Background
     if (settings.backgroundColor !== "transparent") {
@@ -39,14 +272,13 @@ function renderToCanvas(
         ctx.quadraticCurveTo(0, 0, radius, 0);
         ctx.closePath();
         ctx.fill();
-        ctx.clip(); // Clip future drawing to this rounded rect
+        ctx.clip();
       } else {
         ctx.fillRect(0, 0, size, size);
       }
     }
 
     // 2. Draw Image with Padding
-    // Padding is a percentage of the total size
     const paddingPx = (size * settings.padding) / 100;
     const drawAreaSize = size - paddingPx * 2;
 
@@ -66,7 +298,6 @@ function renderToCanvas(
         drawX += (drawAreaSize - drawWidth) / 2;
       }
     } else {
-      // cover
       if (imgAspect > 1) {
         drawWidth = drawHeight * imgAspect;
         drawX += (drawAreaSize - drawWidth) / 2;
@@ -85,124 +316,160 @@ function renderToCanvas(
   });
 }
 
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
 /**
- * Generates all favicon assets and zips them.
+ * Generates all multi-platform favicon & PWA assets, encodes a real multi-res .ico,
+ * and bundles everything into a downloadable ZIP with HTML, Manifest, and Next.js snippets.
  */
 export async function generateFavicons(
   imageSrc: string,
   darkImageSrc: string | null,
   settings: FaviconSettings
-): Promise<{ zipBlob: Blob; htmlCode: string }> {
-  // Load main image
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const i = new Image();
-    i.crossOrigin = "anonymous";
-    i.onload = () => resolve(i);
-    i.onerror = reject;
-    i.src = imageSrc;
-  });
-
-  // Load dark image (if provided)
-  let darkImg: HTMLImageElement | null = null;
-  if (darkImageSrc) {
-    darkImg = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const i = new Image();
-      i.crossOrigin = "anonymous";
-      i.onload = () => resolve(i);
-      i.onerror = reject;
-      i.src = darkImageSrc;
-    });
-  }
+): Promise<GeneratedFaviconBundle> {
+  const img = await loadImage(imageSrc);
+  const darkImg = darkImageSrc ? await loadImage(darkImageSrc) : null;
 
   const zip = new JSZip();
+  const files: GeneratedFaviconBundle["files"] = [];
 
-  // Standard web favicons (transparent background usually preferred, but we use user settings)
-  const sizes = [16, 32];
-  for (const size of sizes) {
+  const addFile = (
+    name: string,
+    data: Blob | Uint8Array | string,
+    dimensions: string,
+    purpose: string
+  ) => {
+    zip.file(name, data);
+    const sizeBytes =
+      typeof data === "string"
+        ? new TextEncoder().encode(data).byteLength
+        : data instanceof Uint8Array
+        ? data.byteLength
+        : data.size;
+    files.push({
+      name,
+      path: resolveAssetUrl(settings.path, name),
+      dimensions,
+      purpose,
+      sizeBytes,
+    });
+  };
+
+  // 1. Standard browser PNG favicons (16, 32, 48, 96)
+  const webSizes = [16, 32, 48, 96] as const;
+  const icoEntries: Array<{ size: number; pngBytes: Uint8Array }> = [];
+
+  for (const size of webSizes) {
     const blob = await renderToCanvas(img, size, settings);
-    zip.file(`favicon-${size}x${size}.png`, blob);
-    if (darkImg) {
+    if (size !== 48) {
+      addFile(
+        `favicon-${size}x${size}.png`,
+        blob,
+        `${size}×${size}`,
+        size === 96 ? "Google SERP & High-DPI" : "Browser Tab"
+      );
+    }
+    if (size === 16 || size === 32 || size === 48) {
+      const ab = await blob.arrayBuffer();
+      icoEntries.push({ size, pngBytes: new Uint8Array(ab) });
+    }
+    if (darkImg && size !== 48) {
       const darkBlob = await renderToCanvas(darkImg, size, settings);
-      zip.file(`favicon-dark-${size}x${size}.png`, darkBlob);
+      addFile(
+        `favicon-dark-${size}x${size}.png`,
+        darkBlob,
+        `${size}×${size}`,
+        "Dark Mode Tab"
+      );
     }
   }
 
-  // Generate favicon.ico (We'll just rename a 32x32 PNG to .ico for simplicity, modern browsers accept this)
-  const icoBlob = await renderToCanvas(img, 32, settings);
-  zip.file("favicon.ico", icoBlob);
+  // 2. Real Multi-Resolution Binary favicon.ico (16 + 32 + 48)
+  const icoBytes = encodePngsToIco(icoEntries);
+  addFile("favicon.ico", icoBytes, "16·32·48", "Legacy & Multi-Res ICO");
 
-  // Apple Touch Icon (180x180, iOS prefers solid background, no transparency)
-  const iosSettings = { ...settings };
-  if (iosSettings.backgroundColor === "transparent") {
-    iosSettings.backgroundColor = "#ffffff"; // Default to white if transparent
-  }
-  iosSettings.backgroundRadius = 0; // iOS applies its own mask
+  // 3. Apple Touch Icon (180x180 — solid background, no corner mask)
+  const iosSettings: FaviconSettings = {
+    ...settings,
+    backgroundColor:
+      settings.backgroundColor === "transparent" ? "#ffffff" : settings.backgroundColor,
+    backgroundRadius: 0,
+  };
   const appleBlob = await renderToCanvas(img, 180, iosSettings);
-  zip.file("apple-touch-icon.png", appleBlob);
+  addFile("apple-touch-icon.png", appleBlob, "180×180", "iOS / iPadOS Home Screen");
 
-  // Android Chrome icons
-  const androidSizes = [192, 512];
-  for (const size of androidSizes) {
+  // 4. Android & PWA Manifest Icons (192x192, 512x512, and Maskable 512x512)
+  for (const size of [192, 512] as const) {
     const blob = await renderToCanvas(img, size, settings);
-    zip.file(`android-chrome-${size}x${size}.png`, blob);
-    if (darkImg) {
-      const darkBlob = await renderToCanvas(darkImg, size, settings);
-      zip.file(`android-chrome-dark-${size}x${size}.png`, darkBlob);
-    }
+    addFile(
+      `web-app-manifest-${size}x${size}.png`,
+      blob,
+      `${size}×${size}`,
+      "Android / PWA Launcher"
+    );
   }
 
-  // Ensure path ends with / and doesn't have duplicate slashes
-  const basePath = settings.path.trim() ? (settings.path.endsWith("/") ? settings.path : `${settings.path}/`) : "/";
-  // If user typed just "/", ensure we don't end up with "//"
-  const getUrl = (filename: string) => {
-    if (basePath === "/") return `/${filename}`;
-    return `${basePath}${filename}`.replace(/(?<!https?:)\/\//g, "/");
+  const maskableSettings: FaviconSettings = {
+    ...settings,
+    padding: Math.max(settings.padding, 16),
+    backgroundColor:
+      settings.backgroundColor === "transparent"
+        ? settings.manifestBackgroundColor
+        : settings.backgroundColor,
+    backgroundRadius: 0,
   };
+  const maskableBlob = await renderToCanvas(img, 512, maskableSettings);
+  addFile(
+    "web-app-manifest-maskable-512x512.png",
+    maskableBlob,
+    "512×512",
+    "Android Adaptive Maskable"
+  );
 
-  // Web Manifest
-  const manifest = {
-    name: settings.appName,
-    short_name: settings.appName,
-    icons: [
-      {
-        src: getUrl("android-chrome-192x192.png"),
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        src: getUrl("android-chrome-512x512.png"),
-        sizes: "512x512",
-        type: "image/png",
-      },
-    ],
-    theme_color: settings.themeColor,
-    background_color: settings.backgroundColor === "transparent" ? "#ffffff" : settings.backgroundColor,
-    display: "standalone",
-  };
-  zip.file("site.webmanifest", JSON.stringify(manifest, null, 2));
-
-  // HTML Code Snippet
-  let htmlCode = `<!-- Copy and paste these tags into the <head> of your HTML -->
-<link rel="apple-touch-icon" sizes="180x180" href="${getUrl("apple-touch-icon.png")}">`;
-
-  if (darkImg) {
-    htmlCode += `
-<link rel="icon" type="image/png" sizes="32x32" href="${getUrl("favicon-32x32.png")}" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="16x16" href="${getUrl("favicon-16x16.png")}" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="32x32" href="${getUrl("favicon-dark-32x32.png")}" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="16x16" href="${getUrl("favicon-dark-16x16.png")}" media="(prefers-color-scheme: dark)">`;
-  } else {
-    htmlCode += `
-<link rel="icon" type="image/png" sizes="32x32" href="${getUrl("favicon-32x32.png")}">
-<link rel="icon" type="image/png" sizes="16x16" href="${getUrl("favicon-16x16.png")}">`;
+  // 5. Optional Windows Pinned Tile (150x150 + browserconfig.xml)
+  if (settings.includeWindowsTile) {
+    const msTileBlob = await renderToCanvas(img, 150, {
+      ...settings,
+      backgroundColor:
+        settings.backgroundColor === "transparent"
+          ? settings.themeColor
+          : settings.backgroundColor,
+      backgroundRadius: 0,
+    });
+    addFile("mstile-150x150.png", msTileBlob, "150×150", "Windows Start Tile");
+    addFile(
+      "browserconfig.xml",
+      buildBrowserConfigXml(settings),
+      "XML",
+      "Windows Tile Config"
+    );
   }
 
-  htmlCode += `
-<link rel="manifest" href="${getUrl("site.webmanifest")}">
-<link rel="shortcut icon" href="${getUrl("favicon.ico")}">
-<meta name="theme-color" content="${settings.themeColor}">`;
+  // 6. site.webmanifest
+  const manifestObj = buildWebManifest(settings);
+  const manifestJson = JSON.stringify(manifestObj, null, 2);
+  addFile("site.webmanifest", manifestJson, "JSON", "W3C Web App Manifest");
+
+  // 7. HTML & Next.js snippets
+  const htmlCode = buildHtmlHeadCode(settings, Boolean(darkImg));
+  const nextjsCode = buildNextjsMetadataCode(settings, Boolean(darkImg));
+  zip.file("head-tags.html", htmlCode);
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
 
-  return { zipBlob, htmlCode };
+  return {
+    zipBlob,
+    htmlCode,
+    manifestJson,
+    nextjsCode,
+    files,
+  };
 }

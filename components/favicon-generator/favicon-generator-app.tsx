@@ -5,17 +5,19 @@ import { UploadSection } from "./upload-section";
 import { EditorSection } from "./editor-section";
 
 interface FaviconGeneratorAppProps {
+  initialImage?: string | null;
   onClose: () => void;
   dict?: any;
   lang?: string;
 }
 
 export default function FaviconGeneratorApp({
+  initialImage = null,
   onClose,
   dict,
   lang = "es",
 }: FaviconGeneratorAppProps) {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(initialImage);
 
   const handleReset = () => {
     setImageSrc(null);
