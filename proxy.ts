@@ -22,6 +22,7 @@ export function proxy(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
+    pathname.startsWith('/google-drive-callback') ||
     pathname.includes('.')
   ) {
     return;
@@ -33,9 +34,15 @@ export function proxy(request: NextRequest) {
 
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
-    const newUrl = new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`, request.url);
+    const normalizedPath = pathname.replace(/^\/+/, '');
+    const suffix = normalizedPath ? `/${normalizedPath}` : '';
+    const newUrl = new URL(`/${locale}${suffix}${request.nextUrl.search}`, request.url);
     const response = NextResponse.redirect(newUrl);
-    response.cookies.set('NEXT_LOCALE', locale);
+    response.cookies.set('NEXT_LOCALE', locale, {
+      sameSite: 'lax',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+    });
     return response;
   }
 
@@ -44,7 +51,11 @@ export function proxy(request: NextRequest) {
     const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
     if (cookieLocale !== pathLocale) {
       const response = NextResponse.next();
-      response.cookies.set('NEXT_LOCALE', pathLocale);
+      response.cookies.set('NEXT_LOCALE', pathLocale, {
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      });
       return response;
     }
   }

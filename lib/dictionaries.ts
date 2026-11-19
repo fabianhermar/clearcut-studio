@@ -10,7 +10,7 @@ export const defaultLocale: Locale = 'en';
 export const locales: Locale[] = ['en', 'es'];
 
 export const getDictionary = async (locale: Locale) => {
-  if (!dictionaries[locale]) {
+  if (!Object.prototype.hasOwnProperty.call(dictionaries, locale)) {
     return dictionaries[defaultLocale]();
   }
   return dictionaries[locale]();

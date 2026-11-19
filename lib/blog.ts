@@ -20,17 +20,28 @@ export interface BlogPost {
   readingTime: number;
 }
 
-const contentDirectory = path.join(process.cwd(), 'content', 'blog');
+const contentDirectory = path.resolve(process.cwd(), 'content', 'blog');
+const ALLOWED_LANGS = new Set(['es', 'en']);
+const VALID_SLUG_REGEX = /^[a-z0-9-]+$/i;
 
 // Calculate reading time based on 200 words per minute
 function calculateReadingTime(text: string): number {
   const wordsPerMinute = 200;
-  const numberOfWords = text.split(/\s/g).length;
-  return Math.ceil(numberOfWords / wordsPerMinute);
+  const trimmed = text.trim();
+  if (!trimmed) return 1;
+  const numberOfWords = trimmed.split(/\s+/g).length;
+  return Math.max(1, Math.ceil(numberOfWords / wordsPerMinute));
 }
 
 export function getBlogPosts(lang: string): BlogPost[] {
-  const langDirectory = path.join(contentDirectory, lang);
+  if (!ALLOWED_LANGS.has(lang)) {
+    return [];
+  }
+
+  const langDirectory = path.resolve(contentDirectory, lang);
+  if (!langDirectory.startsWith(contentDirectory + path.sep)) {
+    return [];
+  }
   
   if (!fs.existsSync(langDirectory)) {
     return [];
@@ -44,7 +55,10 @@ export function getBlogPosts(lang: string): BlogPost[] {
       const slug = fileName.replace(/\.md$/, '');
 
       // Read markdown file as string
-      const fullPath = path.join(langDirectory, fileName);
+      const fullPath = path.resolve(langDirectory, fileName);
+      if (!fullPath.startsWith(langDirectory + path.sep)) {
+        return null;
+      }
       const fileContents = fs.readFileSync(fullPath, 'utf8');
 
       // Use gray-matter to parse the post metadata section
@@ -56,7 +70,8 @@ export function getBlogPosts(lang: string): BlogPost[] {
         content: matterResult.content,
         readingTime: calculateReadingTime(matterResult.content),
       };
-    });
+    })
+    .filter((post): post is BlogPost => post !== null);
 
   // Sort posts by date (newest first)
   return allPostsData.sort((a, b) => {
@@ -69,7 +84,16 @@ export function getBlogPosts(lang: string): BlogPost[] {
 }
 
 export function getBlogPost(lang: string, slug: string): BlogPost | null {
-  const fullPath = path.join(contentDirectory, lang, `${slug}.md`);
+  if (!ALLOWED_LANGS.has(lang) || !VALID_SLUG_REGEX.test(slug)) {
+    return null;
+  }
+
+  const langDirectory = path.resolve(contentDirectory, lang);
+  const fullPath = path.resolve(langDirectory, `${slug}.md`);
+
+  if (!fullPath.startsWith(langDirectory + path.sep)) {
+    return null;
+  }
   
   if (!fs.existsSync(fullPath)) {
     return null;
