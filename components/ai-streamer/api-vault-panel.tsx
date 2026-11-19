@@ -493,10 +493,10 @@ export function ApiVaultPanel({
             <h2 className="text-2xl font-heading font-bold text-foreground">
               {isEn ? "Unlock Your API Keys Vault" : "Desbloquea tu Bóveda de API Keys"}
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {isEn
-                ? `${encryptedKeyCount} encrypted provider key(s) stored locally. Enter your master password to decrypt in memory.`
-                : `${encryptedKeyCount} proveedor(es) cifrados en almacenamiento local. Ingresa tu contraseña maestra para descifrar en memoria.`}
+                ? `${encryptedKeyCount} encrypted provider key(s) are active and ready to generate images, videos, and audio right now. Enter your master password only if you want to view, add, replace, or delete keys.`
+                : `${encryptedKeyCount} proveedor(es) cifrados están activos y listos para generar imágenes, videos y audio sin desbloquear. Ingresa tu contraseña maestra solo si deseas ver, agregar, reemplazar o eliminar una llave.`}
             </p>
           </div>
 

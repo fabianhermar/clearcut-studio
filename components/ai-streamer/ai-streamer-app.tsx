@@ -31,6 +31,7 @@ import {
 } from "@/lib/ai-studio/providers";
 import {
   loadEncryptedVaultEnvelope,
+  loadRuntimeEncryptedVault,
   purgeEncryptedVault,
   saveEncryptedVault,
   unlockEncryptedVault,
@@ -162,12 +163,18 @@ export default function AiStreamerApp({
     }, 3600);
   }, []);
 
-  // Inspect Encrypted AES-256 Vault status & Google Drive session on mount
+  // Inspect Encrypted AES-256 Vault status, silently load runtime keys (usable even while locked), & Google Drive session
   useEffect(() => {
     const envelope = loadEncryptedVaultEnvelope();
     if (envelope) {
       setVaultStatus("locked");
       setEncryptedKeyCount(envelope.configuredCount || 0);
+      loadRuntimeEncryptedVault().then((runtimeDecrypted) => {
+        if (runtimeDecrypted) {
+          setVault(runtimeDecrypted);
+          setEncryptedKeyCount(countConfiguredKeys(runtimeDecrypted));
+        }
+      });
     } else {
       setVaultStatus("uninitialized");
       setEncryptedKeyCount(0);
@@ -224,12 +231,15 @@ export default function AiStreamerApp({
   );
 
   const handleLockVault = useCallback(() => {
+    // Lock vault management UI (require Master Password to view/add/replace/delete),
+    // while keeping runtime keys active so generation works without constant unlocking!
     masterPasswordRef.current = null;
-    setVault(createEmptyVault());
     setVaultStatus("locked");
     showToast(
       "info",
-      isEn ? "Vault locked and keys cleared from memory." : "Bóveda bloqueada y claves limpiadas de memoria."
+      isEn
+        ? "Vault locked for viewing/editing. Saved keys remain active for generation."
+        : "Bóveda bloqueada para ver o editar. Tus API keys siguen activas para generar."
     );
   }, [isEn, showToast]);
 
@@ -431,7 +441,7 @@ export default function AiStreamerApp({
               type="button"
               onClick={() => setActiveSection("api-vault")}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-mono font-semibold transition-colors cursor-pointer ${
-                vaultStatus === "unlocked" && configuredKeys > 0
+                configuredKeys > 0
                   ? "bg-emerald-500/12 hover:bg-emerald-500/20 border-emerald-600/25 text-emerald-900"
                   : vaultStatus === "locked"
                   ? "bg-[#0c0e12] hover:bg-primary border-[#0c0e12] text-white"
@@ -444,14 +454,14 @@ export default function AiStreamerApp({
                 <Lock className="w-3.5 h-3.5" />
               )}
               <span>
-                {vaultStatus === "locked"
-                  ? isEn
-                    ? `Locked (${encryptedKeyCount})`
-                    : `Bloqueada (${encryptedKeyCount})`
-                  : vaultStatus === "uninitialized"
+                {vaultStatus === "uninitialized"
                   ? isEn
                     ? "Setup Vault"
                     : "Crear Bóveda"
+                  : vaultStatus === "locked"
+                  ? isEn
+                    ? `${configuredKeys || encryptedKeyCount}/${PROVIDERS.length} Active · Locked`
+                    : `${configuredKeys || encryptedKeyCount}/${PROVIDERS.length} Activas · Protegida`
                   : `${configuredKeys}/${PROVIDERS.length} AES-256`}
               </span>
             </button>

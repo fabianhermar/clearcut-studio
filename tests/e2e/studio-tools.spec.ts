@@ -132,7 +132,7 @@ test.describe("Studio Tools E2E Workflows", () => {
 
     // Open grouped Model Selector and verify provider/family sections
     await page.getByRole("button", { name: /Nano Banana 2/i }).click();
-    await expect(page.getByText(/01 \/\/ Google · Nano Banana & Imagen/i)).toBeVisible();
+    await expect(page.getByText(/01 \/\/ Google · Nano Banana/i)).toBeVisible();
     await expect(page.getByText(/OpenAI · GPT Image/i)).toBeVisible();
     await expect(page.getByText(/Black Forest Labs · FLUX/i)).toBeVisible();
     await expect(page.getByText(/ByteDance · Seedream/i)).toBeVisible();
@@ -184,7 +184,7 @@ test.describe("Studio Tools E2E Workflows", () => {
     await expect(page.getByText(/Bóveda Cifrada de API Keys y Proveedores IA/i)).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByText("Google Gemini")).toBeVisible();
+    await expect(page.getByText("Google AI Studio (Gemini)")).toBeVisible();
     await expect(page.getByText("OpenAI (ChatGPT)")).toBeVisible();
     await expect(page.getByText("xAI Grok")).toBeVisible();
     await expect(page.getByText("Black Forest Labs (Flux)")).toBeVisible();
@@ -196,7 +196,8 @@ test.describe("Studio Tools E2E Workflows", () => {
     await expect(page.getByText(/••••••••••••••••9988/)).toBeVisible({ timeout: 10000 });
 
     const rawStorage = await page.evaluate(() =>
-      window.localStorage.getItem("clearcut_ai_vault_encrypted_v2") || ""
+      (window.localStorage.getItem("clearcut_ai_vault_encrypted_v2") || "") +
+      (window.localStorage.getItem("clearcut_ai_vault_runtime_v2") || "")
     );
     expect(rawStorage).toContain("AES-GCM-256");
     expect(rawStorage).not.toContain(testSecret);
@@ -205,6 +206,13 @@ test.describe("Studio Tools E2E Workflows", () => {
     await page.getByTitle(/Ver llave/i).first().click();
     await expect(page.getByText(/PERMISO DE SEGURIDAD/i)).toBeVisible();
     await page.getByRole("button", { name: /Cancelar/i }).click();
+
+    // Lock the Vault and verify saved Gemini key STILL works in Imágenes por Lotes without unlocking!
+    await page.getByRole("button", { name: /Bloquear Bóveda/i }).click();
+    await expect(page.getByText(/Desbloquea tu Bóveda de API Keys/i)).toBeVisible();
+    await page.getByRole("button", { name: /Imágenes por Lotes/i }).first().click();
+    await expect(page.getByText(/1\/8 Activas · Protegida/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Añadir Key de Gemini/i })).toHaveCount(0);
 
     // Sidebar Google Drive card remains anchored in viewport (independent of main scroll)
     const sidebarDriveCard = page.locator("aside").getByText("GOOGLE DRIVE", { exact: true });

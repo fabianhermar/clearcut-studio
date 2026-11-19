@@ -2,6 +2,10 @@ import { API_VAULT_STORAGE_KEY, createEmptyVault, PROVIDERS } from "./providers"
 import type { ApiKeyVault } from "./types";
 
 export const ENCRYPTED_VAULT_STORAGE_KEY = "clearcut_ai_vault_encrypted_v2";
+export const RUNTIME_VAULT_STORAGE_KEY = "clearcut_ai_vault_runtime_v2";
+const DEVICE_KEY_DB_NAME = "clearcut_ai_keystore_v1";
+const DEVICE_KEY_STORE_NAME = "keys";
+const DEVICE_KEY_ID = "runtime-aes-256";
 const PBKDF2_ITERATIONS = 310_000;
 
 export interface EncryptedVaultEnvelope {
@@ -196,6 +200,120 @@ export function hasEncryptedVault(): boolean {
   return loadEncryptedVaultEnvelope() !== null;
 }
 
+function openKeyStoreDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof indexedDB === "undefined") {
+      reject(new Error("IndexedDB unavailable"));
+      return;
+    }
+    const req = indexedDB.open(DEVICE_KEY_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(DEVICE_KEY_STORE_NAME)) {
+        db.createObjectStore(DEVICE_KEY_STORE_NAME);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("Failed to open keystore"));
+  });
+}
+
+async function getOrCreateNonExtractableDeviceKey(): Promise<CryptoKey | null> {
+  if (typeof indexedDB === "undefined") return null;
+  try {
+    const db = await openKeyStoreDb();
+    const existing = await new Promise<CryptoKey | undefined>((resolve, reject) => {
+      const tx = db.transaction(DEVICE_KEY_STORE_NAME, "readonly");
+      const req = tx.objectStore(DEVICE_KEY_STORE_NAME).get(DEVICE_KEY_ID);
+      req.onsuccess = () => resolve(req.result as CryptoKey | undefined);
+      req.onerror = () => reject(req.error);
+    });
+    if (existing) {
+      db.close();
+      return existing;
+    }
+
+    const subtle = getSubtleCrypto();
+    const generated = await subtle.generateKey(
+      { name: "AES-GCM", length: 256 },
+      false, // Non-extractable: raw key bytes can NEVER be read or exported
+      ["encrypt", "decrypt"]
+    );
+
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(DEVICE_KEY_STORE_NAME, "readwrite");
+      const req = tx.objectStore(DEVICE_KEY_STORE_NAME).put(generated, DEVICE_KEY_ID);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+    db.close();
+    return generated;
+  } catch {
+    return null;
+  }
+}
+
+async function saveRuntimeEncryptedVault(vault: ApiKeyVault): Promise<void> {
+  if (typeof window === "undefined") return;
+  const deviceKey = await getOrCreateNonExtractableDeviceKey();
+  if (!deviceKey) return;
+
+  const subtle = getSubtleCrypto();
+  const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
+  const plaintext = new TextEncoder().encode(JSON.stringify(vault));
+  const cipherBuffer = await subtle.encrypt(
+    { name: "AES-GCM", iv: iv as unknown as BufferSource },
+    deviceKey,
+    plaintext
+  );
+
+  window.localStorage.setItem(
+    RUNTIME_VAULT_STORAGE_KEY,
+    JSON.stringify({
+      v: 2,
+      cipher: "AES-GCM-256-DEVICE",
+      iv: bytesToBase64(iv),
+      ciphertext: bytesToBase64(new Uint8Array(cipherBuffer)),
+      updatedAt: Date.now(),
+    })
+  );
+}
+
+/**
+ * Silently decrypts the runtime AES-256-GCM envelope using the non-extractable IndexedDB device key
+ * so saved API keys remain usable for AI generation even while the Vault management UI is locked.
+ */
+export async function loadRuntimeEncryptedVault(): Promise<ApiKeyVault | null> {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(RUNTIME_VAULT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { v?: number; iv?: string; ciphertext?: string };
+    if (parsed?.v !== 2 || !parsed.iv || !parsed.ciphertext) return null;
+
+    const deviceKey = await getOrCreateNonExtractableDeviceKey();
+    if (!deviceKey) return null;
+
+    const subtle = getSubtleCrypto();
+    const decryptedBuffer = await subtle.decrypt(
+      { name: "AES-GCM", iv: base64ToBytes(parsed.iv) as unknown as BufferSource },
+      deviceKey,
+      base64ToBytes(parsed.ciphertext) as unknown as BufferSource
+    );
+    const jsonStr = new TextDecoder().decode(decryptedBuffer);
+    const data = JSON.parse(jsonStr) as Partial<ApiKeyVault>;
+    const merged = createEmptyVault();
+    for (const p of PROVIDERS) {
+      if (data[p.id]) {
+        merged[p.id] = { ...merged[p.id], ...data[p.id] };
+      }
+    }
+    return merged;
+  } catch {
+    return null;
+  }
+}
+
 export async function saveEncryptedVault(
   vault: ApiKeyVault,
   masterPassword: string
@@ -204,6 +322,7 @@ export async function saveEncryptedVault(
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(API_VAULT_STORAGE_KEY);
     window.localStorage.setItem(ENCRYPTED_VAULT_STORAGE_KEY, JSON.stringify(envelope));
+    await saveRuntimeEncryptedVault(vault);
   }
   return envelope;
 }
@@ -213,7 +332,9 @@ export async function unlockEncryptedVault(masterPassword: string): Promise<ApiK
   if (!envelope) {
     throw new Error("VAULT_NOT_FOUND");
   }
-  return decryptVaultPayload(envelope, masterPassword);
+  const decrypted = await decryptVaultPayload(envelope, masterPassword);
+  await saveRuntimeEncryptedVault(decrypted);
+  return decrypted;
 }
 
 export async function verifyStoredMasterPassword(candidate: string): Promise<boolean> {
@@ -231,6 +352,14 @@ export function purgeEncryptedVault(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(API_VAULT_STORAGE_KEY);
   window.localStorage.removeItem(ENCRYPTED_VAULT_STORAGE_KEY);
+  window.localStorage.removeItem(RUNTIME_VAULT_STORAGE_KEY);
+  if (typeof indexedDB !== "undefined") {
+    try {
+      indexedDB.deleteDatabase(DEVICE_KEY_DB_NAME);
+    } catch {
+      // Ignore cleanup error
+    }
+  }
 }
 
 export function maskApiKeyForDisplay(key: string): string {
