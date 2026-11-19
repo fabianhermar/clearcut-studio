@@ -21,7 +21,7 @@ function ToolSchematicPreview({ slug, isEn }: { slug: ToolSlug; isEn: boolean })
   switch (slug) {
     case "background-remover":
       return (
-        <div className="mt-5 rounded-xl border border-border bg-[#0c0e12] p-3.5 overflow-hidden">
+        <div className="rounded-xl border border-border bg-[#0c0e12] p-3.5 overflow-hidden">
           <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-2.5">
             <span>LAYER // ONNX-SEG</span>
             <span className="text-emerald-400">ALPHA READY</span>
@@ -59,7 +59,7 @@ function ToolSchematicPreview({ slug, isEn }: { slug: ToolSlug; isEn: boolean })
 
     case "image-optimizer":
       return (
-        <div className="mt-5 rounded-xl border border-border bg-[#0c0e12] p-3.5 text-white">
+        <div className="rounded-xl border border-border bg-[#0c0e12] p-3.5 text-white">
           <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-3">
             <span>WORKER // LIBAVIF + LIBWEBP</span>
             <span className="text-[#ff4d00] font-semibold">-90% DELTA</span>
@@ -82,6 +82,35 @@ function ToolSchematicPreview({ slug, isEn }: { slug: ToolSlug; isEn: boolean })
               <div className="h-2 rounded-full bg-[#1e2330] overflow-hidden">
                 <div className="h-full w-[14%] bg-[#1e40ff] rounded-full" />
               </div>
+            </div>
+          </div>
+        </div>
+      );
+
+    case "ai-image-streamer":
+      return (
+        <div className="rounded-xl border border-border bg-[#0c0e12] p-3.5 sm:p-4 text-white">
+          <div className="flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 mb-3">
+            <span className="truncate">STREAM // GEMINI · GPT · FLUX · GROK</span>
+            <span className="text-[#60a5fa] font-semibold whitespace-nowrap shrink-0">4× LIVE + DRIVE</span>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <div className="h-20 sm:h-24 rounded-lg overflow-hidden border border-[#242936] relative">
+              <img src="/demos/cat.jpg" alt="Slot 1" className="w-full h-full object-cover" />
+              <span className="absolute bottom-1 left-1 text-[9px] font-mono bg-black/75 px-1.5 py-0.5 rounded">01</span>
+            </div>
+            <div className="h-20 sm:h-24 rounded-lg overflow-hidden border border-[#242936] relative">
+              <img src="/demos/car.jpg" alt="Slot 2" className="w-full h-full object-cover" />
+              <span className="absolute bottom-1 left-1 text-[9px] font-mono bg-black/75 px-1.5 py-0.5 rounded">02</span>
+            </div>
+            <div className="h-20 sm:h-24 rounded-lg overflow-hidden border border-[#242936] relative">
+              <img src="/demos/coffee.jpg" alt="Slot 3" className="w-full h-full object-cover" />
+              <span className="absolute bottom-1 left-1 text-[9px] font-mono bg-black/75 px-1.5 py-0.5 rounded">03</span>
+            </div>
+            <div className="h-20 sm:h-24 rounded-lg border border-[#1e40ff]/60 bg-[#141926] flex flex-col items-center justify-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff4d00] animate-pulse" />
+              <span className="text-[9px] font-mono font-bold text-[#93c5fd]">VIDEO+ZIP</span>
+              <span className="text-[8px] font-mono text-slate-400">DRIVE SYNC</span>
             </div>
           </div>
         </div>
@@ -290,17 +319,17 @@ export function ToolsCatalogSection({ lang = "es", onSelectTool }: ToolsCatalogS
                       {copy.description}
                     </p>
                   </div>
-                  <div className="pt-5 mt-6 border-t border-border/70 flex items-center justify-between text-xs">
-                    <span className="font-mono text-muted-foreground">
+                  <div className="pt-5 mt-6 border-t border-border/70 flex items-center justify-between gap-3 text-xs">
+                    <span className="font-mono text-muted-foreground truncate min-w-0">
                       {tool.formats.join(" · ")}
                     </span>
                     <span
-                      className={`font-semibold inline-flex items-center gap-1 ${
+                      className={`font-semibold inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${
                         isComingSoon ? "text-muted-foreground" : "text-primary"
                       }`}
                     >
                       {isComingSoon ? (isEn ? "Soon" : "Pronto") : copy.cta}
-                      {!isComingSoon && <ArrowUpRight className="w-3.5 h-3.5" />}
+                      {!isComingSoon && <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />}
                     </span>
                   </div>
                 </article>
@@ -312,54 +341,75 @@ export function ToolsCatalogSection({ lang = "es", onSelectTool }: ToolsCatalogS
             {/* Active Tools Showcase */}
             {showActive && (
               <div className="space-y-6">
-                {/* Row 1: Two Featured Flagship Tools with Live Schematics */}
+                {/* Row 1: Featured Flagship Tools — 2×2 Bento Grid (spans full width on odd 3rd item, balanced 2×2 at 4 items) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {featuredTools.map((tool, idx) => {
                     const copy = isEn ? tool.en : tool.es;
+                    const isWideBento =
+                      featuredTools.length % 2 === 1 && idx === featuredTools.length - 1;
+
                     return (
                       <article
                         key={tool.slug}
-                        className="group relative bg-card border border-border hover:border-primary/50 rounded-2xl p-6 sm:p-8 transition-all tactile-surface flex flex-col justify-between"
+                        className={`group relative bg-card border border-border hover:border-primary/50 rounded-2xl p-6 sm:p-8 transition-all tactile-surface flex flex-col justify-between ${
+                          isWideBento ? "lg:col-span-2" : ""
+                        }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between gap-3 mb-4">
-                            <div className="flex items-center gap-3">
-                              <span className="font-mono text-xs font-bold text-primary">
-                                0{idx + 1}
-                              </span>
-                              <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-                                {copy.tagline}
+                        <div
+                          className={
+                            isWideBento
+                              ? "grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+                              : ""
+                          }
+                        >
+                          <div className={isWideBento ? "lg:col-span-6" : ""}>
+                            <div className="flex items-center justify-between gap-3 mb-4">
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span className="font-mono text-xs font-bold text-primary shrink-0">
+                                  0{idx + 1}
+                                </span>
+                                <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground truncate">
+                                  {copy.tagline}
+                                </span>
+                              </div>
+                              <span
+                                className={`text-[10px] font-mono px-2.5 py-1 rounded-full border font-semibold whitespace-nowrap shrink-0 ${
+                                  tool.isCloudAi
+                                    ? "bg-primary/10 text-primary border-primary/25"
+                                    : "bg-emerald-500/10 text-emerald-900 border-emerald-600/20"
+                                }`}
+                              >
+                                {isEn ? tool.executionBadge.en : tool.executionBadge.es}
                               </span>
                             </div>
-                            <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-900 border border-emerald-600/20 font-semibold">
-                              {isEn ? tool.executionBadge.en : tool.executionBadge.es}
-                            </span>
+
+                            <h3 className="text-2xl sm:text-3xl font-bold font-heading text-foreground group-hover:text-primary transition-colors mb-2.5 tracking-tight">
+                              <button
+                                type="button"
+                                onClick={() => onSelectTool(tool.slug)}
+                                className="text-left focus:outline-none after:absolute after:inset-0 cursor-pointer"
+                              >
+                                {copy.name}
+                              </button>
+                            </h3>
+
+                            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                              {copy.description}
+                            </p>
                           </div>
 
-                          <h3 className="text-2xl sm:text-3xl font-bold font-heading text-foreground group-hover:text-primary transition-colors mb-2.5 tracking-tight">
-                            <button
-                              type="button"
-                              onClick={() => onSelectTool(tool.slug)}
-                              className="text-left focus:outline-none after:absolute after:inset-0 cursor-pointer"
-                            >
-                              {copy.name}
-                            </button>
-                          </h3>
-
-                          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                            {copy.description}
-                          </p>
-
-                          <ToolSchematicPreview slug={tool.slug} isEn={isEn} />
+                          <div className={isWideBento ? "lg:col-span-6" : "mt-5"}>
+                            <ToolSchematicPreview slug={tool.slug} isEn={isEn} />
+                          </div>
                         </div>
 
-                        <div className="pt-5 mt-6 border-t border-border flex items-center justify-between gap-3">
-                          <span className="text-xs font-mono text-muted-foreground">
+                        <div className="pt-5 mt-6 border-t border-border flex items-center justify-between gap-4">
+                          <span className="text-xs font-mono text-muted-foreground truncate min-w-0">
                             {tool.formats.join(" · ")}
                           </span>
-                          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                            {copy.cta}
-                            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition-colors whitespace-nowrap shrink-0">
+                            <span>{copy.cta}</span>
+                            <ArrowUpRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                           </span>
                         </div>
                       </article>
@@ -379,7 +429,7 @@ export function ToolsCatalogSection({ lang = "es", onSelectTool }: ToolsCatalogS
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-4">
                             <span className="font-mono text-xs font-bold text-primary">
-                              0{idx + 3}
+                              {String(idx + featuredTools.length + 1).padStart(2, "0")}
                             </span>
                             <ToolIcon
                               slug={tool.slug}

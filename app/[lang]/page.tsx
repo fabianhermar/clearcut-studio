@@ -1,6 +1,6 @@
 import { getDictionary, Locale } from "@/lib/dictionaries";
 import HomeClient from "./home-client";
-import { Suspense } from "react";
+import { resolveToolSlug } from "@/lib/tools-catalog";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -48,21 +48,24 @@ export async function generateMetadata({
 
 export default async function Home({
   params,
+  searchParams,
 }: {
   params: Promise<{ lang: string }>;
+  searchParams?: Promise<{ tool?: string | string[] }>;
 }) {
   const { lang } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const rawTool = Array.isArray(resolvedSearchParams?.tool)
+    ? resolvedSearchParams.tool[0]
+    : resolvedSearchParams?.tool;
+  const initialTool = resolveToolSlug(rawTool ?? null);
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center text-sm font-medium text-slate-600">
-          Loading ClearCut Studio...
-        </div>
-      }
-    >
-      <HomeClient dict={dict} lang={lang as Locale} />
-    </Suspense>
+    <HomeClient
+      dict={dict}
+      lang={lang as Locale}
+      initialTool={initialTool}
+    />
   );
 }

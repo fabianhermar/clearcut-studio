@@ -49,7 +49,7 @@ export interface StudioTool {
 }
 
 /**
- * Herramientas activas y disponibles públicamente (6 herramientas listas para producción).
+ * Herramientas activas y disponibles públicamente (7 herramientas listas para producción).
  */
 export const STUDIO_TOOLS: StudioTool[] = [
   {
@@ -108,6 +108,36 @@ export const STUDIO_TOOLS: StudioTool[] = [
         "Compress and convert images into next-gen formats with interactive real-time visual comparison and exact byte-level savings metrics.",
       benefit: "Drastically reduce web asset payload while preserving visual fidelity.",
       cta: "Open image optimizer",
+    },
+  },
+  {
+    slug: "ai-image-streamer",
+    aliases: ["ai-generator", "image-streamer", "ai-studio"],
+    category: "core",
+    featured: true,
+    isCloudAi: true,
+    executionBadge: {
+      es: "BYOK · Streaming IA + Drive",
+      en: "BYOK · Streaming AI + Drive",
+    },
+    formats: ["Lotes 2–8×", "Video", "Audio", "ZIP / Drive"],
+    es: {
+      name: "Generador IA Streaming",
+      shortName: "Generador IA Streaming",
+      tagline: "Imágenes por lotes, video, audio, edición y Google Drive",
+      description:
+        "Crea lotes de hasta 8 imágenes en streaming, genera videos y audio con tus propias API keys (Gemini, ChatGPT, Grok, Flux, Fal.ai y más), redimensiona, edita y descarga en ZIP o guarda en Google Drive.",
+      benefit: "BYOK con control total: descarga 1 a 1, por lotes ZIP o sincroniza con tu Google Drive.",
+      cta: "Abrir Generador IA",
+    },
+    en: {
+      name: "AI Streaming Studio",
+      shortName: "AI Streaming Studio",
+      tagline: "Batch images, video, audio, editing & Google Drive",
+      description:
+        "Stream batches of up to 8 images in real time, generate AI video & audio using your own API keys (Gemini, ChatGPT, Grok, Flux, Fal.ai & more), resize, edit, and export via ZIP or Google Drive.",
+      benefit: "Full BYOK control: download individually, in batch ZIPs, or save directly to Google Drive.",
+      cta: "Open AI Studio",
     },
   },
   {
@@ -283,36 +313,6 @@ export const UPCOMING_TOOLS: StudioTool[] = [
       description:
         "Apply custom text or PNG logos across multiple photographs simultaneously with single-click ZIP export.",
       benefit: "Currently in testing for upcoming studio release.",
-      cta: "Coming soon",
-    },
-  },
-  {
-    slug: "ai-image-streamer",
-    aliases: ["ai-generator", "image-streamer"],
-    category: "core",
-    comingSoon: true,
-    isCloudAi: true,
-    executionBadge: {
-      es: "API IA en Streaming · Próximamente",
-      en: "Streaming AI API · Coming soon",
-    },
-    formats: ["2 · 4 · 6 · 8 imgs", "PNG", "WebP"],
-    es: {
-      name: "Generador de Imágenes IA en Streaming",
-      shortName: "Generador IA (Streaming)",
-      tagline: "Lotes de 2, 4, 6 u 8 imágenes en tiempo real",
-      description:
-        "Genera en streaming lotes configurables de 2, 4, 6 y hasta 8 imágenes simultáneas conectando con motores generativos de última generación (Gemini, OpenAI y más).",
-      benefit: "Visualización progresiva en tiempo real de múltiples variaciones.",
-      cta: "Próximamente",
-    },
-    en: {
-      name: "Streaming AI Image Generator",
-      shortName: "AI Generator (Streaming)",
-      tagline: "Real-time batches of 2, 4, 6, or 8 images",
-      description:
-        "Stream configurable batches of 2, 4, 6, up to 8 simultaneous images powered by next-generation generative AI engines (Gemini, OpenAI, and more).",
-      benefit: "Real-time progressive rendering across multiple variations.",
       cta: "Coming soon",
     },
   },
@@ -524,6 +524,7 @@ export const UPCOMING_TOOLS: StudioTool[] = [
 export const ALL_STUDIO_TOOLS: StudioTool[] = [...STUDIO_TOOLS, ...UPCOMING_TOOLS];
 
 const IMPLEMENTED_SLUGS: ToolSlug[] = [
+  "ai-image-streamer",
   "background-remover",
   "image-optimizer",
   "exif-stripper",

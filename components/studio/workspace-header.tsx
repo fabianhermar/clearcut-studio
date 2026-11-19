@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CloudLightning, ShieldCheck } from "lucide-react";
 import { getToolBySlug, ToolSlug } from "@/lib/tools-catalog";
 import { ToolIcon } from "@/components/studio/tool-icon";
 
@@ -75,13 +75,26 @@ export function WorkspaceHeader({
               </h1>
               <span
                 className={`hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full border font-mono text-[10px] font-semibold shrink-0 ${
-                  isDark
+                  tool?.isCloudAi
+                    ? isDark
+                      ? "bg-[#1e40ff]/20 border-[#60a5fa]/35 text-[#93c5fd]"
+                      : "bg-primary/10 border-primary/25 text-primary"
+                    : isDark
                     ? "bg-emerald-500/10 border-emerald-400/25 text-emerald-300"
                     : "bg-emerald-500/10 border-emerald-700/20 text-emerald-800"
                 }`}
               >
-                <ShieldCheck className="w-3 h-3" aria-hidden="true" />
-                <span>LOCAL // 0 B</span>
+                {tool?.isCloudAi ? (
+                  <>
+                    <CloudLightning className="w-3 h-3" aria-hidden="true" />
+                    <span>BYOK // STREAMING AI</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-3 h-3" aria-hidden="true" />
+                    <span>LOCAL // 0 B</span>
+                  </>
+                )}
               </span>
             </div>
             {(subtitle || copy?.tagline) && (

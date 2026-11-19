@@ -243,7 +243,7 @@ export function PricingSection({ dict, lang = "es" }: PricingSectionProps) {
               className="w-full inline-flex items-center justify-center gap-2.5 py-4 px-6 bg-[#ffdd00] hover:bg-[#f2d000] text-[#111318] border border-[#111318]/10 rounded-full font-semibold font-accent transition-colors"
             >
               <img
-                src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg"
+                src="/logos/bmc.svg"
                 alt="Buy me a coffee"
                 className="w-5 h-5"
               />
