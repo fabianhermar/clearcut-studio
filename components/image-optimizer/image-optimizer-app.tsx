@@ -5,17 +5,19 @@ import { OptimizerUpload } from "./optimizer-upload";
 import { OptimizerWorkspace } from "./optimizer-workspace";
 
 interface ImageOptimizerAppProps {
+  initialFile?: File | null;
   onClose?: () => void;
   dict?: any;
   lang?: string;
 }
 
 export default function ImageOptimizerApp({
+  initialFile = null,
   onClose,
   dict,
   lang = "es",
 }: ImageOptimizerAppProps) {
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(initialFile);
 
   const handleFileSelect = useCallback((f: File) => {
     setFile(f);
