@@ -1,16 +1,22 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 2,
+  workers: process.env.CI ? 2 : 2,
   timeout: 60000,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  expect: {
+    timeout: 10000,
+  },
+  reporter: process.env.CI
+    ? [['list'], ['html', { open: 'never' }], ['github']]
+    : 'list',
   use: {
     baseURL: 'http://localhost:3099',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
